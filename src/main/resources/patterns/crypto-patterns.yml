@@ -1,0 +1,380 @@
+# Cryptographic patterns for secret detection
+# This file contains patterns for detecting cryptographic keys, certificates, and secrets
+
+patterns:
+  # RSA Private Keys
+  rsa:
+    - name: "RSA Private Key"
+      pattern: "-----BEGIN RSA PRIVATE KEY-----[\\s\\S]*?-----END RSA PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "RSA Private Key detected"
+      tags: ["rsa", "private-key", "pki", "encryption"]
+
+    - name: "RSA Private Key (PKCS#8)"
+      pattern: "-----BEGIN PRIVATE KEY-----[\\s\\S]*?-----END PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "PKCS#8 Private Key detected"
+      tags: ["rsa", "pkcs8", "private-key", "pki", "encryption"]
+
+    - name: "RSA Private Key (Encrypted)"
+      pattern: "-----BEGIN ENCRYPTED PRIVATE KEY-----[\\s\\S]*?-----END ENCRYPTED PRIVATE KEY-----"
+      severity: "HIGH"
+      description: "Encrypted Private Key detected"
+      tags: ["rsa", "encrypted", "private-key", "pki", "encryption"]
+
+  # DSA Keys
+  dsa:
+    - name: "DSA Private Key"
+      pattern: "-----BEGIN DSA PRIVATE KEY-----[\\s\\S]*?-----END DSA PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "DSA Private Key detected"
+      tags: ["dsa", "private-key", "pki", "encryption"]
+
+  # ECDSA Keys
+  ecdsa:
+    - name: "EC Private Key"
+      pattern: "-----BEGIN EC PRIVATE KEY-----[\\s\\S]*?-----END EC PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "Elliptic Curve Private Key detected"
+      tags: ["ecdsa", "ec", "private-key", "pki", "encryption"]
+
+  # OpenSSH Keys
+  openssh:
+    - name: "OpenSSH Private Key"
+      pattern: "-----BEGIN OPENSSH PRIVATE KEY-----[\\s\\S]*?-----END OPENSSH PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "OpenSSH Private Key detected"
+      tags: ["openssh", "ssh", "private-key", "remote-access"]
+
+    - name: "SSH RSA Private Key (Legacy)"
+      pattern: "ssh-rsa\\s+[A-Za-z0-9+/]+[=]{0,2}(?:\\s+\\S+)?"
+      severity: "HIGH"
+      description: "SSH RSA Public Key detected (check for corresponding private key)"
+      tags: ["ssh", "rsa", "public-key", "remote-access"]
+
+  # PGP/GPG Keys
+  pgp:
+    - name: "PGP Private Key Block"
+      pattern: "-----BEGIN PGP PRIVATE KEY BLOCK-----[\\s\\S]*?-----END PGP PRIVATE KEY BLOCK-----"
+      severity: "CRITICAL"
+      description: "PGP Private Key Block detected"
+      tags: ["pgp", "gpg", "private-key", "encryption", "signing"]
+
+    - name: "PGP Private Key"
+      pattern: "-----BEGIN PGP PRIVATE KEY-----[\\s\\S]*?-----END PGP PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "PGP Private Key detected"
+      tags: ["pgp", "gpg", "private-key", "encryption", "signing"]
+
+    - name: "PGP Signature"
+      pattern: "-----BEGIN PGP SIGNATURE-----[\\s\\S]*?-----END PGP SIGNATURE-----"
+      severity: "LOW"
+      description: "PGP Signature detected"
+      tags: ["pgp", "gpg", "signature", "signing"]
+
+  # X.509 Certificates
+  x509:
+    - name: "X.509 Certificate"
+      pattern: "-----BEGIN CERTIFICATE-----[\\s\\S]*?-----END CERTIFICATE-----"
+      severity: "MEDIUM"
+      description: "X.509 Certificate detected"
+      tags: ["x509", "certificate", "pki", "ssl", "tls"]
+
+    - name: "Certificate Request"
+      pattern: "-----BEGIN CERTIFICATE REQUEST-----[\\s\\S]*?-----END CERTIFICATE REQUEST-----"
+      severity: "LOW"
+      description: "Certificate Signing Request detected"
+      tags: ["x509", "csr", "certificate-request", "pki"]
+
+    - name: "X.509 CRL"
+      pattern: "-----BEGIN X509 CRL-----[\\s\\S]*?-----END X509 CRL-----"
+      severity: "LOW"
+      description: "X.509 Certificate Revocation List detected"
+      tags: ["x509", "crl", "certificate", "pki"]
+
+  # SSL/TLS Related
+  ssl:
+    - name: "SSL Certificate"
+      pattern: "-----BEGIN SSL CERTIFICATE-----[\\s\\S]*?-----END SSL CERTIFICATE-----"
+      severity: "MEDIUM"
+      description: "SSL Certificate detected"
+      tags: ["ssl", "tls", "certificate", "web-security"]
+
+    - name: "TLS Private Key"
+      pattern: "-----BEGIN TLS PRIVATE KEY-----[\\s\\S]*?-----END TLS PRIVATE KEY-----"
+      severity: "CRITICAL"
+      description: "TLS Private Key detected"
+      tags: ["tls", "ssl", "private-key", "web-security"]
+
+  # Cryptographic Hashes and Secrets
+  hashes:
+    - name: "MD5 Hash"
+      pattern: "(?i)(?:md5|hash)\\s*[=:]\\s*['\"]?([a-f0-9]{32})['\"]?"
+      severity: "LOW"
+      description: "MD5 Hash detected"
+      tags: ["md5", "hash", "digest"]
+
+    - name: "SHA1 Hash"
+      pattern: "(?i)(?:sha1|sha-1)\\s*[=:]\\s*['\"]?([a-f0-9]{40})['\"]?"
+      severity: "LOW"
+      description: "SHA1 Hash detected"
+      tags: ["sha1", "hash", "digest"]
+
+    - name: "SHA256 Hash"
+      pattern: "(?i)(?:sha256|sha-256)\\s*[=:]\\s*['\"]?([a-f0-9]{64})['\"]?"
+      severity: "LOW"
+      description: "SHA256 Hash detected"
+      tags: ["sha256", "hash", "digest"]
+
+    - name: "SHA512 Hash"
+      pattern: "(?i)(?:sha512|sha-512)\\s*[=:]\\s*['\"]?([a-f0-9]{128})['\"]?"
+      severity: "LOW"
+      description: "SHA512 Hash detected"
+      tags: ["sha512", "hash", "digest"]
+
+  # Symmetric Keys
+  symmetric:
+    - name: "AES Key"
+      pattern: "(?i)(?:aes_key|aes-key|aeskey)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "CRITICAL"
+      description: "AES Encryption Key detected"
+      tags: ["aes", "symmetric", "encryption-key"]
+
+    - name: "DES Key"
+      pattern: "(?i)(?:des_key|des-key|deskey)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{8,}={0,2})['\"]?"
+      severity: "HIGH"
+      description: "DES Encryption Key detected"
+      tags: ["des", "symmetric", "encryption-key"]
+
+    - name: "3DES Key"
+      pattern: "(?i)(?:3des_key|3des-key|tripledeskey)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{24,}={0,2})['\"]?"
+      severity: "HIGH"
+      description: "3DES Encryption Key detected"
+      tags: ["3des", "tripledes", "symmetric", "encryption-key"]
+
+  # JWT Secrets
+  jwt:
+    - name: "JWT Secret"
+      pattern: "(?i)(?:jwt_secret|jwt-secret|jwtsecret)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "CRITICAL"
+      description: "JWT Secret Key detected"
+      tags: ["jwt", "secret", "authentication", "signing"]
+
+    - name: "JWT Token"
+      pattern: "(?i)(?:jwt_token|jwt-token|jwttoken)\\s*[=:]\\s*['\"]?(eyJ[A-Za-z0-9+/=]+\\.[A-Za-z0-9+/=]+\\.[A-Za-z0-9+/=]*)['\"]?"
+      severity: "HIGH"
+      description: "JWT Token detected"
+      tags: ["jwt", "token", "authentication"]
+
+  # Encryption Keys and IVs
+  encryption:
+    - name: "Encryption Key"
+      pattern: "(?i)(?:encryption_key|encrypt_key|cipher_key)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "CRITICAL"
+      description: "Encryption Key detected"
+      tags: ["encryption", "cipher", "key"]
+
+    - name: "Initialization Vector"
+      pattern: "(?i)(?:iv|initialization_vector|init_vector)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "HIGH"
+      description: "Initialization Vector detected"
+      tags: ["iv", "initialization-vector", "encryption"]
+
+    - name: "Salt"
+      pattern: "(?i)(?:salt|crypto_salt|password_salt)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{8,}={0,2})['\"]?"
+      severity: "MEDIUM"
+      description: "Cryptographic Salt detected"
+      tags: ["salt", "hashing", "password"]
+
+  # HMAC Keys
+  hmac:
+    - name: "HMAC Key"
+      pattern: "(?i)(?:hmac_key|hmac-key|hmackey)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "HIGH"
+      description: "HMAC Key detected"
+      tags: ["hmac", "mac", "authentication", "integrity"]
+
+    - name: "HMAC Secret"
+      pattern: "(?i)(?:hmac_secret|hmac-secret|hmacsecret)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{16,}={0,2})['\"]?"
+      severity: "HIGH"
+      description: "HMAC Secret detected"
+      tags: ["hmac", "secret", "authentication", "integrity"]
+
+  # Keystore and Certificate Store
+  keystore:
+    - name: "Java Keystore Password"
+      pattern: "(?i)(?:keystore_password|keystore-password|keystorepass)\\s*[=:]\\s*['\"]?([A-Za-z0-9@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?]{6,})['\"]?"
+      severity: "HIGH"
+      description: "Java Keystore Password detected"
+      tags: ["keystore", "java", "password", "certificate"]
+
+    - name: "PKCS#12 Password"
+      pattern: "(?i)(?:p12_password|pkcs12_password|pfx_password)\\s*[=:]\\s*['\"]?([A-Za-z0-9@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?]{6,})['\"]?"
+      severity: "HIGH"
+      description: "PKCS#12/PFX Password detected"
+      tags: ["pkcs12", "pfx", "password", "certificate"]
+
+  # Blockchain and Cryptocurrency
+  blockchain:
+    - name: "Bitcoin Private Key (WIF)"
+      pattern: "(?i)(?:bitcoin_private_key|btc_private_key)\\s*[=:]\\s*['\"]?([5KL][1-9A-HJ-NP-Za-km-z]{50,51})['\"]?"
+      severity: "CRITICAL"
+      description: "Bitcoin Private Key (WIF format) detected"
+      tags: ["bitcoin", "cryptocurrency", "private-key", "blockchain"]
+
+    - name: "Ethereum Private Key"
+      pattern: "(?i)(?:ethereum_private_key|eth_private_key)\\s*[=:]\\s*['\"]?(0x[a-fA-F0-9]{64})['\"]?"
+      severity: "CRITICAL"
+      description: "Ethereum Private Key detected"
+      tags: ["ethereum", "cryptocurrency", "private-key", "blockchain"]
+
+    - name: "Mnemonic Seed Phrase"
+      pattern: "(?i)(?:mnemonic|seed_phrase|recovery_phrase)\\s*[=:]\\s*['\"]?((?:[a-z]+\\s+){11,23}[a-z]+)['\"]?"
+      severity: "CRITICAL"
+      description: "Cryptocurrency Mnemonic Seed Phrase detected"
+      tags: ["mnemonic", "seed-phrase", "cryptocurrency", "wallet"]
+
+  # Generic Cryptographic Patterns
+  generic:
+    - name: "Base64 Encoded Key"
+      pattern: "(?i)(?:key|secret|token)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/]{40,}={0,2})['\"]?"
+      severity: "MEDIUM"
+      description: "Potential Base64 encoded key detected"
+      tags: ["base64", "encoded", "key", "generic"]
+
+    - name: "Hex Encoded Key"
+      pattern: "(?i)(?:key|secret|token)\\s*[=:]\\s*['\"]?([a-fA-F0-9]{32,})['\"]?"
+      severity: "MEDIUM"
+      description: "Potential Hex encoded key detected"
+      tags: ["hex", "encoded", "key", "generic"]
+
+    - name: "Master Key"
+      pattern: "(?i)(?:master_key|masterkey|master-key)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/=]{16,})['\"]?"
+      severity: "CRITICAL"
+      description: "Master Key detected"
+      tags: ["master-key", "critical", "encryption"]
+
+    - name: "Root Key"
+      pattern: "(?i)(?:root_key|rootkey|root-key)\\s*[=:]\\s*['\"]?([A-Za-z0-9+/=]{16,})['\"]?"
+      severity: "CRITICAL"
+      description: "Root Key detected"
+      tags: ["root-key", "critical", "encryption"]
+
+  # TLS/SSL Configuration
+  tls_config:
+    - name: "TLS Certificate Chain"
+      pattern: "(?:-----BEGIN CERTIFICATE-----[\\s\\S]*?-----END CERTIFICATE-----\\s*){2,}"
+      severity: "MEDIUM"
+      description: "TLS Certificate Chain detected"
+      tags: ["tls", "ssl", "certificate-chain", "web-security"]
+
+    - name: "SSL Context Password"
+      pattern: "(?i)(?:ssl_password|tls_password|cert_password)\\s*[=:]\\s*['\"]?([A-Za-z0-9@#$%^&*()_+=\\-\\[\\]{}|;:,.<>?]{6,})['\"]?"
+      severity: "HIGH"
+      description: "SSL/TLS Password detected"
+      tags: ["ssl", "tls", "password", "web-security"]
+
+# Configuration for cryptographic pattern detection
+config:
+  # Enable high entropy checking for crypto patterns
+  entropy_check: true
+  min_entropy: 5.0
+
+  # Context-aware detection settings
+  context_aware: true
+  ignore_comments: false # Comments might contain valid crypto material
+  ignore_test_files: false # Test files might contain real keys
+
+  # Special handling for certificate files
+  certificate_files:
+    - "*.pem"
+    - "*.crt"
+    - "*.cer"
+    - "*.p12"
+    - "*.pfx"
+    - "*.jks"
+    - "*.keystore"
+    - "*.truststore"
+
+  # File extensions to scan for crypto patterns
+  file_extensions:
+    - "kt"
+    - "java"
+    - "js"
+    - "ts"
+    - "py"
+    - "rb"
+    - "go"
+    - "php"
+    - "cs"
+    - "cpp"
+    - "c"
+    - "pem"
+    - "crt"
+    - "cer"
+    - "key"
+    - "p12"
+    - "pfx"
+    - "jks"
+    - "keystore"
+    - "truststore"
+    - "properties"
+    - "yml"
+    - "yaml"
+    - "json"
+    - "xml"
+    - "env"
+    - "config"
+    - "conf"
+    - "ini"
+    - "toml"
+
+  # Exclusion patterns
+  exclusions:
+    - "node_modules/**"
+    - "build/**"
+    - "dist/**"
+    - ".git/**"
+    - "*.min.js"
+    - "*.bundle.js"
+
+  # Whitelist patterns (known safe values)
+  whitelist:
+    - "YOUR_PRIVATE_KEY_HERE"
+    - "REPLACE_WITH_YOUR_PRIVATE_KEY"
+    - "INSERT_PRIVATE_KEY"
+    - "EXAMPLE_PRIVATE_KEY"
+    - "TEST_PRIVATE_KEY"
+    - "DUMMY_PRIVATE_KEY"
+    - "FAKE_PRIVATE_KEY"
+    - "SAMPLE_PRIVATE_KEY"
+    - "PLACEHOLDER_KEY"
+    - "BEGIN EXAMPLE"
+    - "END EXAMPLE"
+    - "BEGIN SAMPLE"
+    - "END SAMPLE"
+    - "xxxxxxxxxxxxxxxx"
+    - "****************"
+    - "1234567890abcdef"
+    - "abcdef1234567890"
+
+  # Additional security checks
+  security_checks:
+    # Check for weak key sizes
+    check_key_strength: true
+    min_rsa_key_size: 2048
+    min_ec_key_size: 256
+
+    # Check for weak algorithms
+    warn_weak_algorithms: true
+    weak_algorithms:
+      - "md5"
+      - "sha1"
+      - "des"
+      - "rc4"
+
+    # Check for expired certificates
+    check_certificate_expiry: false # Requires parsing, might be expensive
+
+    # Check for self-signed certificates
+    check_self_signed: false # Requires parsing, might be expensive
