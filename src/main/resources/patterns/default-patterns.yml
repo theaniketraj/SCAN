@@ -1,0 +1,232 @@
+# Default Security Patterns Configuration
+# This file contains the default patterns used by the SCAN plugin for detecting secrets and sensitive information
+
+# Plugin configuration
+enabled: true
+scanPaths:
+  - "src/main"
+  - "src/test"
+excludePaths:
+  - "build"
+  - ".gradle"
+  - ".git"
+  - "node_modules"
+  - "target"
+  - ".idea"
+  - ".vscode"
+includeExtensions:
+  - "kt"
+  - "java"
+  - "scala"
+  - "groovy"
+  - "properties"
+  - "yml"
+  - "yaml"
+  - "json"
+  - "xml"
+  - "conf"
+  - "config"
+  - "env"
+  - "sh"
+  - "bat"
+  - "ps1"
+  - "sql"
+  - "md"
+  - "txt"
+excludeExtensions:
+  - "class"
+  - "jar"
+  - "war"
+  - "ear"
+  - "zip"
+  - "tar"
+  - "gz"
+  - "7z"
+  - "rar"
+  - "exe"
+  - "dll"
+  - "so"
+  - "dylib"
+  - "bin"
+  - "dat"
+  - "log"
+  - "tmp"
+  - "cache"
+
+# Pattern definitions for different types of secrets
+patterns:
+  # Generic secret patterns
+  secretPatterns:
+    # Generic password patterns
+    - "(?i)password\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{8,})[\"']?"
+    - "(?i)passwd\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{8,})[\"']?"
+    - "(?i)pwd\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{8,})[\"']?"
+
+    # Generic secret patterns
+    - "(?i)secret\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{8,})[\"']?"
+    - "(?i)token\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+    - "(?i)auth\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{16,})[\"']?"
+
+    # Private keys
+    - "(?i)private[_-]?key\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{20,})[\"']?"
+    - "(?i)priv[_-]?key\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]{20,})[\"']?"
+
+    # Various secret formats
+    - "(?i)(secret|token|key|password)\\s*[:=]\\s*[\"']([a-zA-Z0-9+/]{32,}={0,2})[\"']"
+    - "(?i)(secret|token|key|password)\\s*[:=]\\s*[\"']([a-f0-9]{32,})[\"']"
+
+  # API Key patterns for popular services
+  apiKeyPatterns:
+    # Generic API key patterns
+    - "(?i)api[_-]?key\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+    - "(?i)access[_-]?key\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+    - "(?i)client[_-]?secret\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+
+    # AWS patterns
+    - "AKIA[0-9A-Z]{16}"
+    - "(?i)aws[_-]?secret[_-]?access[_-]?key\\s*[:=]\\s*[\"']?([a-zA-Z0-9+/]{40})[\"']?"
+    - "(?i)aws[_-]?access[_-]?key[_-]?id\\s*[:=]\\s*[\"']?(AKIA[0-9A-Z]{16})[\"']?"
+
+    # Google API keys
+    - "AIza[0-9A-Za-z\\-_]{35}"
+    - "(?i)google[_-]?api[_-]?key\\s*[:=]\\s*[\"']?(AIza[0-9A-Za-z\\-_]{35})[\"']?"
+
+    # GitHub tokens
+    - "ghp_[a-zA-Z0-9]{36}"
+    - "gho_[a-zA-Z0-9]{36}"
+    - "ghu_[a-zA-Z0-9]{36}"
+    - "ghs_[a-zA-Z0-9]{36}"
+    - "ghr_[a-zA-Z0-9]{36}"
+
+    # Slack tokens
+    - "xox[baprs]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32}"
+    - "(?i)slack[_-]?token\\s*[:=]\\s*[\"']?(xox[baprs]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})[\"']?"
+
+    # Stripe keys
+    - "sk_live_[0-9a-zA-Z]{24,}"
+    - "pk_live_[0-9a-zA-Z]{24,}"
+    - "sk_test_[0-9a-zA-Z]{24,}"
+    - "pk_test_[0-9a-zA-Z]{24,}"
+
+    # OpenAI API keys
+    - "sk-[a-zA-Z0-9]{48}"
+    - "(?i)openai[_-]?api[_-]?key\\s*[:=]\\s*[\"']?(sk-[a-zA-Z0-9]{48})[\"']?"
+
+    # Twilio
+    - "AC[a-f0-9]{32}"
+    - "SK[a-f0-9]{32}"
+
+    # SendGrid
+    - "SG\\.[a-zA-Z0-9_\\-]{22}\\.[a-zA-Z0-9_\\-]{43}"
+
+    # MailChimp
+    - "[0-9a-f]{32}-us[0-9]{1,2}"
+
+    # Facebook Access Token
+    - "EAA[a-zA-Z0-9]{90,}"
+
+    # Twitter API keys
+    - "(?i)twitter[_-]?api[_-]?key\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{25})[\"']?"
+    - "(?i)twitter[_-]?api[_-]?secret\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{50})[\"']?"
+
+    # Generic OAuth patterns
+    - "(?i)client[_-]?id\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+    - "(?i)client[_-]?secret\\s*[:=]\\s*[\"']?([a-zA-Z0-9]{20,})[\"']?"
+
+  # Cryptographic key patterns
+  cryptoPatterns:
+    # PEM private keys
+    - "-----BEGIN (DSA|EC|OPENSSH|PGP|RSA) PRIVATE KEY-----"
+    - "-----BEGIN PRIVATE KEY-----"
+    - "-----BEGIN ENCRYPTED PRIVATE KEY-----"
+    - "-----BEGIN EC PRIVATE KEY-----"
+    - "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+
+    # SSH private keys
+    - "-----BEGIN OPENSSH PRIVATE KEY-----"
+
+    # JWT tokens
+    - "eyJ[a-zA-Z0-9+/=]+"
+
+    # Base64 encoded potential keys (high entropy)
+    - "(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4}){32,}"
+
+    # Hex encoded keys
+    - "(?i)(private|secret|key)\\s*[:=]\\s*[\"']?([a-f0-9]{32,})[\"']?"
+
+  # Database connection patterns
+  databasePatterns:
+    # JDBC URLs
+    - "(?i)jdbc:[a-zA-Z0-9]+://[^\\s\"'\\n\\r]+"
+    - "(?i)jdbc:mysql://[^\\s\"'\\n\\r]+"
+    - "(?i)jdbc:postgresql://[^\\s\"'\\n\\r]+"
+    - "(?i)jdbc:oracle:[^\\s\"'\\n\\r]+"
+    - "(?i)jdbc:sqlserver://[^\\s\"'\\n\\r]+"
+    - "(?i)jdbc:h2:[^\\s\"'\\n\\r]+"
+
+    # MongoDB URLs
+    - "(?i)mongodb://[^\\s\"'\\n\\r]+"
+    - "(?i)mongodb\\+srv://[^\\s\"'\\n\\r]+"
+
+    # Redis URLs
+    - "(?i)redis://[^\\s\"'\\n\\r]+"
+    - "(?i)rediss://[^\\s\"'\\n\\r]+"
+
+    # Database credentials in connection strings
+    - "(?i)(database|db)[_-]?url\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]+)[\"']?"
+    - "(?i)(database|db)[_-]?password\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]+)[\"']?"
+    - "(?i)(database|db)[_-]?user\\s*[:=]\\s*[\"']?([^\\s\"'\\n\\r]+)[\"']?"
+
+    # Elasticsearch
+    - "(?i)elasticsearch://[^\\s\"'\\n\\r]+"
+
+    # CouchDB
+    - "(?i)couchdb://[^\\s\"'\\n\\r]+"
+
+    # Neo4j
+    - "(?i)neo4j://[^\\s\"'\\n\\r]+"
+    - "(?i)bolt://[^\\s\"'\\n\\r]+"
+
+  # Custom patterns (empty by default, can be overridden)
+  customPatterns: []
+
+# Detector configuration
+detectors:
+  patternDetector:
+    enabled: true
+    sensitivity: "medium" # low, medium, high
+    options:
+      caseSensitive: false
+      multiline: true
+      maxMatches: 100
+
+  entropyDetector:
+    enabled: true
+    sensitivity: "medium"
+    options:
+      minEntropy: 4.5
+      minLength: 20
+      maxLength: 100
+      charset: "base64" # base64, hex, alphanumeric
+
+  contextAwareDetector:
+    enabled: false
+    sensitivity: "low"
+    options:
+      ignoreComments: true
+      ignoreTestFiles: true
+      ignoreDocumentation: true
+
+# Reporting configuration
+reporting:
+  formats:
+    - "console"
+  outputPath: "build/reports/scan"
+  failOnSecrets: true
+  includeContext: true
+
+# Performance configuration
+performance:
+  maxFileSize: 10485760 # 10MB in bytes
+  parallelScanning: true
+  threadCount: 4 # Will be overridden by available processors if not specified
