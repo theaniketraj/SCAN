@@ -1,5 +1,150 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-.vscode
-# Ignore Gradle build output directory
-build
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle Wrapper
+!gradle/wrapper/gradle-wrapper.properties
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~.nib
+local.properties
+.loadpath
+
+# Linux
+*~
+
+# JVM
+hs_err_pid*
+replay_pid*
+
+# Kotlin
+*.hprof
+
+# Test Results
+/test-results/
+/reports/
+/build/reports/
+/build/test-results/
+
+# Plugin Development
+/plugin-dev/
+/local-plugin-repository/
+/test-plugin-projects/
+
+# Scan Plugin Specific
+# Generated scan reports (should not be committed)
+scan-reports/
+*.scan-report.json
+*.scan-report.html
+*.scan-report.xml
+
+# Local configuration overrides
+local-scan-config.yml
+.scan-config-local.yml
+
+# IDE generated files for plugin development
+/runIde/
+/system/
+/.idea_modules/
+
+# Temporary files during development
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Log files
+*.log
+logs/
+
+# Backup files
+*.backup
+*.bak
+
+# OS generated files
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Gradle Plugin Portal publishing
+gradle.publish.key
+gradle.publish.secret
+
+# Sensitive information (should never be committed)
+secrets.yml
+credentials.properties
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+
+# Coverage reports
+/coverage/
+jacoco.exec
+*.exec
+
+# Profiling
+*.prof
+
+# Documentation build artifacts
+/docs/build/
+/docs/_site/
+
+# Local Gradle properties
+gradle-local.properties
