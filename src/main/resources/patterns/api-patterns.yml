@@ -1,0 +1,299 @@
+# API-specific patterns for secret detection
+# This file contains patterns for detecting API keys, tokens, and secrets from various services
+
+patterns:
+  # AWS Patterns
+  aws:
+    - name: "AWS Access Key ID"
+      pattern: "(?i)(?:aws_access_key_id|aws-access-key-id|aws_access_key)\\s*[=:]\\s*['\"]?([A-Z0-9]{20})['\"]?"
+      severity: "HIGH"
+      description: "AWS Access Key ID detected"
+      tags: ["aws", "access-key", "cloud"]
+
+    - name: "AWS Secret Access Key"
+      pattern: "(?i)(?:aws_secret_access_key|aws-secret-access-key|aws_secret_key)\\s*[=:]\\s*['\"]?([A-Za-z0-9/+=]{40})['\"]?"
+      severity: "CRITICAL"
+      description: "AWS Secret Access Key detected"
+      tags: ["aws", "secret-key", "cloud"]
+
+    - name: "AWS Session Token"
+      pattern: "(?i)(?:aws_session_token|aws-session-token)\\s*[=:]\\s*['\"]?([A-Za-z0-9/+=]{16,})['\"]?"
+      severity: "HIGH"
+      description: "AWS Session Token detected"
+      tags: ["aws", "session-token", "cloud"]
+
+  # Google Cloud Patterns
+  gcp:
+    - name: "Google Cloud API Key"
+      pattern: "(?i)(?:gcp_api_key|google_api_key|gcloud_api_key)\\s*[=:]\\s*['\"]?(AIza[0-9A-Za-z\\-_]{35})['\"]?"
+      severity: "HIGH"
+      description: "Google Cloud API Key detected"
+      tags: ["gcp", "google", "api-key", "cloud"]
+
+    - name: "Google Cloud Service Account"
+      pattern: "(?i)(?:service_account|serviceaccount).*['\"]?([a-zA-Z0-9\\-_]+@[a-zA-Z0-9\\-_]+\\.iam\\.gserviceaccount\\.com)['\"]?"
+      severity: "MEDIUM"
+      description: "Google Cloud Service Account detected"
+      tags: ["gcp", "google", "service-account", "cloud"]
+
+  # Azure Patterns
+  azure:
+    - name: "Azure Client ID"
+      pattern: "(?i)(?:azure_client_id|client_id)\\s*[=:]\\s*['\"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})['\"]?"
+      severity: "HIGH"
+      description: "Azure Client ID detected"
+      tags: ["azure", "microsoft", "client-id", "cloud"]
+
+    - name: "Azure Client Secret"
+      pattern: "(?i)(?:azure_client_secret|client_secret)\\s*[=:]\\s*['\"]?([A-Za-z0-9\\-_~.]{34,40})['\"]?"
+      severity: "CRITICAL"
+      description: "Azure Client Secret detected"
+      tags: ["azure", "microsoft", "client-secret", "cloud"]
+
+  # GitHub Patterns
+  github:
+    - name: "GitHub Personal Access Token"
+      pattern: "(?i)(?:github_token|gh_token|github_pat)\\s*[=:]\\s*['\"]?(ghp_[A-Za-z0-9]{36})['\"]?"
+      severity: "HIGH"
+      description: "GitHub Personal Access Token detected"
+      tags: ["github", "token", "vcs"]
+
+    - name: "GitHub OAuth Token"
+      pattern: "(?i)(?:github_oauth|gh_oauth)\\s*[=:]\\s*['\"]?(gho_[A-Za-z0-9]{36})['\"]?"
+      severity: "HIGH"
+      description: "GitHub OAuth Token detected"
+      tags: ["github", "oauth", "vcs"]
+
+    - name: "GitHub App Token"
+      pattern: "(?i)(?:github_app_token|gh_app_token)\\s*[=:]\\s*['\"]?(ghs_[A-Za-z0-9]{36})['\"]?"
+      severity: "HIGH"
+      description: "GitHub App Token detected"
+      tags: ["github", "app-token", "vcs"]
+
+  # GitLab Patterns
+  gitlab:
+    - name: "GitLab Personal Access Token"
+      pattern: "(?i)(?:gitlab_token|gl_token)\\s*[=:]\\s*['\"]?(glpat-[A-Za-z0-9\\-_]{20})['\"]?"
+      severity: "HIGH"
+      description: "GitLab Personal Access Token detected"
+      tags: ["gitlab", "token", "vcs"]
+
+  # Slack Patterns
+  slack:
+    - name: "Slack API Token"
+      pattern: "(?i)(?:slack_token|slack_api_token)\\s*[=:]\\s*['\"]?(xox[baprs]-[A-Za-z0-9\\-]+)['\"]?"
+      severity: "HIGH"
+      description: "Slack API Token detected"
+      tags: ["slack", "api-token", "communication"]
+
+    - name: "Slack Webhook URL"
+      pattern: "(?i)(?:slack_webhook|webhook_url)\\s*[=:]\\s*['\"]?(https://hooks\\.slack\\.com/services/[A-Za-z0-9/]+)['\"]?"
+      severity: "MEDIUM"
+      description: "Slack Webhook URL detected"
+      tags: ["slack", "webhook", "communication"]
+
+  # Stripe Patterns
+  stripe:
+    - name: "Stripe Secret Key"
+      pattern: "(?i)(?:stripe_secret|stripe_sk)\\s*[=:]\\s*['\"]?(sk_live_[A-Za-z0-9]{24,})['\"]?"
+      severity: "CRITICAL"
+      description: "Stripe Secret Key detected"
+      tags: ["stripe", "secret-key", "payment"]
+
+    - name: "Stripe Publishable Key"
+      pattern: "(?i)(?:stripe_publishable|stripe_pk)\\s*[=:]\\s*['\"]?(pk_live_[A-Za-z0-9]{24,})['\"]?"
+      severity: "MEDIUM"
+      description: "Stripe Publishable Key detected"
+      tags: ["stripe", "publishable-key", "payment"]
+
+  # Twilio Patterns
+  twilio:
+    - name: "Twilio Account SID"
+      pattern: "(?i)(?:twilio_account_sid|twilio_sid)\\s*[=:]\\s*['\"]?(AC[a-f0-9]{32})['\"]?"
+      severity: "HIGH"
+      description: "Twilio Account SID detected"
+      tags: ["twilio", "account-sid", "communication"]
+
+    - name: "Twilio Auth Token"
+      pattern: "(?i)(?:twilio_auth_token|twilio_token)\\s*[=:]\\s*['\"]?([a-f0-9]{32})['\"]?"
+      severity: "CRITICAL"
+      description: "Twilio Auth Token detected"
+      tags: ["twilio", "auth-token", "communication"]
+
+  # SendGrid Patterns
+  sendgrid:
+    - name: "SendGrid API Key"
+      pattern: "(?i)(?:sendgrid_api_key|sg_api_key)\\s*[=:]\\s*['\"]?(SG\\.[A-Za-z0-9\\-_]{22}\\.[A-Za-z0-9\\-_]{43})['\"]?"
+      severity: "HIGH"
+      description: "SendGrid API Key detected"
+      tags: ["sendgrid", "api-key", "email"]
+
+  # Mailgun Patterns
+  mailgun:
+    - name: "Mailgun API Key"
+      pattern: "(?i)(?:mailgun_api_key|mg_api_key)\\s*[=:]\\s*['\"]?(key-[a-f0-9]{32})['\"]?"
+      severity: "HIGH"
+      description: "Mailgun API Key detected"
+      tags: ["mailgun", "api-key", "email"]
+
+  # PayPal Patterns
+  paypal:
+    - name: "PayPal Client ID"
+      pattern: "(?i)(?:paypal_client_id|pp_client_id)\\s*[=:]\\s*['\"]?(A[A-Za-z0-9\\-_]{80,})['\"]?"
+      severity: "MEDIUM"
+      description: "PayPal Client ID detected"
+      tags: ["paypal", "client-id", "payment"]
+
+    - name: "PayPal Client Secret"
+      pattern: "(?i)(?:paypal_client_secret|pp_client_secret)\\s*[=:]\\s*['\"]?(E[A-Za-z0-9\\-_]{80,})['\"]?"
+      severity: "CRITICAL"
+      description: "PayPal Client Secret detected"
+      tags: ["paypal", "client-secret", "payment"]
+
+  # Firebase Patterns
+  firebase:
+    - name: "Firebase API Key"
+      pattern: "(?i)(?:firebase_api_key|fb_api_key)\\s*[=:]\\s*['\"]?(AIza[0-9A-Za-z\\-_]{35})['\"]?"
+      severity: "HIGH"
+      description: "Firebase API Key detected"
+      tags: ["firebase", "google", "api-key", "mobile"]
+
+  # Heroku Patterns
+  heroku:
+    - name: "Heroku API Key"
+      pattern: "(?i)(?:heroku_api_key|heroku_token)\\s*[=:]\\s*['\"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})['\"]?"
+      severity: "HIGH"
+      description: "Heroku API Key detected"
+      tags: ["heroku", "api-key", "platform"]
+
+  # Digital Ocean Patterns
+  digitalocean:
+    - name: "DigitalOcean Personal Access Token"
+      pattern: "(?i)(?:do_token|digitalocean_token)\\s*[=:]\\s*['\"]?(dop_v1_[a-f0-9]{64})['\"]?"
+      severity: "HIGH"
+      description: "DigitalOcean Personal Access Token detected"
+      tags: ["digitalocean", "token", "cloud"]
+
+  # MongoDB Patterns
+  mongodb:
+    - name: "MongoDB Atlas API Key"
+      pattern: "(?i)(?:mongodb_api_key|atlas_api_key)\\s*[=:]\\s*['\"]?([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})['\"]?"
+      severity: "HIGH"
+      description: "MongoDB Atlas API Key detected"
+      tags: ["mongodb", "atlas", "api-key", "database"]
+
+  # Shopify Patterns
+  shopify:
+    - name: "Shopify Access Token"
+      pattern: "(?i)(?:shopify_token|shopify_access_token)\\s*[=:]\\s*['\"]?(shpat_[a-f0-9]{32})['\"]?"
+      severity: "HIGH"
+      description: "Shopify Access Token detected"
+      tags: ["shopify", "access-token", "ecommerce"]
+
+  # Square Patterns
+  square:
+    - name: "Square Access Token"
+      pattern: "(?i)(?:square_token|square_access_token)\\s*[=:]\\s*['\"]?(sq0atp-[A-Za-z0-9\\-_]{22})['\"]?"
+      severity: "HIGH"
+      description: "Square Access Token detected"
+      tags: ["square", "access-token", "payment"]
+
+  # Auth0 Patterns
+  auth0:
+    - name: "Auth0 Client Secret"
+      pattern: "(?i)(?:auth0_client_secret|auth0_secret)\\s*[=:]\\s*['\"]?([A-Za-z0-9\\-_]{64})['\"]?"
+      severity: "CRITICAL"
+      description: "Auth0 Client Secret detected"
+      tags: ["auth0", "client-secret", "authentication"]
+
+  # Okta Patterns
+  okta:
+    - name: "Okta API Token"
+      pattern: "(?i)(?:okta_token|okta_api_token)\\s*[=:]\\s*['\"]?([a-f0-9]{40})['\"]?"
+      severity: "HIGH"
+      description: "Okta API Token detected"
+      tags: ["okta", "api-token", "authentication"]
+
+  # Generic API Patterns
+  generic:
+    - name: "Generic API Key"
+      pattern: "(?i)(?:api_key|apikey|api-key)\\s*[=:]\\s*['\"]?([A-Za-z0-9\\-_]{16,})['\"]?"
+      severity: "MEDIUM"
+      description: "Generic API Key detected"
+      tags: ["generic", "api-key"]
+
+    - name: "Generic Bearer Token"
+      pattern: "(?i)(?:bearer_token|bearer)\\s*[=:]\\s*['\"]?([A-Za-z0-9\\-_\\.]{16,})['\"]?"
+      severity: "MEDIUM"
+      description: "Generic Bearer Token detected"
+      tags: ["generic", "bearer-token"]
+
+    - name: "Generic Access Token"
+      pattern: "(?i)(?:access_token|accesstoken)\\s*[=:]\\s*['\"]?([A-Za-z0-9\\-_\\.]{16,})['\"]?"
+      severity: "MEDIUM"
+      description: "Generic Access Token detected"
+      tags: ["generic", "access-token"]
+
+# Configuration for API pattern detection
+config:
+  # Enable entropy checking for API keys
+  entropy_check: true
+  min_entropy: 4.5
+
+  # Context-aware detection settings
+  context_aware: true
+  ignore_comments: true
+  ignore_test_files: false
+
+  # File extensions to scan for API patterns
+  file_extensions:
+    - "kt"
+    - "java"
+    - "js"
+    - "ts"
+    - "py"
+    - "rb"
+    - "go"
+    - "php"
+    - "cs"
+    - "cpp"
+    - "c"
+    - "properties"
+    - "yml"
+    - "yaml"
+    - "json"
+    - "xml"
+    - "env"
+    - "config"
+    - "conf"
+    - "ini"
+    - "toml"
+
+  # Exclusion patterns
+  exclusions:
+    - "test/**"
+    - "**/*test*"
+    - "**/*mock*"
+    - "**/*example*"
+    - "**/*sample*"
+    - "node_modules/**"
+    - "build/**"
+    - "dist/**"
+    - ".git/**"
+
+  # Whitelist patterns (known safe values)
+  whitelist:
+    - "YOUR_API_KEY_HERE"
+    - "REPLACE_WITH_YOUR_KEY"
+    - "INSERT_API_KEY"
+    - "API_KEY_PLACEHOLDER"
+    - "EXAMPLE_API_KEY"
+    - "TEST_API_KEY"
+    - "DUMMY_API_KEY"
+    - "FAKE_API_KEY"
+    - "SAMPLE_API_KEY"
+    - "PLACEHOLDER_KEY"
+    - "xxxxxxxxxxxxxxxx"
+    - "****************"
+    - "sk_test_" # Stripe test keys
+    - "pk_test_" # Stripe test publishable keys
