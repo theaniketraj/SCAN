@@ -1,0 +1,326 @@
+# Strict Configuration for SCAN Plugin
+# This configuration enables maximum security scanning with minimal tolerance for false positives
+# Suitable for production environments and critical repositories
+
+# General scanning settings
+scan:
+  # Enable all detection methods for maximum coverage
+  enabled: true
+
+  # Fail build on any secrets found
+  failOnSecretsFound: true
+
+  # Minimum confidence level required to report a finding (0.0 to 1.0)
+  # Strict mode uses high confidence threshold to minimize false positives
+  minConfidenceLevel: 0.85
+
+  # Maximum file size to scan (in MB) - strict mode scans larger files
+  maxFileSizeInMB: 50
+
+  # Scan hidden files and directories
+  scanHiddenFiles: true
+
+  # Scan binary files (may produce false positives but ensures comprehensive coverage)
+  scanBinaryFiles: false
+
+  # Enable deep scanning mode (slower but more thorough)
+  deepScanMode: true
+
+# Detection strategies configuration
+detectors:
+  # Pattern-based detection
+  pattern:
+    enabled: true
+    # Use all available pattern categories
+    categories:
+      - api_keys
+      - database_urls
+      - crypto_keys
+      - passwords
+      - tokens
+      - certificates
+      - ssh_keys
+      - cloud_credentials
+      - generic_secrets
+
+    # Case sensitivity for pattern matching
+    caseSensitive: true
+
+    # Enable multi-line pattern matching
+    multiLine: true
+
+  # Entropy-based detection for high-randomness strings
+  entropy:
+    enabled: true
+    # Strict entropy threshold - lower values catch more potential secrets
+    minEntropyThreshold: 4.5
+    # Minimum string length to analyze
+    minStringLength: 8
+    # Maximum string length to avoid performance issues
+    maxStringLength: 512
+    # Character sets to analyze
+    characterSets:
+      - alphanumeric
+      - base64
+      - hex
+      - ascii_printable
+
+  # Context-aware detection
+  contextAware:
+    enabled: true
+    # Analyze variable names and assignments
+    analyzeVariableNames: true
+    # Check function parameters
+    analyzeFunctionParameters: true
+    # Examine comments for leaked secrets
+    analyzeComments: true
+    # Check string literals
+    analyzeStringLiterals: true
+    # Confidence boost for suspicious contexts
+    contextConfidenceBoost: 0.2
+
+# File filtering configuration
+filters:
+  # File extensions to include (empty means all files)
+  includeExtensions: []
+
+  # File extensions to exclude
+  excludeExtensions:
+    - ".git"
+    - ".gradle"
+    - ".idea"
+    - ".class"
+    - ".jar"
+    - ".war"
+    - ".ear"
+    - ".zip"
+    - ".tar"
+    - ".gz"
+    - ".7z"
+    - ".rar"
+    - ".exe"
+    - ".dll"
+    - ".so"
+    - ".dylib"
+    - ".png"
+    - ".jpg"
+    - ".jpeg"
+    - ".gif"
+    - ".bmp"
+    - ".svg"
+    - ".ico"
+    - ".pdf"
+    - ".doc"
+    - ".docx"
+    - ".xls"
+    - ".xlsx"
+    - ".ppt"
+    - ".pptx"
+
+  # Paths to exclude from scanning
+  excludePaths:
+    - "**/build/**"
+    - "**/target/**"
+    - "**/node_modules/**"
+    - "**/.git/**"
+    - "**/.gradle/**"
+    - "**/.idea/**"
+    - "**/dist/**"
+    - "**/out/**"
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/vendor/**"
+    - "**/third-party/**"
+
+  # Paths to include (takes precedence over excludes)
+  includePaths: []
+
+  # Maximum directory depth to scan
+  maxDirectoryDepth: 20
+
+  # Test file handling
+  testFiles:
+    # Scan test files but with different rules
+    scanTestFiles: true
+    # Apply relaxed rules to test files
+    relaxedRulesForTests: false
+    # Test file patterns
+    testFilePatterns:
+      - "**/test/**"
+      - "**/tests/**"
+      - "**/*Test.*"
+      - "**/*Tests.*"
+      - "**/*Spec.*"
+      - "**/*Specs.*"
+
+# Whitelist configuration for known false positives
+whitelist:
+  # Global patterns to ignore (regex patterns)
+  patterns:
+    # Common false positives
+    - "example\\.com"
+    - "localhost"
+    - "127\\.0\\.0\\.1"
+    - "0\\.0\\.0\\.0"
+    - "INSERT_.*_HERE"
+    - "REPLACE_.*_WITH"
+    - "YOUR_.*_HERE"
+    - "TODO:.*"
+    - "FIXME:.*"
+    - "XXX.*"
+    # Common placeholder values
+    - "password123"
+    - "secretkey"
+    - "mysecret"
+    - "changeme"
+    - "default"
+
+  # File-specific whitelists
+  files: {}
+
+  # Entropy-specific whitelists for high-entropy strings that are not secrets
+  entropy:
+    - "abcdefghijklmnopqrstuvwxyz"
+    - "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    - "0123456789"
+
+# Reporting configuration
+reporting:
+  # Output formats to generate
+  formats:
+    - console
+    - json
+    - html
+
+  # Console output settings
+  console:
+    # Use colors in console output
+    useColors: true
+    # Show full file paths
+    showFullPaths: true
+    # Show line numbers
+    showLineNumbers: true
+    # Show matched content
+    showMatchedContent: true
+    # Maximum content length to display
+    maxContentLength: 200
+    # Verbose output
+    verbose: true
+
+  # JSON report settings
+  json:
+    # Output file path (relative to project root)
+    outputFile: "build/reports/scan/scan-results.json"
+    # Pretty print JSON
+    prettyPrint: true
+    # Include file content in report
+    includeFileContent: false
+    # Include line context around matches
+    includeContext: true
+    # Number of context lines to include
+    contextLines: 3
+
+  # HTML report settings
+  html:
+    # Output file path (relative to project root)
+    outputFile: "build/reports/scan/scan-report.html"
+    # Include CSS inline
+    inlineCSS: true
+    # Include JavaScript inline
+    inlineJS: true
+    # Show statistics
+    showStatistics: true
+    # Group results by file type
+    groupByFileType: true
+
+# Performance settings
+performance:
+  # Number of parallel threads for scanning
+  parallelThreads: 4
+
+  # Enable file content caching
+  enableCaching: false
+
+  # Memory usage limits
+  memory:
+    # Maximum heap size for scanning (in MB)
+    maxHeapSizeMB: 512
+    # Garbage collection strategy
+    gcStrategy: "aggressive"
+
+  # Timeouts
+  timeouts:
+    # Maximum time per file scan (in seconds)
+    perFileScanTimeoutSeconds: 30
+    # Maximum total scan time (in seconds)
+    totalScanTimeoutSeconds: 1800
+
+# Advanced settings
+advanced:
+  # Enable debug logging
+  debugMode: false
+
+  # Custom pattern file paths
+  customPatternFiles: []
+
+  # Plugin behavior
+  behavior:
+    # Continue scanning after finding secrets
+    continueAfterSecrets: true
+    # Generate report even if no secrets found
+    alwaysGenerateReport: true
+    # Validate configuration on startup
+    validateConfig: true
+
+  # Integration settings
+  integration:
+    # Exit codes
+    exitCodes:
+      success: 0
+      secretsFound: 1
+      scanError: 2
+      configError: 3
+
+    # Git integration
+    git:
+      # Only scan staged files
+      onlyStaged: false
+      # Only scan modified files
+      onlyModified: false
+      # Ignore files in .gitignore
+      respectGitignore: true
+
+# Pattern customization for strict mode
+patterns:
+  # Additional strict patterns
+  custom:
+    # High-value targets
+    - name: "Production Database URLs"
+      pattern: "(?i)(prod|production)[._-]?(db|database)[._-]?url\\s*[:=]\\s*['\"]?[^'\"\\s]+['\"]?"
+      confidence: 0.9
+      category: "database"
+
+    - name: "API Keys in Headers"
+      pattern: "(?i)(x-api-key|authorization|bearer)\\s*[:=]\\s*['\"]?[a-zA-Z0-9]{20,}['\"]?"
+      confidence: 0.95
+      category: "api_keys"
+
+    - name: "Private Keys"
+      pattern: "-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----"
+      confidence: 1.0
+      category: "crypto_keys"
+
+    - name: "JWT Tokens"
+      pattern: "ey[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+"
+      confidence: 0.8
+      category: "tokens"
+
+  # Severity levels for different pattern categories
+  severity:
+    crypto_keys: "CRITICAL"
+    private_keys: "CRITICAL"
+    database_urls: "HIGH"
+    api_keys: "HIGH"
+    passwords: "HIGH"
+    tokens: "MEDIUM"
+    generic_secrets: "LOW"
