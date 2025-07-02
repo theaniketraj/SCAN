@@ -1,0 +1,227 @@
+# Custom Patterns Configuration Example
+# This file demonstrates how to define custom patterns for the SCAN plugin
+# This file should be kept in the project root and customized according to needs
+
+# Pattern configuration structure:
+# patterns:
+#   - name: "Pattern Name"
+#     description: "Description of what this pattern detects"
+#     regex: "Regular expression pattern"
+#     confidence: "high|medium|low"
+#     category: "Category name"
+#     tags: ["tag1", "tag2"]
+#     examples:
+#       - "example string that matches"
+#     false_positives:
+#       - "example string that might falsely match"
+
+patterns:
+  # Custom API Keys
+  - name: "Custom Internal API Key"
+    description: "Detects internal company API keys with COMP_ prefix"
+    regex: "COMP_[A-Za-z0-9]{32,64}"
+    confidence: "high"
+    category: "api_keys"
+    tags: ["internal", "api", "authentication"]
+    examples:
+      - "COMP_abc123def456ghi789jkl012mno345pq"
+      - "COMP_XYZ789ABC123DEF456GHI789JKL012MNO345PQ"
+    false_positives:
+      - "COMP_EXAMPLE_KEY_FOR_TESTING"
+
+  # Custom Database Patterns
+  - name: "Custom MongoDB Connection String"
+    description: "Detects MongoDB connection strings with custom domain"
+    regex: "mongodb://[^\\s]+@[^\\s]*\\.yourcompany\\.com[^\\s]*"
+    confidence: "high"
+    category: "database"
+    tags: ["mongodb", "connection", "database"]
+    examples:
+      - "mongodb://user:pass@db.yourcompany.com:27017/database"
+      - "mongodb://admin:secret123@mongo-prod.yourcompany.com/app"
+
+  # Custom Authentication Tokens
+  - name: "Custom JWT Token"
+    description: "Detects custom JWT tokens with specific header"
+    regex: "eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+"
+    confidence: "medium"
+    category: "tokens"
+    tags: ["jwt", "authentication", "token"]
+    examples:
+      - "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+  # Custom Private Keys
+  - name: "Custom RSA Private Key"
+    description: "Detects RSA private keys in various formats"
+    regex: "-----BEGIN (RSA )?PRIVATE KEY-----[\\s\\S]*?-----END (RSA )?PRIVATE KEY-----"
+    confidence: "high"
+    category: "private_keys"
+    tags: ["rsa", "private_key", "encryption"]
+    examples:
+      - "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----"
+
+  # Custom Configuration Secrets
+  - name: "Custom Config Secret"
+    description: "Detects configuration secrets with specific naming convention"
+    regex: "(?i)(secret|password|pwd|token|key)\\s*[:=]\\s*['\"]?[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;':\",./<>?`~]{8,}['\"]?"
+    confidence: "medium"
+    category: "configuration"
+    tags: ["config", "secret", "password"]
+    examples:
+      - 'secret: "my-super-secret-key-123"'
+      - "password=VerySecurePassword123!"
+      - "API_TOKEN: 'abc123def456ghi789'"
+
+  # Custom Cloud Provider Keys
+  - name: "Custom Cloud Provider Key"
+    description: "Detects custom cloud provider access keys"
+    regex: "CCPK_[A-Z0-9]{20,40}"
+    confidence: "high"
+    category: "cloud_keys"
+    tags: ["cloud", "access_key", "infrastructure"]
+    examples:
+      - "CCPK_ABCDEFGHIJ1234567890KLMNOPQRST"
+
+  # Custom Email Patterns (for notification systems)
+  - name: "Internal Email with Credentials"
+    description: "Detects internal emails that might contain credentials"
+    regex: "[a-zA-Z0-9._%+-]+@yourcompany\\.com.*(?i)(password|secret|token|key).*[A-Za-z0-9]{8,}"
+    confidence: "low"
+    category: "emails"
+    tags: ["email", "credentials", "communication"]
+    examples:
+      - "admin@yourcompany.com with password: SecretPass123"
+
+  # Custom Docker Secrets
+  - name: "Docker Registry Token"
+    description: "Detects Docker registry authentication tokens"
+    regex: "dckr_pat_[A-Za-z0-9_-]{22,}"
+    confidence: "high"
+    category: "docker"
+    tags: ["docker", "registry", "token"]
+    examples:
+      - "dckr_pat_AbCdEf123456789GhIjKlMnOpQrStUvWxYz"
+
+  # Custom Webhook URLs
+  - name: "Webhook URL with Secrets"
+    Description: "Detects webhook URLs that might contain sensitive tokens"
+    regex: "https?://[^\\s]*webhook[^\\s]*[?&]token=[A-Za-z0-9]{16,}"
+    confidence: "medium"
+    category: "webhooks"
+    tags: ["webhook", "url", "token"]
+    examples:
+      - "https://api.example.com/webhook?token=abc123def456ghi789"
+
+  # Custom License Keys
+  - name: "Software License Key"
+    description: "Detects software license keys with specific format"
+    regex: "[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}"
+    confidence: "low"
+    category: "licenses"
+    tags: ["license", "software", "key"]
+    examples:
+      - "ABCD-1234-EFGH-5678"
+      - "WXYZ-9876-MNOP-5432"
+
+# File-specific patterns (patterns that should only be checked in certain file types)
+file_specific_patterns:
+  # Patterns for Kotlin/Java files
+  ".kt,.java":
+    - name: "Hardcoded API Endpoint with Key"
+      description: "Detects hardcoded API endpoints with keys in Kotlin/Java code"
+      regex: '"https?://[^"]*api[^"]*[?&]key=[A-Za-z0-9]{16,}"'
+      confidence: "high"
+      category: "api_endpoints"
+      tags: ["hardcoded", "api", "endpoint"]
+
+  # Patterns for Properties files
+  ".properties,.env":
+    - name: "Database Password Property"
+      description: "Detects database passwords in properties files"
+      regex: "(?i)(db|database)\\.(password|pwd|pass)\\s*[:=]\\s*[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;':\",./<>?`~]{6,}"
+      confidence: "high"
+      category: "database"
+      tags: ["properties", "database", "password"]
+
+  # Patterns for YAML files
+  ".yml,.yaml":
+    - name: "Kubernetes Secret"
+      description: "Detects Kubernetes secrets in YAML files"
+      regex: "(?i)kind:\\s*secret[\\s\\S]*?data:[\\s\\S]*?[A-Za-z0-9+/]{20,}={0,2}"
+      confidence: "medium"
+      category: "kubernetes"
+      tags: ["kubernetes", "secret", "yaml"]
+
+# Context-aware patterns (patterns that consider surrounding context)
+context_aware_patterns:
+  - name: "Commented Out Secret"
+    description: "Detects secrets that are commented out but still present"
+    regex: "(?i)//.*(?:secret|password|key|token).*[:=].*[A-Za-z0-9]{8,}"
+    confidence: "low"
+    category: "commented_secrets"
+    tags: ["commented", "secret", "code"]
+    context_rules:
+      - type: "comment"
+        action: "flag"
+      - type: "string_literal"
+        action: "ignore"
+
+  - name: "Test Configuration Secret"
+    description: "Detects secrets in test configuration that might be real"
+    regex: "(?i)(secret|password|key|token)\\s*[:=]\\s*['\"]?(?!test|demo|example|sample)[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;':\",./<>?`~]{8,}['\"]?"
+    confidence: "medium"
+    category: "test_secrets"
+    tags: ["test", "configuration", "secret"]
+    context_rules:
+      - type: "test_file"
+        action: "flag_with_warning"
+      - type: "production_file"
+        action: "flag_as_high_risk"
+
+# Pattern exclusions (patterns to ignore even if they match)
+exclusions:
+  - pattern: "(?i)(example|sample|demo|test|placeholder|dummy|fake|mock)"
+    description: "Ignore obvious placeholder values"
+  - pattern: "XXXX-XXXX-XXXX-XXXX"
+    description: "Ignore placeholder patterns with X's"
+  - pattern: "\\$\\{[^}]+\\}"
+    description: "Ignore template variables"
+  - pattern: "\\{\\{[^}]+\\}\\}"
+    description: "Ignore template placeholders"
+
+# Entropy-based detection configuration
+entropy_config:
+  enabled: true
+  min_length: 12
+  max_length: 100
+  threshold: 4.5
+  ignore_patterns:
+    - "(?i)uuid"
+    - "(?i)guid"
+    - "[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}"
+
+# Custom severity levels
+severity_levels:
+  critical:
+    description: "Immediate security risk - must be fixed before commit"
+    patterns: ["private_keys", "database_credentials"]
+  high:
+    description: "High security risk - should be fixed promptly"
+    patterns: ["api_keys", "cloud_keys", "docker"]
+  medium:
+    description: "Medium security risk - review and fix if needed"
+    patterns: ["tokens", "webhooks", "configuration"]
+  low:
+    description: "Low security risk - review for false positives"
+    patterns: ["emails", "licenses", "commented_secrets"]
+  info:
+    description: "Informational - might not be a security issue"
+    patterns: ["test_secrets"]
+
+# Reporting configuration
+reporting:
+  include_examples: true
+  include_false_positives: true
+  show_pattern_details: true
+  group_by_category: true
+  sort_by_severity: true
