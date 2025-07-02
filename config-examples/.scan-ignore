@@ -1,0 +1,286 @@
+# .scan-ignore - Configuration file for SCAN Gradle Plugin
+# This file defines patterns for files, directories, and content that should be excluded from security scanning
+# Syntax is similar to .gitignore with additional features for content-based exclusions
+
+# =============================================================================
+# FILE AND DIRECTORY EXCLUSIONS
+# =============================================================================
+
+# Build directories and artifacts
+build/
+.gradle/
+out/
+target/
+dist/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Dependency directories
+node_modules/
+bower_components/
+vendor/
+.m2/repository/
+.ivy2/
+
+# Log files
+*.log
+logs/
+log/
+
+# Test coverage reports
+coverage/
+.nyc_output/
+jacoco/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# =============================================================================
+# SPECIFIC FILE TYPES TO EXCLUDE
+# =============================================================================
+
+# Documentation files (often contain example credentials)
+README.md
+readme.txt
+CHANGELOG.md
+HISTORY.md
+docs/**/*.md
+*.rst
+
+# Configuration templates (contain placeholder values)
+*.template
+*.example
+*.sample
+config.example.*
+settings.example.*
+
+# Lock files and dependency manifests
+package-lock.json
+yarn.lock
+Pipfile.lock
+poetry.lock
+composer.lock
+Gemfile.lock
+
+# Binary and compiled files
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.dylib
+*.bin
+
+# Image and media files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.pdf
+*.mp4
+*.avi
+*.mov
+
+# =============================================================================
+# CONTENT-BASED EXCLUSIONS
+# =============================================================================
+
+# Lines containing test or mock data (case-insensitive)
+content:(?i).*test.*password.*
+content:(?i).*mock.*key.*
+content:(?i).*fake.*secret.*
+content:(?i).*dummy.*token.*
+content:(?i).*placeholder.*
+content:(?i).*example.*credential.*
+
+# Common false positive patterns
+content:.*TODO.*password.*
+content:.*FIXME.*secret.*
+content:.*XXX.*key.*
+
+# Base64 encoded test data (short strings that are clearly not real secrets)
+content:^[A-Za-z0-9+/]{4,16}={0,2}$
+
+# Environment variable declarations without values
+content:.*export\s+\w+\s*=\s*$
+content:.*set\s+\w+\s*=\s*$
+
+# Configuration file comments and documentation
+content:^\s*#.*password.*
+content:^\s*#.*secret.*
+content:^\s*#.*key.*
+content:^\s*//.*password.*
+content:^\s*//.*secret.*
+content:^\s*//.*key.*
+content:^\s*/\*.*password.*\*/
+content:^\s*/\*.*secret.*\*/
+content:^\s*/\*.*key.*\*/
+
+# =============================================================================
+# LANGUAGE-SPECIFIC EXCLUSIONS
+# =============================================================================
+
+# Kotlin/Java test files
+**/*Test.kt
+**/*Tests.kt
+**/*Test.java
+**/*Tests.java
+**/test/**/*.kt
+**/test/**/*.java
+**/androidTest/**/*.kt
+**/androidTest/**/*.java
+
+# JavaScript/TypeScript test files
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+**/tests/**/*.js
+**/tests/**/*.ts
+**/__tests__/**/*
+
+# Python test files
+**/*_test.py
+**/test_*.py
+**/tests/**/*.py
+**/*_tests.py
+
+# Go test files
+**/*_test.go
+
+# Ruby test files
+**/spec/**/*.rb
+**/*_spec.rb
+**/test/**/*.rb
+
+# =============================================================================
+# FRAMEWORK AND LIBRARY SPECIFIC
+# =============================================================================
+
+# Spring Boot
+application.properties
+application.yml
+application.yaml
+application-*.properties
+application-*.yml
+application-*.yaml
+
+# Android
+local.properties
+keystore.properties
+gradle.properties
+proguard-rules.pro
+
+# React/Node.js
+.env.example
+.env.local
+.env.development
+.env.test
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# =============================================================================
+# CUSTOM PROJECT EXCLUSIONS
+# =============================================================================
+
+# Add your project-specific exclusions here
+# Examples:
+# my-project/config/secrets.template
+# internal-tools/**/*
+# legacy-code/**/*.old
+
+# =============================================================================
+# SECRET-SPECIFIC EXCLUSIONS
+# =============================================================================
+
+# Exclude known safe patterns that might trigger false positives
+
+# Version strings that look like tokens
+content:v\d+\.\d+\.\d+[-\w]*
+
+# UUIDs in test contexts
+content:(?i).*test.*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.*
+
+# Localhost URLs and common development endpoints
+content:.*localhost.*
+content:.*127\.0\.0\.1.*
+content:.*0\.0\.0\.0.*
+content:.*example\.com.*
+content:.*test\.com.*
+
+# Common placeholder values
+content:.*your_api_key_here.*
+content:.*insert_token_here.*
+content:.*replace_with_actual.*
+content:.*change_me.*
+
+# =============================================================================
+# ENTROPY-BASED EXCLUSIONS
+# =============================================================================
+
+# Exclude strings with high entropy but known to be safe
+# (These patterns work with the EntropyDetector)
+
+# Short high-entropy strings (likely not real secrets)
+entropy:length<10,entropy<4.0
+
+# Very long strings (likely encoded data or hashes, not secrets)
+entropy:length>100
+
+# Base64 padding that creates false entropy
+entropy:pattern=.*={1,2}$,entropy<3.5
+
+# =============================================================================
+# GLOBAL SETTINGS
+# =============================================================================
+
+# Enable case-insensitive matching for content patterns
+case-insensitive: true
+
+# Set minimum line length for scanning (ignore very short lines)
+min-line-length: 10
+
+# Maximum file size to scan (in KB)
+max-file-size: 1024
+
+# Enable/disable specific detector types
+detectors:
+  pattern: true
+  entropy: true
+  context-aware: true
+
+# Confidence threshold for reporting (0.0 to 1.0)
+confidence-threshold: 0.7
