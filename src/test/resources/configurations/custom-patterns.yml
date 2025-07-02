@@ -1,0 +1,427 @@
+# Custom Patterns Configuration for SCAN Plugin
+# This file demonstrates how to define custom patterns for detecting organization-specific secrets
+
+# Metadata about this pattern configuration
+metadata:
+  name: "Custom Organization Patterns"
+  version: "1.0.0"
+  description: "Custom patterns for detecting organization-specific secrets and sensitive data"
+  author: "Security Team"
+  lastUpdated: "2024-01-15"
+  tags:
+    - "custom"
+    - "organization"
+    - "enterprise"
+
+# Custom pattern definitions
+patterns:
+  # Company-specific API keys and tokens
+  company_secrets:
+    - name: "Internal API Key"
+      description: "Detects internal API keys with company prefix"
+      pattern: "(?i)COMP_API_[A-Z0-9]{32}"
+      confidence: 0.95
+      category: "api_keys"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "COMP_API_1234567890ABCDEF1234567890ABCDEF"
+          - "comp_api_FEDCBA0987654321FEDCBA0987654321"
+        negative:
+          - "API_KEY_PLACEHOLDER"
+          - "COMP_API_EXAMPLE"
+      tags:
+        - "internal"
+        - "company"
+
+    - name: "Service Token"
+      description: "Internal service-to-service authentication tokens"
+      pattern: "(?i)SVC_TOKEN_[A-Za-z0-9+/]{44}="
+      confidence: 0.9
+      category: "tokens"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "SVC_TOKEN_dGhpcyBpcyBhIHRlc3QgdG9rZW4gZm9yIGRlbW9uc3RyYXRpb24="
+        negative:
+          - "SVC_TOKEN_PLACEHOLDER"
+      multiline: false
+      caseSensitive: false
+
+    - name: "Database Password"
+      description: "Database passwords in connection strings"
+      pattern: "(?i)(password|pwd)\\s*[:=]\\s*['\"]([^'\"\\s]{8,})['\"]"
+      confidence: 0.8
+      category: "passwords"
+      severity: "MEDIUM"
+      captureGroup: 2
+      examples:
+        positive:
+          - 'password="SuperSecretDbPass123"'
+          - "pwd: 'MyDatabasePassword456'"
+        negative:
+          - 'password="PLACEHOLDER"'
+          - 'password="${DB_PASSWORD}"'
+      tags:
+        - "database"
+        - "credentials"
+
+  # Cloud provider specific patterns
+  cloud_credentials:
+    - name: "Custom AWS Role ARN"
+      description: "AWS IAM Role ARNs for specific organization account"
+      pattern: "arn:aws:iam::123456789012:role/[A-Za-z0-9_-]+"
+      confidence: 0.85
+      category: "cloud_credentials"
+      severity: "MEDIUM"
+      examples:
+        positive:
+          - "arn:aws:iam::123456789012:role/MyAppRole"
+          - "arn:aws:iam::123456789012:role/Production-Service-Role"
+        negative:
+          - "arn:aws:iam::ACCOUNT_ID:role/ROLE_NAME"
+      tags:
+        - "aws"
+        - "iam"
+
+    - name: "Azure Subscription Key"
+      description: "Azure Cognitive Services subscription keys"
+      pattern: "[0-9a-f]{32}"
+      confidence: 0.7
+      category: "cloud_credentials"
+      severity: "MEDIUM"
+      contextPatterns:
+        - "(?i)azure.*subscription.*key"
+        - "(?i)cognitive.*services.*key"
+        - "(?i)ocp-apim-subscription-key"
+      examples:
+        positive:
+          - "azure_subscription_key: 1234567890abcdef1234567890abcdef"
+        negative:
+          - "placeholder_key: 1234567890abcdef1234567890abcdef"
+      tags:
+        - "azure"
+        - "cognitive-services"
+
+    - name: "GCP Service Account Key"
+      description: "Google Cloud Platform service account private keys"
+      pattern: "-----BEGIN PRIVATE KEY-----[\\s\\S]*-----END PRIVATE KEY-----"
+      confidence: 0.95
+      category: "crypto_keys"
+      severity: "CRITICAL"
+      multiline: true
+      contextPatterns:
+        - "(?i)service.*account"
+        - "(?i)google.*cloud"
+        - "(?i)gcp.*credentials"
+      examples:
+        positive:
+          - |
+            -----BEGIN PRIVATE KEY-----
+            MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...
+            -----END PRIVATE KEY-----
+      tags:
+        - "gcp"
+        - "service-account"
+
+  # Third-party service patterns
+  third_party_services:
+    - name: "Slack Webhook URL"
+      description: "Slack incoming webhook URLs"
+      pattern: "https://hooks\\.slack\\.com/services/[A-Z0-9]{9}/[A-Z0-9]{9}/[A-Za-z0-9]{24}"
+      confidence: 0.9
+      category: "webhooks"
+      severity: "MEDIUM"
+      examples:
+        positive:
+          - "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+        negative:
+          - "https://hooks.slack.com/services/YOUR_WEBHOOK_ID"
+      tags:
+        - "slack"
+        - "webhook"
+
+    - name: "SendGrid API Key"
+      description: "SendGrid API keys"
+      pattern: "SG\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}"
+      confidence: 0.95
+      category: "api_keys"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "SG.abcdefghijklmnopqrstu.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq"
+        negative:
+          - "SG.YOUR_API_KEY_HERE.PLACEHOLDER_VALUE"
+      tags:
+        - "sendgrid"
+        - "email"
+
+    - name: "Stripe API Key"
+      description: "Stripe API keys (both test and live)"
+      pattern: "(?:sk|pk)_(test|live)_[A-Za-z0-9]{24,}"
+      confidence: 0.9
+      category: "api_keys"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+          - "pk_live_AbCdEf123456789AbCdEf123456789"
+        negative:
+          - "sk_test_YOUR_KEY_HERE"
+          - "pk_live_PLACEHOLDER"
+      tags:
+        - "stripe"
+        - "payment"
+
+    - name: "Twilio Auth Token"
+      description: "Twilio authentication tokens"
+      pattern: "[A-Fa-f0-9]{32}"
+      confidence: 0.75
+      category: "tokens"
+      severity: "MEDIUM"
+      contextPatterns:
+        - "(?i)twilio.*auth.*token"
+        - "(?i)twilio.*token"
+        - "(?i)auth.*token.*twilio"
+      examples:
+        positive:
+          - "twilio_auth_token: a1b2c3d4e5f6789012345678901234567890abcd"
+        negative:
+          - "auth_token: YOUR_TWILIO_TOKEN_HERE"
+      tags:
+        - "twilio"
+        - "sms"
+
+  # Database and connection strings
+  database_patterns:
+    - name: "MongoDB Connection String"
+      description: "MongoDB connection strings with credentials"
+      pattern: "mongodb://[^:]+:[^@]+@[^/]+/[^?\\s]+"
+      confidence: 0.85
+      category: "database_urls"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "mongodb://user:password@cluster0.mongodb.net/database"
+          - "mongodb://admin:secret123@localhost:27017/myapp"
+        negative:
+          - "mongodb://username:password@host:port/database"
+          - "mongodb://USER:PASS@HOST/DB"
+      tags:
+        - "mongodb"
+        - "database"
+
+    - name: "Redis Connection String"
+      description: "Redis connection strings with authentication"
+      pattern: "redis://:[^@]+@[^:/]+(?::[0-9]+)?(?:/[0-9]+)?"
+      confidence: 0.8
+      category: "database_urls"
+      severity: "MEDIUM"
+      examples:
+        positive:
+          - "redis://:mypassword@redis-server:6379/0"
+          - "redis://:secret123@localhost:6379"
+        negative:
+          - "redis://:password@host:port/db"
+      tags:
+        - "redis"
+        - "cache"
+
+    - name: "PostgreSQL Connection String"
+      description: "PostgreSQL connection strings with credentials"
+      pattern: "postgresql://[^:]+:[^@]+@[^/]+/[^?\\s]+"
+      confidence: 0.85
+      category: "database_urls"
+      severity: "HIGH"
+      examples:
+        positive:
+          - "postgresql://user:password@localhost:5432/mydb"
+          - "postgresql://admin:secret@db.example.com/production"
+        negative:
+          - "postgresql://username:password@host:port/database"
+      tags:
+        - "postgresql"
+        - "database"
+
+  # Custom application secrets
+  application_secrets:
+    - name: "JWT Secret Key"
+      description: "JWT signing secret keys"
+      pattern: "(?i)(jwt[._-]?secret|jwt[._-]?key)\\s*[:=]\\s*['\"]([A-Za-z0-9+/]{32,}={0,2})['\"]"
+      confidence: 0.8
+      category: "crypto_keys"
+      severity: "HIGH"
+      captureGroup: 2
+      examples:
+        positive:
+          - 'jwt_secret: "dGhpcyBpcyBhIHNlY3JldCBrZXkgZm9yIEpXVCBzaWduaW5n"'
+          - "JWT_KEY='MySecretJWTSigningKey123456789'"
+        negative:
+          - 'jwt_secret: "YOUR_JWT_SECRET_HERE"'
+          - 'jwt_key: "${JWT_SECRET}"'
+      tags:
+        - "jwt"
+        - "authentication"
+
+    - name: "Encryption Key"
+      description: "Application encryption keys"
+      pattern: "(?i)(encrypt(ion)?[._-]?key|aes[._-]?key)\\s*[:=]\\s*['\"]([A-Fa-f0-9]{32,})['\"]"
+      confidence: 0.85
+      category: "crypto_keys"
+      severity: "HIGH"
+      captureGroup: 3
+      examples:
+        positive:
+          - 'encryption_key: "1234567890abcdef1234567890abcdef"'
+          - "AES_KEY='FEDCBA0987654321FEDCBA0987654321'"
+        negative:
+          - 'encryption_key: "PLACEHOLDER_KEY"'
+      tags:
+        - "encryption"
+        - "aes"
+
+    - name: "Session Secret"
+      description: "Web application session secrets"
+      pattern: "(?i)session[._-]?secret\\s*[:=]\\s*['\"]([A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:,.<>?]{16,})['\"]"
+      confidence: 0.75
+      category: "generic_secrets"
+      severity: "MEDIUM"
+      captureGroup: 1
+      examples:
+        positive:
+          - 'session_secret: "MyVerySecretSessionKey123!@#"'
+          - "SESSION_SECRET='RandomSessionSecret456$%^'"
+        negative:
+          - 'session_secret: "CHANGE_ME_IN_PRODUCTION"'
+      tags:
+        - "session"
+        - "web"
+
+  # DevOps and infrastructure
+  devops_patterns:
+    - name: "Docker Registry Token"
+      description: "Docker registry authentication tokens"
+      pattern: "(?i)(docker[._-]?token|registry[._-]?token)\\s*[:=]\\s*['\"]([A-Za-z0-9+/]{40,}={0,2})['\"]"
+      confidence: 0.8
+      category: "tokens"
+      severity: "MEDIUM"
+      captureGroup: 2
+      examples:
+        positive:
+          - 'docker_token: "dGhpcyBpcyBhIGRvY2tlciByZWdpc3RyeSB0b2tlbg=="'
+        negative:
+          - 'docker_token: "YOUR_DOCKER_TOKEN"'
+      tags:
+        - "docker"
+        - "registry"
+
+    - name: "Kubernetes Secret"
+      description: "Kubernetes secret values in YAML"
+      pattern: "(?i)data:\\s*[\\r\\n]+\\s+[a-zA-Z0-9._-]+:\\s*([A-Za-z0-9+/]{20,}={0,2})"
+      confidence: 0.7
+      category: "generic_secrets"
+      severity: "MEDIUM"
+      captureGroup: 1
+      multiline: true
+      examples:
+        positive:
+          - |
+            data:
+              username: YWRtaW4=
+              password: MWYyZDFlMmU2N2Rm
+        negative:
+          - |
+            data:
+              example: REPLACE_WITH_BASE64
+      tags:
+        - "kubernetes"
+        - "k8s"
+
+    - name: "Ansible Vault Password"
+      description: "Ansible vault passwords"
+      pattern: "\\$ANSIBLE_VAULT;[0-9.]+;AES256[\\r\\n]+[A-Fa-f0-9\\r\\n]+"
+      confidence: 0.9
+      category: "passwords"
+      severity: "HIGH"
+      multiline: true
+      examples:
+        positive:
+          - |
+            $ANSIBLE_VAULT;1.1;AES256
+            66386439653765616235643132386236333762336237653137663635316439326537636535616438
+        negative:
+          - "$ANSIBLE_VAULT;VERSION;ENCRYPTION_METHOD"
+      tags:
+        - "ansible"
+        - "vault"
+
+# Pattern categories and their default settings
+categories:
+  webhooks:
+    description: "Webhook URLs and endpoints"
+    defaultSeverity: "MEDIUM"
+    defaultConfidence: 0.8
+
+# Global settings for custom patterns
+settings:
+  # Enable case-insensitive matching by default for custom patterns
+  defaultCaseSensitive: false
+
+  # Default confidence level for patterns without explicit confidence
+  defaultConfidence: 0.7
+
+  # Default severity for patterns without explicit severity
+  defaultSeverity: "MEDIUM"
+
+  # Whether to enable multiline matching by default
+  defaultMultiline: false
+
+  # Maximum pattern length to prevent ReDoS attacks
+  maxPatternLength: 1000
+
+  # Whether to validate patterns on load
+  validatePatterns: true
+
+  # Context window size for context-aware patterns
+  contextWindowSize: 3
+
+# Testing and validation
+testing:
+  # Enable pattern testing with provided examples
+  enableTesting: true
+
+  # Fail on pattern compilation errors
+  failOnPatternErrors: true
+
+  # Validate that positive examples match and negative examples don't
+  validateExamples: true
+
+  # Performance testing settings
+  performance:
+    # Maximum time allowed per pattern test (milliseconds)
+    maxPatternTestTime: 1000
+    # Warn if pattern takes longer than this (milliseconds)
+    warnPatternTestTime: 100
+
+# Documentation and metadata
+documentation:
+  # URL to organization's security guidelines
+  securityGuidelinesUrl: "https://wiki.company.com/security/guidelines"
+
+  # Contact information for security team
+  securityContact: "security-team@company.com"
+
+  # Instructions for developers who find false positives
+  falsePositiveInstructions: |
+    If you believe this is a false positive:
+    1. Add the pattern to your project's .scan-ignore file
+    2. Create a whitelist entry in your scan configuration
+    3. Contact the security team if you need help
+
+  # Instructions for adding new patterns
+  addPatternInstructions: |
+    To add new custom patterns:
+    1. Follow the pattern format shown in this file
+    2. Include positive and negative examples
+    3. Test your patterns before deploying
+    4. Submit a pull request for review
