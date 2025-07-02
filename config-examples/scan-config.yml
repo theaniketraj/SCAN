@@ -1,0 +1,526 @@
+# scan-config.yml - Configuration file for SCAN Gradle Plugin
+# This file defines comprehensive settings for security scanning behavior
+# This file should be placed in project root or specify its location in build.gradle.kts
+
+# =============================================================================
+# GENERAL SETTINGS
+# =============================================================================
+
+# Plugin version and compatibility
+version: "1.0.0"
+config-version: "1.0"
+
+# Global scanning behavior
+scan:
+  # Enable/disable the plugin entirely
+  enabled: true
+
+  # Scan mode: 'strict', 'balanced', 'lenient'
+  mode: "balanced"
+
+  # Fail build on findings
+  fail-on-secrets: true
+
+  # Minimum confidence level to report findings (0.0 to 1.0)
+  confidence-threshold: 0.7
+
+  # Maximum number of findings before stopping scan
+  max-findings: 100
+
+  # Timeout for entire scan operation (in seconds)
+  timeout: 300
+
+# =============================================================================
+# FILE SCANNING CONFIGURATION
+# =============================================================================
+
+files:
+  # Directories to scan (relative to project root)
+  include-paths:
+    - "src/"
+    - "app/"
+    - "lib/"
+    - "config/"
+    - "scripts/"
+
+  # Directories to exclude from scanning
+  exclude-paths:
+    - "build/"
+    - ".gradle/"
+    - "node_modules/"
+    - "vendor/"
+    - "target/"
+    - "out/"
+    - ".git/"
+    - ".idea/"
+    - ".vscode/"
+
+  # File extensions to scan
+  include-extensions:
+    - ".kt"
+    - ".java"
+    - ".js"
+    - ".ts"
+    - ".py"
+    - ".rb"
+    - ".go"
+    - ".php"
+    - ".cs"
+    - ".cpp"
+    - ".c"
+    - ".h"
+    - ".swift"
+    - ".scala"
+    - ".properties"
+    - ".yml"
+    - ".yaml"
+    - ".json"
+    - ".xml"
+    - ".toml"
+    - ".env"
+    - ".config"
+    - ".conf"
+    - ".ini"
+    - ".sh"
+    - ".bash"
+    - ".zsh"
+    - ".ps1"
+    - ".bat"
+    - ".cmd"
+    - ".sql"
+    - ".gradle"
+    - ".gradle.kts"
+    - ".tf"
+    - ".dockerfile"
+
+  # File extensions to exclude
+  exclude-extensions:
+    - ".log"
+    - ".tmp"
+    - ".cache"
+    - ".lock"
+    - ".jar"
+    - ".war"
+    - ".ear"
+    - ".zip"
+    - ".tar"
+    - ".gz"
+    - ".png"
+    - ".jpg"
+    - ".jpeg"
+    - ".gif"
+    - ".svg"
+    - ".ico"
+    - ".pdf"
+    - ".doc"
+    - ".docx"
+    - ".xls"
+    - ".xlsx"
+    - ".ppt"
+    - ".pptx"
+
+  # Maximum file size to scan (in KB)
+  max-file-size: 1024
+
+  # Minimum line length to consider for scanning
+  min-line-length: 10
+
+  # Maximum line length to scan (very long lines often contain encoded data)
+  max-line-length: 1000
+
+  # Follow symbolic links
+  follow-symlinks: false
+
+# =============================================================================
+# DETECTOR CONFIGURATION
+# =============================================================================
+
+detectors:
+  # Pattern-based detection
+  pattern:
+    enabled: true
+    # Pattern files to load (relative to plugin resources or absolute paths)
+    pattern-files:
+      - "patterns/default-patterns.yml"
+      - "patterns/api-patterns.yml"
+      - "patterns/crypto-patterns.yml"
+    # Custom patterns defined inline
+    custom-patterns:
+      - name: "Custom API Key"
+        pattern: "custom_api_key_[a-zA-Z0-9]{32}"
+        confidence: 0.8
+        description: "Custom API key pattern for our service"
+      - name: "Internal Token"
+        pattern: "INT_TOKEN_[A-Z0-9]{16}"
+        confidence: 0.9
+        description: "Internal authentication token"
+
+  # Entropy-based detection
+  entropy:
+    enabled: true
+    # Minimum entropy threshold for detection
+    min-entropy: 4.5
+    # Minimum length for entropy analysis
+    min-length: 20
+    # Maximum length for entropy analysis
+    max-length: 100
+    # Character sets to analyze
+    charset-analysis:
+      base64: true
+      hex: true
+      alphanumeric: true
+    # Entropy calculation method: 'shannon', 'kolmogorov', 'combined'
+    method: "shannon"
+
+  # Context-aware detection
+  context-aware:
+    enabled: true
+    # Analyze variable names and context
+    analyze-variable-names: true
+    # Analyze code comments
+    analyze-comments: false
+    # Analyze string literals
+    analyze-string-literals: true
+    # Context keywords that increase confidence
+    context-keywords:
+      - "password"
+      - "secret"
+      - "token"
+      - "key"
+      - "auth"
+      - "credential"
+      - "api"
+      - "private"
+      - "sensitive"
+    # Code context patterns to ignore
+    ignore-contexts:
+      - "test"
+      - "mock"
+      - "example"
+      - "sample"
+      - "demo"
+      - "placeholder"
+
+# =============================================================================
+# PATTERN DEFINITIONS
+# =============================================================================
+
+patterns:
+  # AWS credentials
+  aws:
+    - name: "AWS Access Key ID"
+      pattern: "AKIA[0-9A-Z]{16}"
+      confidence: 0.9
+      description: "Amazon Web Services Access Key ID"
+    - name: "AWS Secret Access Key"
+      pattern: "[A-Za-z0-9/+=]{40}"
+      confidence: 0.6
+      description: "Amazon Web Services Secret Access Key"
+      context-required: true
+      context-keywords: ["aws", "amazon", "secret"]
+
+  # Google Cloud Platform
+  gcp:
+    - name: "Google API Key"
+      pattern: "AIza[0-9A-Za-z_-]{35}"
+      confidence: 0.9
+      description: "Google API Key"
+    - name: "Google OAuth Client Secret"
+      pattern: "[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com"
+      confidence: 0.8
+      description: "Google OAuth Client ID"
+
+  # GitHub
+  github:
+    - name: "GitHub Personal Access Token"
+      pattern: "ghp_[0-9A-Za-z]{36}"
+      confidence: 0.95
+      description: "GitHub Personal Access Token"
+    - name: "GitHub OAuth Token"
+      pattern: "gho_[0-9A-Za-z]{36}"
+      confidence: 0.95
+      description: "GitHub OAuth Token"
+    - name: "GitHub App Token"
+      pattern: "ghs_[0-9A-Za-z]{36}"
+      confidence: 0.95
+      description: "GitHub App Token"
+
+  # Database connections
+  database:
+    - name: "Database Connection String"
+      pattern: "(mysql|postgresql|mongodb|redis)://[^\\s;'\"]*"
+      confidence: 0.8
+      description: "Database connection string"
+    - name: "JDBC Connection String"
+      pattern: "jdbc:[^\\s;'\"]*"
+      confidence: 0.7
+      description: "JDBC database connection string"
+
+  # Generic secrets
+  generic:
+    - name: "Private Key Header"
+      pattern: "-----BEGIN [A-Z ]*PRIVATE KEY-----"
+      confidence: 0.95
+      description: "Private key header"
+    - name: "Generic API Key"
+      pattern: "(?i)(api[_-]?key|apikey)[\"']?\\s*[:=]\\s*[\"']?[0-9A-Za-z_-]{16,}[\"']?"
+      confidence: 0.7
+      description: "Generic API key assignment"
+    - name: "Generic Password"
+      pattern: "(?i)(password|passwd|pwd)[\"']?\\s*[:=]\\s*[\"']?[^\\s\"']{8,}[\"']?"
+      confidence: 0.6
+      description: "Generic password assignment"
+      context-required: true
+
+# =============================================================================
+# FILTERING CONFIGURATION
+# =============================================================================
+
+filters:
+  # Whitelist/exclusion filtering
+  whitelist:
+    enabled: true
+    # Files to ignore (supports glob patterns)
+    ignore-files:
+      - "**/*test*"
+      - "**/*Test*"
+      - "**/*spec*"
+      - "**/*Spec*"
+      - "**/*.example.*"
+      - "**/*.template.*"
+      - "**/*.sample.*"
+    # Patterns to ignore in content
+    ignore-patterns:
+      - "(?i).*test.*password.*"
+      - "(?i).*mock.*secret.*"
+      - "(?i).*example.*key.*"
+      - "(?i).*placeholder.*"
+      - "(?i).*dummy.*"
+      - "(?i).*fake.*"
+    # Use .scan-ignore file
+    use-ignore-file: true
+    ignore-file-path: ".scan-ignore"
+
+  # Test file filtering
+  test-files:
+    enabled: true
+    # Apply different rules to test files
+    reduced-confidence: true
+    confidence-reduction: 0.3
+    # Test file patterns
+    test-patterns:
+      - "**/test/**/*"
+      - "**/tests/**/*"
+      - "**/*Test.*"
+      - "**/*Tests.*"
+      - "**/*test.*"
+      - "**/*tests.*"
+      - "**/*Spec.*"
+      - "**/*spec.*"
+
+  # Path-based filtering
+  path-filters:
+    enabled: true
+    # High-confidence paths (increase confidence)
+    sensitive-paths:
+      - "**/config/**"
+      - "**/configuration/**"
+      - "**/settings/**"
+      - "**/.env*"
+      - "**/secrets/**"
+    # Low-confidence paths (decrease confidence)
+    non-sensitive-paths:
+      - "**/docs/**"
+      - "**/documentation/**"
+      - "**/readme*"
+      - "**/changelog*"
+      - "**/license*"
+
+# =============================================================================
+# REPORTING CONFIGURATION
+# =============================================================================
+
+reporting:
+  # Report formats to generate
+  formats:
+    - "console"
+    - "json"
+    - "html"
+
+  # Output directory for reports
+  output-dir: "build/scan-reports"
+
+  # Console reporting
+  console:
+    enabled: true
+    # Verbosity level: 'minimal', 'normal', 'detailed', 'verbose'
+    verbosity: "normal"
+    # Show file content snippets
+    show-snippets: true
+    # Maximum snippet length
+    snippet-length: 80
+    # Color output
+    use-colors: true
+    # Group findings by type
+    group-by-type: true
+
+  # JSON reporting
+  json:
+    enabled: true
+    filename: "scan-results.json"
+    # Pretty print JSON
+    pretty-print: true
+    # Include file snippets in JSON
+    include-snippets: true
+    # Include metadata
+    include-metadata: true
+
+  # HTML reporting
+  html:
+    enabled: true
+    filename: "scan-report.html"
+    # Include interactive features
+    interactive: true
+    # Include charts and statistics
+    include-charts: true
+    # Template theme: 'default', 'dark', 'minimal'
+    theme: "default"
+
+  # Baseline comparison
+  baseline:
+    enabled: false
+    baseline-file: "scan-baseline.json"
+    # Only report new findings
+    report-new-only: false
+    # Update baseline automatically
+    auto-update: false
+
+# =============================================================================
+# PERFORMANCE CONFIGURATION
+# =============================================================================
+
+performance:
+  # Number of threads for parallel scanning
+  thread-count: 4
+
+  # Memory management
+  memory:
+    # Maximum heap size for scanning (in MB)
+    max-heap: 512
+    # Enable memory monitoring
+    monitor-memory: true
+    # Memory threshold to trigger garbage collection (percentage)
+    gc-threshold: 80
+
+  # Caching
+  cache:
+    enabled: true
+    # Cache file checksums to skip unchanged files
+    file-checksums: true
+    # Cache directory
+    cache-dir: ".gradle/scan-cache"
+    # Cache TTL in hours
+    ttl: 24
+
+  # Rate limiting
+  rate-limiting:
+    enabled: false
+    # Maximum files per second
+    max-files-per-second: 100
+    # Maximum CPU usage percentage
+    max-cpu-usage: 80
+
+# =============================================================================
+# INTEGRATION CONFIGURATION
+# =============================================================================
+
+integration:
+  # Git integration
+  git:
+    enabled: true
+    # Scan only modified files
+    scan-modified-only: false
+    # Scan files in specific commit range
+    commit-range: ""
+    # Ignore files in .gitignore
+    respect-gitignore: true
+
+  # CI/CD integration
+  ci-cd:
+    # Exit codes for different scenarios
+    exit-codes:
+      success: 0
+      secrets-found: 1
+      scan-error: 2
+      config-error: 3
+    # Environment variable overrides
+    env-overrides:
+      enabled: true
+      prefix: "SCAN_"
+
+  # IDE integration
+  ide:
+    # Generate IDE-compatible output
+    generate-ide-markers: true
+    # IDE marker format: 'checkstyle', 'pmd', 'spotbugs'
+    marker-format: "checkstyle"
+
+# =============================================================================
+# ADVANCED CONFIGURATION
+# =============================================================================
+
+advanced:
+  # Experimental features
+  experimental:
+    enabled: false
+    # Machine learning-based detection
+    ml-detection: false
+    # Advanced entropy analysis
+    advanced-entropy: false
+    # Semantic analysis
+    semantic-analysis: false
+
+  # Plugin behavior
+  plugin:
+    # Strict mode (fail on any configuration errors)
+    strict-mode: false
+    # Debug mode (verbose logging)
+    debug-mode: false
+    # Profile performance
+    profile-performance: false
+
+  # Custom extensions
+  extensions:
+    # Custom detector classes
+    custom-detectors: []
+    # Custom filter classes
+    custom-filters: []
+    # Custom reporter classes
+    custom-reporters: []
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+
+logging:
+  # Log level: 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'
+  level: "INFO"
+
+  # Log to file
+  file:
+    enabled: true
+    path: "build/logs/scan.log"
+    # Maximum file size (in MB)
+    max-size: 10
+    # Number of backup files
+    backup-count: 5
+
+  # Log format
+  format: "%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n"
+
+  # Component-specific logging
+  components:
+    scanner: "INFO"
+    detectors: "INFO"
+    filters: "INFO"
+    reporters: "INFO"
