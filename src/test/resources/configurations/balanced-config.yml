@@ -1,0 +1,431 @@
+# Balanced Configuration for SCAN Plugin
+# This configuration provides a reasonable balance between security coverage and development productivity
+# Suitable for most development teams and CI/CD pipelines
+
+# General scanning settings
+scan:
+  # Enable scanning by default
+  enabled: true
+
+  # Don't fail build by default - let teams decide based on findings
+  failOnSecretsFound: false
+
+  # Moderate confidence level to balance false positives and coverage
+  minConfidenceLevel: 0.7
+
+  # Reasonable file size limit for performance
+  maxFileSizeInMB: 10
+
+  # Skip hidden files by default (can contain OS-specific files)
+  scanHiddenFiles: false
+
+  # Don't scan binary files to avoid false positives
+  scanBinaryFiles: false
+
+  # Use standard scanning mode for better performance
+  deepScanMode: false
+
+# Detection strategies configuration
+detectors:
+  # Pattern-based detection - primary detection method
+  pattern:
+    enabled: true
+    # Focus on most common and critical secret types
+    categories:
+      - api_keys
+      - database_urls
+      - crypto_keys
+      - passwords
+      - tokens
+      - cloud_credentials
+      - ssh_keys
+
+    # Case insensitive for better coverage
+    caseSensitive: false
+
+    # Enable multi-line for complex patterns
+    multiLine: true
+
+  # Entropy-based detection with moderate threshold
+  entropy:
+    enabled: true
+    # Balanced entropy threshold - catches obvious secrets without too many false positives
+    minEntropyThreshold: 5.0
+    # Reasonable string length range
+    minStringLength: 12
+    maxStringLength: 256
+    # Common encoding types
+    characterSets:
+      - base64
+      - hex
+      - alphanumeric
+
+  # Context-aware detection for better accuracy
+  contextAware:
+    enabled: true
+    # Analyze variable names for suspicious patterns
+    analyzeVariableNames: true
+    # Check function parameters
+    analyzeFunctionParameters: true
+    # Skip comments by default (often contain examples)
+    analyzeComments: false
+    # Check string literals
+    analyzeStringLiterals: true
+    # Moderate confidence boost
+    contextConfidenceBoost: 0.15
+
+# File filtering configuration
+filters:
+  # Include common source code files
+  includeExtensions:
+    - ".kt"
+    - ".java"
+    - ".js"
+    - ".ts"
+    - ".py"
+    - ".rb"
+    - ".go"
+    - ".rs"
+    - ".php"
+    - ".cs"
+    - ".cpp"
+    - ".c"
+    - ".h"
+    - ".hpp"
+    - ".scala"
+    - ".clj"
+    - ".sh"
+    - ".bash"
+    - ".zsh"
+    - ".fish"
+    - ".ps1"
+    - ".sql"
+    - ".yaml"
+    - ".yml"
+    - ".json"
+    - ".xml"
+    - ".properties"
+    - ".conf"
+    - ".config"
+    - ".ini"
+    - ".env"
+    - ".toml"
+    - ".gradle"
+    - ".gradle.kts"
+    - ".pom"
+    - ".sbt"
+    - ".cmake"
+    - ".dockerfile"
+    - ".md"
+    - ".txt"
+
+  # Exclude binary and generated files
+  excludeExtensions:
+    - ".class"
+    - ".jar"
+    - ".war"
+    - ".ear"
+    - ".zip"
+    - ".tar"
+    - ".gz"
+    - ".7z"
+    - ".rar"
+    - ".exe"
+    - ".dll"
+    - ".so"
+    - ".dylib"
+    - ".a"
+    - ".lib"
+    - ".obj"
+    - ".o"
+    - ".png"
+    - ".jpg"
+    - ".jpeg"
+    - ".gif"
+    - ".bmp"
+    - ".tiff"
+    - ".webp"
+    - ".svg"
+    - ".ico"
+    - ".pdf"
+    - ".doc"
+    - ".docx"
+    - ".xls"
+    - ".xlsx"
+    - ".ppt"
+    - ".pptx"
+    - ".mp3"
+    - ".mp4"
+    - ".avi"
+    - ".mov"
+    - ".wmv"
+    - ".flv"
+    - ".webm"
+    - ".woff"
+    - ".woff2"
+    - ".ttf"
+    - ".eot"
+
+  # Standard exclusion paths
+  excludePaths:
+    - "**/build/**"
+    - "**/target/**"
+    - "**/dist/**"
+    - "**/out/**"
+    - "**/bin/**"
+    - "**/.git/**"
+    - "**/.gradle/**"
+    - "**/.idea/**"
+    - "**/.vscode/**"
+    - "**/node_modules/**"
+    - "**/vendor/**"
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/.DS_Store"
+    - "**/Thumbs.db"
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/coverage/**"
+    - "**/logs/**"
+    - "**/tmp/**"
+    - "**/temp/**"
+
+  # No specific include paths - scan project root
+  includePaths: []
+
+  # Reasonable directory depth
+  maxDirectoryDepth: 15
+
+  # Test file handling with relaxed rules
+  testFiles:
+    # Scan test files but be more lenient
+    scanTestFiles: true
+    # Apply relaxed rules to test files (test data often contains fake secrets)
+    relaxedRulesForTests: true
+    # Common test file patterns
+    testFilePatterns:
+      - "**/test/**"
+      - "**/tests/**"
+      - "**/*Test.*"
+      - "**/*Tests.*"
+      - "**/*Spec.*"
+      - "**/*Specs.*"
+      - "**/spec/**"
+      - "**/specs/**"
+      - "**/__tests__/**"
+      - "**/*.test.*"
+      - "**/*.spec.*"
+
+# Whitelist configuration for common false positives
+whitelist:
+  # Common patterns that are typically safe
+  patterns:
+    # Documentation and examples
+    - "example\\.com"
+    - "example\\.org"
+    - "test\\.com"
+    - "localhost"
+    - "127\\.0\\.0\\.1"
+    - "0\\.0\\.0\\.0"
+    - "\\[::1\\]"
+    # Placeholder patterns
+    - "INSERT_.*_HERE"
+    - "REPLACE_.*_WITH"
+    - "YOUR_.*_HERE"
+    - "PUT_.*_HERE"
+    - "ADD_.*_HERE"
+    - "ENTER_.*_HERE"
+    - "\\$\\{.*\\}"
+    - "\\{\\{.*\\}\\}"
+    # Common comments and TODOs
+    - "TODO:.*"
+    - "FIXME:.*"
+    - "XXX:.*"
+    - "HACK:.*"
+    - "NOTE:.*"
+    # Common test/dummy values
+    - "password123"
+    - "secretkey"
+    - "testkey"
+    - "dummykey"
+    - "fakekey"
+    - "mysecret"
+    - "changeme"
+    - "default"
+    - "admin"
+    - "root"
+    - "user"
+    # Base64 encoded common strings
+    - "dGVzdA==" # "test"
+    - "YWRtaW4=" # "admin"
+    - "cGFzc3dvcmQ=" # "password"
+    # UUID patterns (often used as IDs, not secrets)
+    - "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+  # File-specific whitelists
+  files:
+    # Common configuration files that might contain test data
+    "application-test.properties": [".*"]
+    "application-test.yml": [".*"]
+    "test.properties": [".*"]
+    "test.yml": [".*"]
+    "test-config.json": [".*"]
+    "mock-data.json": [".*"]
+    "sample-data.sql": [".*"]
+
+  # Entropy-specific whitelists
+  entropy:
+    # Common high-entropy strings that aren't secrets
+    - "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    - "0123456789abcdefghijklmnopqrstuvwxyz"
+    - "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    - "Lorem ipsum dolor sit amet"
+    - "The quick brown fox jumps over the lazy dog"
+
+# Reporting configuration
+reporting:
+  # Generate console and JSON reports by default
+  formats:
+    - console
+    - json
+
+  # Console output settings
+  console:
+    # Use colors for better readability
+    useColors: true
+    # Show relative paths for cleaner output
+    showFullPaths: false
+    # Show line numbers for easy navigation
+    showLineNumbers: true
+    # Show matched content but limit length
+    showMatchedContent: true
+    # Reasonable content length
+    maxContentLength: 100
+    # Standard verbosity
+    verbose: false
+
+  # JSON report settings
+  json:
+    # Standard location for CI/CD integration
+    outputFile: "build/reports/scan/scan-results.json"
+    # Pretty print for readability
+    prettyPrint: true
+    # Don't include full file content to keep reports manageable
+    includeFileContent: false
+    # Include limited context
+    includeContext: true
+    # Minimal context lines
+    contextLines: 2
+
+# Performance settings
+performance:
+  # Use available CPU cores efficiently
+  parallelThreads: 2
+
+  # Enable basic caching for repeated scans
+  enableCaching: true
+
+  # Moderate memory usage
+  memory:
+    # Reasonable heap size
+    maxHeapSizeMB: 256
+    # Standard garbage collection
+    gcStrategy: "balanced"
+
+  # Reasonable timeouts
+  timeouts:
+    # Per-file timeout
+    perFileScanTimeoutSeconds: 15
+    # Total scan timeout (15 minutes)
+    totalScanTimeoutSeconds: 900
+
+# Advanced settings
+advanced:
+  # Disable debug mode for production use
+  debugMode: false
+
+  # No custom patterns by default
+  customPatternFiles: []
+
+  # Standard behavior
+  behavior:
+    # Continue scanning to get full picture
+    continueAfterSecrets: true
+    # Only generate report if issues found
+    alwaysGenerateReport: false
+    # Validate configuration
+    validateConfig: true
+
+  # Integration settings
+  integration:
+    # Standard exit codes
+    exitCodes:
+      success: 0
+      secretsFound: 1
+      scanError: 2
+      configError: 3
+
+    # Git integration
+    git:
+      # Scan all files, not just staged
+      onlyStaged: false
+      # Scan all files, not just modified
+      onlyModified: false
+      # Respect .gitignore
+      respectGitignore: true
+
+# Pattern customization for balanced approach
+patterns:
+  # Focus on high-confidence patterns
+  custom:
+    - name: "AWS Access Key ID"
+      pattern: "AKIA[0-9A-Z]{16}"
+      confidence: 0.95
+      category: "cloud_credentials"
+
+    - name: "GitHub Token"
+      pattern: "ghp_[a-zA-Z0-9]{36}"
+      confidence: 0.9
+      category: "tokens"
+
+    - name: "Database Connection String"
+      pattern: "(?i)(jdbc|mongodb|mysql|postgresql)://[^\\s'\"]+"
+      confidence: 0.8
+      category: "database_urls"
+
+    - name: "Generic API Key"
+      pattern: "(?i)(api[_-]?key|apikey)\\s*[:=]\\s*['\"]?[a-zA-Z0-9]{16,}['\"]?"
+      confidence: 0.75
+      category: "api_keys"
+
+    - name: "SSH Private Key Header"
+      pattern: "-----BEGIN\\s+(OPENSSH\\s+)?PRIVATE\\s+KEY-----"
+      confidence: 0.95
+      category: "ssh_keys"
+
+  # Balanced severity levels
+  severity:
+    crypto_keys: "HIGH"
+    ssh_keys: "HIGH"
+    cloud_credentials: "HIGH"
+    database_urls: "MEDIUM"
+    api_keys: "MEDIUM"
+    tokens: "MEDIUM"
+    passwords: "LOW"
+    generic_secrets: "LOW"
+
+# Rules for test files (more lenient)
+testRules:
+  # Higher confidence threshold for test files
+  minConfidenceLevel: 0.8
+
+  # Only report critical secrets in test files
+  reportOnlyHighSeverity: true
+
+  # Additional whitelist patterns for test files
+  additionalWhitelist:
+    - "test.*secret"
+    - "dummy.*key"
+    - "fake.*token"
+    - "mock.*password"
+    - "sample.*credential"
