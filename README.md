@@ -140,7 +140,7 @@ We welcome contributions! Please see our [Contributing Guide](Contributing-guide
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/theaniketraj/SCAN/blob/main/LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
