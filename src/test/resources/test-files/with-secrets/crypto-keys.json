@@ -1,0 +1,224 @@
+{
+    "description": "Test file containing various cryptographic keys and secrets for SCAN plugin testing",
+    "test_scenarios": {
+        "rsa_private_keys": {
+            "pem_format": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA3VoPN9PKUjKFLMwOge9+G9aPDdmtR1V3qJUjLNHjQTZnZMZn\nrO2EWJYqJQsOKG3+ks/dXlCELeLZoOk+sQgI0Jf1nU8Aw8fKpWvvq+sJAhOmL7Lj\nxqJ4Zj8Vqd7fWgYjpCuQ9kQs+WQl8fGVpgfNuZOKCITYtm2Dq1dVlOKsIQqQJMhT\nUJLjvvP9PEODhRcJqpGqhQfzjGwOtm+HKGxCQKzjQ9RiHPJJgFXgzuAKyQ5dWQbD\nJsLvjlGHWOqWDpvQF1Rr+8fYdJIOMNYBIIhpG9EjQNwFVxNbJXiEsONO4YJaQgYt\nJf0eBKQx5Ej3Lm3qNZtYKwLgCqI6Pj8FdUL3WwIDAQABAoIBAQCaJ8yyLF9tKuXV\nsEQgOKJrL6Hh0f5Sj/2ug/zT7PnkKF4mhTNNIGGHfY5Tw6uyY5GWOaFyYfvYQqgF\nNJzj9/I5CXlLFEyTXCrJwbQSJ4jW5v7qzGZpLGbBqfJYJ+gKqZzEJJ6zDnWgUXKA\nKZOjcVwjYMdOqFjJfOONGfGqhQFSqfLKdWz7hFTNvUqGNJmKJJ0Hq6oY9tFcuOlB\n5q1sD9eSfLfP0yxhQNLxJKELUHjuQVpOsE2NfpnHvZUVJbKqI8zMVQzqPqcqQmGr\nLcEL0nYJ9JMLqzq9FJJ+iJVjPzQQmYvQvYPjKEJnLWGrfhHNnQWfz9QyJPGQqmU+\nEcPGMWU1AoGBAO0Q0BXUMjyOp3/MgY8+eMkLjBuF8uh4JV9KvmjJQ7FBPvYJyXIR\nWTjZJzJ6VwZPJqZmJVlqY6K7VjQv7vMGqS8BqtUGJJCRbKrFZQQ1OL6FJkUKmSNJ\nFnGOYBzXDWMNFBGPpPQRILLfMIoFqJzEJfzfpWGIFhEaL1FqfQJ7qPeN\n-----END RSA PRIVATE KEY-----",
+            "pkcs8_format": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdWg830cpSMoUs\nzA6B734b1o8N2a1HVXeolSMs0eNBNmdkxmes7YRYliolCw4obf6Sz91eUIQt4tmg\n6T6xCAjQl/WdTwDDx8qla++r6wkCE6YvsuPGonhmPxWp3t9aBiOkK5D2RCz5ZCXx\n8ZWmB825k4oIhNi2bYOrV1WU4qwhCpAkyFNQkuO+8/08Q4OFFwmqkaqFB/OMbA62\nb4cobEJArOND1GIc8kmAVeDO4ArJDl1ZBsMmwu+OUYdY6pYOm9AXVGv7x9h0kg4w\n1gEgiGkb0SNA3AVXE1sleISw407hglpCBi0l/R4EpDHkSPcubeo1m1grAuAKojo+\nPwV1QvdbAgMBAAECggEBAJonzLIsX20q5dWwRCA4omsvoeHR/lKP/a6D/NPs+eQo\nXiaFM00gYYd9jlPDq7JjkZY5oXJh+9hCqAU0nOP38jkJeUsUTJNcKsnBtBIniNbm\n/urMZmksZsGp8lgn6AqpnMQknrMOdaBRcoApk6NxXCNgx06oWMl8440Z8aqFAVKp\n8sp1bPuEVM29SoY0mYoknQerqhj20Vy46UHmrWwP15J8t8/TLGFA0vEkoQtQeO5B\nWk6wTY1+mce9lRUlsqojzMxVDOo+pypCYastwQvSdgn0kwurOr0Ukn6IlWM/NBCZ\ni9C9g+MoQmctYat+Ec2dBZ/P1DIk8ZCqZT4Rw8YxZTUCgYEA7RDQFdQyPI6nf8yB\njz54yQuMG4Xy6HglX0q+aMlDsUE+9gnJchFZONknMnpXBk8mpmYlWWpjortWNC/u\n8wapLwGq1QYkkJFsqsVlBDU4voUmRQqZI0kWcY5gHNcNYw0UEY+k9BEgst8wigWo\nnMQl/N+lYYgWERovUWp9Anuo943\n-----END PRIVATE KEY-----"
+        },
+        "aws_credentials": {
+            "access_key_id": "AKIAIOSFODNN7EXAMPLE",
+            "secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+            "session_token": "AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVPvLXCrrrUtdnniCEXAMPLE/IvU1BdQnlAhYdNxfAZ",
+            "alternate_formats": {
+                "iam_user_key": "AKIA2OGYBAH4XZGHJK7S",
+                "root_access_key": "AKIAI44QH8DHBEXAMPLE",
+                "temporary_credentials": "ASIAI44QH8DHBEXAMPLE"
+            }
+        },
+        "gcp_service_account": {
+            "type": "service_account",
+            "project_id": "my-project-123456",
+            "private_key_id": "a1b2c3d4e5f6789012345678901234567890abcd",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC4Z6Zq9C+lTt6D\nGOgPZBmCLLZjkJY8qlPd1VlNXzpFJ6Pw6zVzQyJlQzEU5vDaYgIZJEqLGGfvjJGG\nXVKNJ7DdHMfaV6WZ8pPQIzpQOzD1Gv4Vy7y8p2lGE1NJZlNHjODFWjD2kA3TGJ3h\nzQAuVQ7y4mAKqrYjmTQ8U0GEK0m4vXGFgGGlmYnJCFvQJ5u4L+9RbqYQdD8kOPU4\nkGSgFQdSWFmqhCx6EYCOsyH7VXP2EBQLxGrF6l4oRl0qs7P5GvSCNHWGdKvKxmzP\n9ZjkOaJGfFSHoQkGbIZQqZDSQYRdFNa+RIzQ7fZGaYEzOJ5qMJJvAzOHQiSE/Yt\nKABGhCgHdAgMBAAECggEAXzjK4wCUgKqLOlLbYFLXwk1tpYnHOQH8cJ+x0WJGEOqf\nCUKFCRSxb+mHlLJ1vQzO2aNiIdQj+BVuZNQWFoRZqTGOkJ5YxLzWdJDzYMfuPGYO\nqgHvZgBJKKwTdBIEJdCxZDWyEKVGM8yPMdJxGjDKMGdZKNUYRBfQQbGJNHgJxp3k\nDpCTCKCPmMz2kEwzZhGHaQUCOqiPGHsYbzBDyQNDGLxm0K1wqWGP4I9qvPqZKo6g\nqwVQ5jqfTx6ZL4YnYQzxzDWcqQB+pUTrZFqGnOvTAB6mKBzwCt1kV8tYFQ6zUGFR\n0zZLdLJ9gE5Q6u3wqzYeGOJ+F8bMHrNOIwdGGJ2SkwKBgQDkTLEJYdNJVCLKWoGJ\nzBHrQqjnqQ5eLmIVJqLQF1L6QTaEjOQWXbXWvMZGzGP3D9qBcPBkHWEZ2LXhHgqE\nCQ2XHFzgmVqOGQ4V0vYBFf1hJlOqKUHsGjrETQaWQ3JCXJ5lUvWpfgzJ9GGOKdRZ\nMVJWtGxvhOQGLDHjBzOjUXLAQwKBgQDPZKKsQFiVCNnWOgmWw8dGEyKJqWXxQEGZ\nWQIzFRhD5z4pDvGOJ3KqGGPbXgBGfxMQTHtVjBJZaEhXZjKhGjUKpUYqVQQSLELT\nmhUzQJQIvQqgQZJqLGpwNgpEuOBgzqFaQdJGtQPQFKxOaCyJ3mBGDKxLYmAzGdUQ\nLgAKr7YJOcWLfZNM9uCdJ2qsOJLZqfzfgOGCBKkfXzl3vFrRGOQNpNNYhXTQ6Ux\nQnNKjyUE9qHWXWMBzQKBgQDJRpN0QAXPKjmJZqfBBE7+zF0IqOQQaYhqSJwJ+YO\nJuNjVxOGPIGfWFqJUyXm9HJqTYJZgSKzPJNHVW9jNnHPZEKCqhDQSgQg3PLhcJ8\nKyVKtgGjK6KJMYBKONWBOqvZYqzYaLIvuR0qAh5JtZDkUOwEqfVhRPtRNJNfwB/\nqmK5YJWJEIgJdLnLrPD3R6Dw==\n-----END PRIVATE KEY-----",
+            "client_email": "test-service@my-project-123456.iam.gserviceaccount.com",
+            "client_id": "114849583475298457829",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/test-service%40my-project-123456.iam.gserviceaccount.com"
+        },
+        "azure_credentials": {
+            "client_id": "12345678-1234-1234-1234-123456789012",
+            "client_secret": "abcdef123456789012345678901234567890abcd",
+            "tenant_id": "87654321-4321-4321-4321-210987654321",
+            "subscription_id": "11111111-2222-3333-4444-555555555555",
+            "connection_string": "DefaultEndpointsProtocol=https;AccountName=mystorageaccount;AccountKey=abcdef123456789012345678901234567890abcdef123456789012345678901234567890abcdef12==;EndpointSuffix=core.windows.net"
+        },
+        "github_tokens": {
+            "personal_access_token": "ghp_1234567890abcdef1234567890abcdef12345678",
+            "app_token": "ghs_1234567890abcdef1234567890abcdef12345678",
+            "oauth_token": "gho_1234567890abcdef1234567890abcdef12345678",
+            "refresh_token": "ghr_1234567890abcdef1234567890abcdef12345678"
+        },
+        "docker_registry": {
+            "dockerhub_token": "dckr_pat_1234567890abcdef1234567890abcdef",
+            "gcr_token": "ya29.c.b0AXv0zTXPCZJpQYx7vGGHJqLl3kZzqZFKjVRtXTa8bKpPQGH7GzF2P4N6bYR3L8tJPQ",
+            "ecr_token": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20230615/us-east-1/ecr/aws4_request, SignedHeaders=host;x-amz-date, Signature=abcdef123456789012345678901234567890abcdef123456789012345678901234"
+        },
+        "database_credentials": {
+            "mongodb_uri": "mongodb+srv://username:password123@cluster0.mongodb.net/myDatabase?retryWrites=true&w=majority",
+            "postgres_url": "postgresql://username:password123@localhost:5432/mydatabase",
+            "mysql_connection": "mysql://root:password123@localhost:3306/mydb",
+            "redis_url": "redis://username:password123@localhost:6379/0"
+        },
+        "api_keys": {
+            "stripe_secret": "sk_live_51234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+            "sendgrid_api_key": "SG.1234567890abcdef1234567890abcdef.1234567890abcdef1234567890abcdef",
+            "twilio_auth_token": "abcdef1234567890abcdef1234567890ab",
+            "slack_webhook_url": "https://hooks.slack.com/services/T12345678/B12345678/1234567890abcdef1234567890abcdef",
+            "firebase_server_key": "AAAA1234567890:APA91bGH123456789012345678901234567890abcdef123456789012345678901234"
+        },
+        "jwt_secrets": {
+            "jwt_secret": "super_secret_jwt_key_that_should_never_be_exposed_in_code_2023",
+            "jwt_secret_base64": "c3VwZXJfc2VjcmV0X2p3dF9rZXlfdGhhdF9zaG91bGRfbmV2ZXJfYmVfZXhwb3NlZF9pbl9jb2RlXzIwMjM=",
+            "refresh_token_secret": "refresh_token_secret_key_2023_very_long_and_complex_string"
+        },
+        "encryption_keys": {
+            "aes_key": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+            "aes_256_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "encryption_salt": "salt_1234567890abcdef1234567890abcdef",
+            "iv": "1234567890abcdef1234567890abcdef"
+        },
+        "ssh_keys": {
+            "private_key": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAFwAAAAdzc2gtcn\nNhAAAAAwEAAQAAAQEA3VoPN9PKUjKFLMwOge9+G9aPDdmtR1V3qJUjLNHjQTZnZMZnrO2E\nWJYqJQsOKG3+ks/dXlCELeLZoOk+sQgI0Jf1nU8Aw8fKpWvvq+sJAhOmL7LjxqJ4Zj8V\nqd7fWgYjpCuQ9kQs+WQl8fGVpgfNuZOKCITYtm2Dq1dVlOKsIQqQJMhTUJLjvvP9PEOD\nhRcJqpGqhQfzjGwOtm+HKGxCQKzjQ9RiHPJJgFXgzuAKyQ5dWQbDJsLvjlGHWOqWDpvQ\nF1Rr+8fYdJIOMNYBIIhpG9EjQNwFVxNbJXiEsONO4YJaQgYtJf0eBKQx5Ej3Lm3qNZtY\nKwLgCqI6Pj8FdUL3WwAAA8gA5mHWAOZh1gAAAAdzc2gtcnNhAAABAQDdWg830cpSMoUs\nzA6B734b1o8N2a1HVXeolSMs0eNBNmdkxmes7YRYliolCw4obf6Sz91eUIQt4tmg6T6x\nCAjQl/WdTwDDx8qla++r6wkCE6YvsuPGonhmPxWp3t9aBiOkK5D2RCz5ZCXx8ZWmB825\nk4oIhNi2bYOrV1WU4qwhCpAkyFNQkuO+8/08Q4OFFwmqkaqFB/OMbA62b4cobEJArOND\n1GIc8kmAVeDO4ArJDl1ZBsMmwu+OUYdY6pYOm9AXVGv7x9h0kg4w1gEgiGkb0SNA3AVX\nE1sleISw407hglpCBi0l/R4EpDHkSPcubeo1m1grAuAKojo+PwV1QvdbAAAAAwEAAQAA\nAQEAmifMsixfbSrl1bBEIDigay+h4dH+Uo/9roP80+z55CheJoUzTSBhh32OU8OrsmOR\nljmhcmH72EKoBTSc4/fyOQl5SxRMk1wqycG0EieI1ub+6sxmaSymwanyWCfoCqmcxCSe\nsw51oFFygCmTo3FcI2DHTqhYyXzjjRnxqoUBUqnyynVs+4RUzb1KhjSZiiSdB6uqGPbR\nXLjpQeatbA/Xkny3z9MsYUDS8SShC1B47kFaTrBNjX6Zx72VFSWyqiPMzFUM6j6nKkJh\nqy3BC9J2CfSTC6s6vRSSfoiVYz80EJmL0L2D4yhCZy1hq34RzZ0Fn8/UMiTxkKplPhHD\nxjFlNQAAAIEAzJXQXCNKEqTVqjODGG0wFTgVOOqjlvkzVjCVP1b7VGzlJYT6p5c6Q4a\naFOOFxsrONjNRe0YJWILWbfq9FYJVRXZrN5qzT/7vgZKkMnJHHdZkbMZqS3wF2j6xWJ\n5AZP8PsGb+6lHKsJdWb3qGc9fQyLwq6b5FjgmEMGlPGHsF8xmQ0AAAIEA9cBSgFqh\nMHJOkCu5Jj0aJgxC7nEfBJvZbMOuN3aZaYJhpMqULdUvQyNpE5bSGg9F7U1qpTYJ\nOeYQzxCYqKDMF2OcCgYEA9CBjMFzTNpBsXWPGfPfqD1YwXJvMCgYEA+J9V4lUmLUJr\nFYvZlXHgmZmLnZgcZcZJOaFhZqOOZqYGGbzGhCgOtGqjUAZzBKDQbTXFjlPbO2Kl0s\nEQWKzQqjKXGRhCgFOWGKBgQDy7oGZCDFvdlU3Vj7VGCBKGmYfP5CWELg4oWXGXZKoO\nzlGqGwUOQBPm9bvhXpqYfxGqMdXZQYOKXBOk7TJ9jvTjJkqHWGzFRKzOJ5KjJzLKoJ\nAAAAE3Rlc3QgZXhhbXBsZSBrZXkgMjAyMwECAwQF\n-----END OPENSSH PRIVATE KEY-----",
+            "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4f0e3VoPN9PKUjKFLMwOge9+G9aPDdmtR1V3qJUjLNHjQTZnZMZnrO2EWJYqJQsOKG3+ks/dXlCELeLZoOk+sQgI0Jf1nU8Aw8fKpWvvq+sJAhOmL7LjxqJ4Zj8Vqd7fWgYjpCuQ9kQs+WQl8fGVpgfNuZOKCITYtm2Dq1dVlOKsIQqQJMhTUJLjvvP9PEODhRcJqpGqhQfzjGwOtm+HKGxCQKzjQ9RiHPJJgFXgzuAKyQ5dWQbDJsLvjlGHWOqWDpvQF1Rr+8fYdJIOMNYBIIhpG9EjQNwFVxNbJXiEsONO4YJaQgYtJf0eBKQx5Ej3Lm3qNZtYKwLgCqI6Pj8FdUL3Ww== test@example.com"
+        },
+        "certificates": {
+            "ssl_certificate": "-----BEGIN CERTIFICATE-----\nMIIDXTCCAkWgAwIBAgIJAKl2lMZf2XwcMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV\nBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX\naWRnaXRzIFB0eSBMdGQwHhcNMjMwNjE1MTIwMDAwWhcNMjQwNjE0MTIwMDAwWjBF\nMQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50\nZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB\nCgKCAQEAuH9Ht1aDzfTylIyhSzMDofvfhvWjw3ZrUdVd6iVIyzR40E2Z2TGZ6zth\nFiWKiULDiht/pLP3V5QhC3i2aDpPrEICNCX9Z1PAMPHyqVr76vrCQITpi+y48ai\neGY/Fane31oGI6QrkPZELPlkJfHxlaYHzbmTigiE2LZtg6tXVZTirCEKkCTIU1CS\n477z/TxDg4UXCaqRqoUH84xsDrZvhyhsQkCs40PUYhzySYBV4M7gCskOXVkGwybC\n745Rh1jqlg6b0BdUa/vH2HSSjjDWASCIaRvRI0DcBVcTWyV4hLDjTuGCWkIGLSX9\nHgSkMeRI9y5t6jWbWCsC4AqiOj4/BXVC91sCAwEAAaNQME4wHQYDVR0OBBYEFErt\nSuWXZgQVwj5tMtRcCY+YbVQHMB8GA1UdIwQYMBaAFErtsul2ZZgQVwj5tMtRcCY+\nYbVQHMAwGA1UdEwEB/wQCMAAwEAAaOBEAwDgYDVR0PAQH/BAQDAgWgMA0GCSqGSIb3\nDQEBCwUAA4IBAQBqU1mTN1kNWBGjGpLqH5WgpFGQc3J1bnl6Q7Oe8vQw6gJgL5Yv\nfEhsXqJWrOZCNqhG6vhZHJpFN6+7HF2XaJ7q5G7RqNE0V0YKPr8AKGiJQKqiULHq\nDQ1D1yIWOYkJvVLq8RRhpRIcjYQoZsVw5Gq5YJyTZ+EZ6qYI+GvmXKRGvLF3y5G
+n6qYI+GvmXKRGvLF3y5Gn6qYI+GvmXKRGvLF3y5Gn6qYI+GvmXKRGvLF3y5G
+-----END CERTIFICATE-----","ca_certificate": "-----BEGIN CERTIFICATE-----\nMIIDdzCCAl+gAwIBAgIJAKWpukZNuIUiMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNV\nBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNp\nc2NvMRYwFAYDVQQKDA1NeU9yZ2FuaXphdGlvbjAeFw0yMzA2MTUxMjAwMDBaFw0y\nODA2MTMxMjAwMDBaMFIxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlh\nMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMRYwFAYDVQQKDA1NeU9yZ2FuaXphdGlv\nbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALh/R7dWg8308pSMoUsz\nA6H734b1o8N2a1HVXeolSMs0eNBNmdkxmes7YRYliolCw4obf6Sz91eUIQt4tmg6\nT6xCAjQl/WdTwDDx8qla++r6wkCE6YvsuPGonhmPxWp3t9aBiOkK5D2RCz5ZCXx\n8ZWmB825k4oIhNi2bYOrV1WU4qwhCpAkyFNQkuO+8/08Q4OFFwmqkaqFB/OMbA62\nb4cobEJArOND1GIc8kmAVeDO4ArJDl1ZBsMmwu+OUYdY6pYOm9AXVGv7x9h0kg4w\n1gEgiGkb0SNA3AVXE1sleISw407hglpCBi0l/R4EpDHkSPcubeo1m1grAuAKojo+\nPwV1QvdbCwIDAQABo1AwTjAdBgNVHQ4EFgQUSu1K5ZdmBBXCPm0y1FwJj5htVAcw\nHwYDVR0jBBgwFoAUSu1K5ZdmBBXCPm0y1FwJj5htVAcwDAYDVR0TBAUwAwEB/zAN\nBgkqhkiG9w0BAQsFAAOCAQEAalNZkzdZDVgRoxqS6h+VoKRRkHNydW55ekOznvL0\nMOoCYC+WL3xIbF6iVqzmQjaoRur4WRyaRTevuxxdl2ie6uRu0ajRNFdGCj6/AChoi\nUCqolCx6g0NQ9ciFjmJCb1S6vEUYaUSHI2EKGbFcORquWCck2fhGeqmCPhr5lykR\nryzd8uRp+qmCPhr5lykRryzd8uRp+qmCPhr5lykRryzd8uRp+qmCPhr5lykRryzd8\n-----END CERTIFICATE-----"
+        },
+        "blockchain_keys": {
+            "bitcoin_private_key": "L1uyy5qTuGrVXrmrsvHWHgVzW9kw4aAhqOTJpSBzVCgzJGW4J5Hm",
+            "ethereum_private_key": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+            "bitcoin_wif": "KxFC1jmwwCoACiCAWZ3eXa96mBM6tb3TYzGmf6YwgdGWZgawvrtJ",
+            "ethereum_keystore": {
+                "address": "0x1234567890123456789012345678901234567890",
+                "crypto": {
+                    "cipher": "aes-128-ctr",
+                    "cipherparams": {
+                        "iv": "6087dab2f9fdbbfaddc31a909735c1e6"
+                    },
+                    "ciphertext": "5318b4d5bcd28de64ee5559e671353e16f075ecae9f99c7a79a38af5f869aa46",
+                    "kdf": "pbkdf2",
+                    "kdfparams": {
+                        "c": 262144,
+                        "dklen": 32,
+                        "prf": "hmac-sha256",
+                        "salt": "ae3cd4e7013836a3df6bd7241b12db061dbe2c6785853cce422d148a624ce0bd"
+                    },
+                    "mac": "517ead924a82bbe2a6a2a2b3b1e2e5e9e5e7e8e9e1e2e3e4e5e6e7e8e9e0e1e2"
+                },
+                "id": "3198bc9c-6672-5ab3-d995-4942343ae5b6",
+                "version": 3
+            }
+        },
+        "oauth_secrets": {
+            "google_oauth": {
+                "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+                "client_secret": "GOCSPX-abcdefghijklmnopqrstuvwxyz123456",
+                "refresh_token": "1//04abcdefghijklmnopqrstuvwxyz123456789012345678901234567890abcdef"
+            },
+            "facebook_oauth": {
+                "app_id": "123456789012345",
+                "app_secret": "abcdef1234567890abcdef1234567890"
+            },
+            "twitter_oauth": {
+                "consumer_key": "abcdefghijklmnopqrstuvwx",
+                "consumer_secret": "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnop",
+                "access_token": "123456789012345678-abcdefghijklmnopqrstuvwxyz123456789",
+                "access_token_secret": "abcdefghijklmnopqrstuvwxyz1234567890abcdefg"
+            }
+        },
+        "email_service_keys": {
+            "mailgun_api_key": "key-1234567890abcdef1234567890abcdef",
+            "mailgun_domain": "mg.example.com",
+            "postmark_server_token": "12345678-1234-1234-1234-123456789012",
+            "amazon_ses": {
+                "access_key_id": "AKIAIOSFODNN7EXAMPLE",
+                "secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+                "region": "us-east-1"
+            }
+        },
+        "payment_gateway_keys": {
+            "paypal_client_id": "AabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+            "paypal_client_secret": "EabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+            "razorpay_key_id": "rzp_live_1234567890abcd",
+            "razorpay_key_secret": "abcdefghijklmnopqrstuvwxyz123456"
+        },
+        "cloud_storage_keys": {
+            "s3_access_key": "AKIA1234567890ABCDEF",
+            "s3_secret_key": "abcdefghijklmnopqrstuvwxyz1234567890ABCDEF",
+            "dropbox_access_token": "sl.BabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+            "box_access_token": "BabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        },
+        "notification_service_keys": {
+            "pusher_app_id": "123456",
+            "pusher_key": "abcdefghijklmnopqrst",
+            "pusher_secret": "abcdefghijklmnopqrst",
+            "pusher_cluster": "us2",
+            "firebase_server_key": "AAAAabcdefg:APA91bHabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        },
+        "monitoring_keys": {
+            "datadog_api_key": "abcdefghijklmnopqrstuvwxyz123456",
+            "datadog_app_key": "abcdefghijklmnopqrstuvwxyz1234567890abcdef",
+            "new_relic_license_key": "abcdefghijklmnopqrstuvwxyz1234567890abcdef",
+            "bugsnag_api_key": "abcdefghijklmnopqrstuvwxyz123456"
+        },
+        "cdn_keys": {
+            "cloudflare_api_key": "abcdefghijklmnopqrstuvwxyz1234567890abc",
+            "cloudflare_email": "user@example.com",
+            "cloudflare_zone_id": "abcdefghijklmnopqrstuvwxyz123456",
+            "aws_cloudfront_key_id": "APKAI1234567890ABCDEF",
+            "aws_cloudfront_private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\n-----END RSA PRIVATE KEY-----"
+        },
+        "high_entropy_strings": {
+            "random_base64": "SGVsbG9Xb3JsZFRoaXNJc0FTZWNyZXRLZXlUaGF0U2hvdWxkTm90QmVFeHBvc2VkSW5Db2RlMjAyMw==",
+            "random_hex": "deadbeef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+            "uuid_secret": "550e8400-e29b-41d4-a716-446655440000",
+            "hash_secret": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+            "encoded_secret": "%2BVGhlUXVpY2tCcm93bkZveEp1bXBzT3ZlclRoZUxhenlEb2c%3D"
+        },
+        "environment_variables": {
+            "SECRET_KEY": "django-insecure-1234567890abcdef1234567890abcdef1234567890abcdef",
+            "DATABASE_URL": "postgres://user:pass123@localhost:5432/mydb",
+            "REDIS_URL": "redis://localhost:6379",
+            "CELERY_BROKER_URL": "redis://localhost:6379/0",
+            "EMAIL_HOST_PASSWORD": "smtp_password_123456",
+            "SENTRY_DSN": "https://abcdef1234567890abcdef1234567890@o123456.ingest.sentry.io/1234567"
+        }
+    },
+    "metadata": {
+        "test_purpose": "This file contains various types of cryptographic keys, API keys, and secrets that should be detected by the SCAN plugin",
+        "categories_covered": [
+            "RSA Private Keys",
+            "Cloud Provider Credentials (AWS, GCP, Azure)",
+            "Version Control Tokens (GitHub)",
+            "Container Registry Tokens",
+            "Database Connection Strings",
+            "API Keys (Stripe, SendGrid, Twilio, etc.)",
+            "JWT Secrets",
+            "Encryption Keys (AES)",
+            "SSH Keys",
+            "SSL/TLS Certificates",
+            "Blockchain Private Keys",
+            "OAuth Credentials",
+            "Email Service Keys",
+            "Payment Gateway Keys",
+            "Cloud Storage Keys",
+            "Notification Service Keys",
+            "Monitoring Service Keys",
+            "CDN Keys",
+            "High Entropy Strings",
+            "Environment Variables with Secrets"
+        ],
+        "detection_challenges": [
+            "Different key formats (PEM, PKCS8, OpenSSH)",
+            "Base64 encoded secrets",
+            "Hex encoded secrets",
+            "URL encoded secrets",
+            "Multi-line private keys",
+            "JSON nested secrets",
+            "High entropy random strings",
+            "UUIDs as secrets",
+            "Hash-like strings",
+            "Connection strings with embedded credentials"
+        ],
+        "expected_detections": 50,
+        "false_positive_tests": [
+            "Short random strings that might not be secrets",
+            "Common test values",
+            "Example/placeholder values"
+        ]
+    }
+}
