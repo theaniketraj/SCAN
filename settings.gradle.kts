@@ -1,6 +1,28 @@
-plugins {
-    // Apply the foojay-resolver plugin to allow automatic download of JDKs
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
+// Configure plugin management
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+
+    plugins {
+        // Apply the foojay-resolver plugin to allow automatic download of JDKs
+        id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
+    }
+    
+    // Configure plugin resolution strategy
+    resolutionStrategy {
+        eachPlugin {
+            when (requested.id.namespace) {
+                "org.jetbrains.kotlin" -> {
+                    useVersion(libs.versions.kotlin.get())
+                }
+                "org.jetbrains.dokka" -> {
+                    useVersion(libs.versions.dokka.get())
+                }
+            }
+        }
+    }
 }
 
 rootProject.name = "scan-gradle-plugin"
@@ -189,28 +211,6 @@ if (isDevelopmentMode) {
                 buildScan {
                     tag("development")
                     publishAlwaysIf(true)
-                }
-            }
-        }
-    }
-}
-
-// Configure plugin management
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-    
-    // Configure plugin resolution strategy
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.namespace) {
-                "org.jetbrains.kotlin" -> {
-                    useVersion(libs.versions.kotlin.get())
-                }
-                "org.jetbrains.dokka" -> {
-                    useVersion(libs.versions.dokka.get())
                 }
             }
         }
