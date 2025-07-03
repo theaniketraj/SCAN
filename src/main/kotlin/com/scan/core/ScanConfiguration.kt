@@ -1026,4 +1026,3 @@ class ScanConfigurationBuilder {
         return config.getEffectivePathExcludePatterns()
     }
 }
-   
