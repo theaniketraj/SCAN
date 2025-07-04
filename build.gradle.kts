@@ -22,11 +22,6 @@ java {
     withJavadocJar()
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 dependencies {
     // Kotlin Core
     implementation(libs.bundles.kotlin.core)
