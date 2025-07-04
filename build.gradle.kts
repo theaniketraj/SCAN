@@ -28,9 +28,6 @@ dependencies {
     implementation(libs.bundles.kotlin.coroutines)
     implementation(libs.bundles.kotlin.serialization)
     
-    // Gradle API
-    implementation(libs.gradle.api)
-    
     // Configuration Management
     implementation(libs.bundles.config)
     
@@ -52,7 +49,6 @@ dependencies {
     
     // Testing
     testImplementation(libs.bundles.testing)
-    testImplementation(libs.gradle.testkit)
     
     // Performance Testing
     testImplementation(libs.bundles.performance)
