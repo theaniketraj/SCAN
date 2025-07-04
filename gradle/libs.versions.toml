@@ -5,8 +5,8 @@ kotlinCoroutines = "1.8.1"
 kotlinSerialization = "1.6.3"
 
 # Gradle Plugin Development
-gradleApi = "8.8"
-gradleTestKit = "8.8"
+# gradleApi = "8.8"
+# gradleTestKit = "8.8"
 pluginPublish = "1.2.1"
 
 # YAML Processing
@@ -67,10 +67,6 @@ kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-j
 # Kotlin Serialization
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinSerialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxJson" }
-
-# Gradle API
-gradle-api = { module = "org.gradle:gradle-api", version.ref = "gradleApi" }
-gradle-testkit = { module = "org.gradle:gradle-test-kit", version.ref = "gradleTestKit" }
 
 # YAML Processing
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
