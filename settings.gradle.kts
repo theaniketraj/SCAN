@@ -11,13 +11,6 @@ dependencyResolutionManagement {
         mavenCentral()
         gradlePluginPortal()
     }
-    
-    // Enable version catalog
-    versionCatalogs {
-        create("libs") {
-            from(files("gradle/libs.versions.toml"))
-        }
-    }
 }
 
 rootProject.name = "scan-gradle-plugin"
