@@ -122,7 +122,10 @@ spotless {
     kotlin {
         target("**/*.kt")
         targetExclude("**/build/**/*.kt")
-        ktlint(libs.versions.ktlint.get()).setUseExperimental(true)
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf(
+                "ktlint_experimental" to "enabled"
+            ))
         licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
     
@@ -134,7 +137,7 @@ spotless {
 
 // Documentation
 tasks.dokkaHtml.configure {
-    outputDirectory.set(buildDir.resolve("dokka"))
+    outputDirectory.set(layout.buildDirectory.dir("dokka"))
 }
 
 // Version updates check
