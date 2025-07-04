@@ -161,3 +161,7 @@ tasks.register("benchmark") {
     description = "Runs JMH performance benchmarks"
     dependsOn("jmh")
 }
+
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
