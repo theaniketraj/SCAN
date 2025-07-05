@@ -107,6 +107,12 @@ scan-gradle-plugin/
 │               ├── balanced-config.yml                      # Balanced scanning configuration
 │               └── custom-patterns.yml                      # Custom pattern examples
 │
+├── config/
+│   └── detekt/
+│       ├── detekt.yml
+│       └── baseline.xml
+│
+│
 ├── docs/
 │   ├── user-guide.md                                        # User documentation
 │   ├── configuration-reference.md                           # Configuration options
@@ -122,10 +128,6 @@ scan-gradle-plugin/
 │       ├── gradle-wrapper.jar
 │       └── gradle-wrapper.properties
 │
-├── config/
-│   └── detekt/
-│       ├── detekt.yml
-│       └── baseline.xml
 │
 ├── gradlew
 ├── gradlew.bat
