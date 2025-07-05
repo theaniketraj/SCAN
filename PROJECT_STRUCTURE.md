@@ -122,6 +122,11 @@ scan-gradle-plugin/
 │       ├── gradle-wrapper.jar
 │       └── gradle-wrapper.properties
 │
+├── config/
+│   └── detekt/
+│       ├── detekt.yml
+│       └── baseline.xml
+│
 ├── gradlew
 ├── gradlew.bat
 │
