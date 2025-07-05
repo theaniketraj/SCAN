@@ -19,8 +19,7 @@ processors:
   active: true
   exclude:
     - "DetektProgressListener"
-  # Use absolute paths for better IDE integration
-  absolutePaths: true
+  # Remove the absolutePaths property as it doesn't exist
 
 console-reports:
   active: true
@@ -561,15 +560,12 @@ potential-bugs:
   MissingPackageDeclaration:
     active: false
     excludes: ["**/*.kts"]
-  MissingWhenCase:
-    active: true
-    allowElseExpression: true
+  # Remove MissingWhenCase - deprecated
   NullCheckOnMutableProperty:
     active: false
   NullableToStringCall:
     active: false
-  RedundantElseInWhen:
-    active: true
+  # Remove RedundantElseInWhen - deprecated
   UnconditionalJumpStatementInLoop:
     active: false
   UnnecessaryNotNullCheck:
@@ -623,8 +619,7 @@ style:
     active: false
   CollapsibleIfStatements:
     active: false
-  DataClassContainsFunction:
-    active: false
+  # Remove DataClassContainsFunction - doesn't exist
   DataClassShouldBeImmutable:
     active: false
   DestructuringDeclarationWithTooManyEntries:
@@ -643,12 +638,14 @@ style:
     includeLineWrapping: false
   ForbiddenComment:
     active: true
-    values:
-      - "FIXME:"
-      - "STOPSHIP:"
-      - "TODO:"
+    comments:
+      - value: "FIXME:"
+        reason: "Forbidden FIXME comment."
+      - value: "STOPSHIP:"
+        reason: "Forbidden STOPSHIP comment."
+      - value: "TODO:"
+        reason: "Forbidden TODO comment."
     allowedPatterns: ""
-    customMessage: ""
   ForbiddenImport:
     active: false
     imports: []
@@ -670,12 +667,8 @@ style:
     ignoreOverridableFunction: true
     ignoreActualFunction: true
     excludedFunctions: []
-  LibraryCodeMustSpecifyReturnType:
-    active: true
-    excludes: ["**"]
-  LibraryEntitiesShouldNotBePublic:
-    active: false
-    excludes: ["**"]
+  # Remove LibraryCodeMustSpecifyReturnType - deprecated
+  # Remove LibraryEntitiesShouldNotBePublic - deprecated
   LoopWithTooManyJumpStatements:
     active: true
     maxJumpCount: 1
@@ -740,8 +733,7 @@ style:
     active: true
   OptionalUnit:
     active: false
-  OptionalWhenBraces:
-    active: false
+  # Remove OptionalWhenBraces - deprecated
   PreferToOverPairSyntax:
     active: false
   ProtectedMemberInFinalClass:
