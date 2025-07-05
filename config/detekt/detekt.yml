@@ -855,3 +855,5 @@ style:
       ]
     excludeImports:
       - "java.util.*"
+    formatting:
+      active: false
