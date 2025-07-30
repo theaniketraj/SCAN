@@ -8,7 +8,7 @@ import java.util.regex.PatternSyntaxException
  * Filter implementation that includes or excludes files based on their file paths.
  * 
  * This filter supports multiple pattern matching strategies:
- * - Glob patterns (*.kt, **/*.test.*, etc.)
+ * - Glob patterns (like *.kt, **/*.test.*, etc.)
  * - Regular expressions
  * - Exact path matching
  * - Directory-based filtering

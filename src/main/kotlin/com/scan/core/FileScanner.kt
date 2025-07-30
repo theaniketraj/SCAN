@@ -111,7 +111,7 @@ class FileScanner(
      * @param filePath The path to the file to scan
      * @return ScanResult containing any findings or null if file should be skipped
      */
-    fun scanFile(filePath: Path): ScanResult? {
+    fun scanFile(filePath: Path): FileScanResult? {
         val file = filePath.toFile()
 
         // Pre-scanning validation
@@ -154,22 +154,17 @@ class FileScanner(
             // Post-process findings
             val processedFindings = postProcessFindings(findings, scanContext)
 
-            ScanResult(
+            FileScanResult.success(
                     filePath = filePath.toString(),
-                    findings = processedFindings,
-                    scanTime = System.currentTimeMillis(),
-                    fileSize = file.length(),
-                    linesScanned = scanContext.lines.size
+                    detections = processedFindings,
+                    scanTimeMs = System.currentTimeMillis(),
+                    fileSize = file.length()
             )
         } catch (e: Exception) {
             System.err.println("Failed to scan file ${filePath}: ${e.message}")
-            ScanResult(
+            FileScanResult.error(
                     filePath = filePath.toString(),
-                    findings = emptyList(),
-                    scanTime = System.currentTimeMillis(),
-                    fileSize = file.length(),
-                    linesScanned = 0,
-                    error = e.message
+                    errorMessage = e.message ?: "Unknown error"
             )
         }
     }

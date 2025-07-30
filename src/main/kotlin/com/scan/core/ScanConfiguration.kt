@@ -633,7 +633,8 @@ data class PerformanceConfiguration(
         val enableProgressReporting: Boolean = true,
         val batchSize: Int = 50,
         val enableCaching: Boolean = true,
-        val cacheDirectory: String = ".scan-cache"
+        val cacheDirectory: String = ".scan-cache",
+        val incrementalScan: Boolean = false
 ) {
     fun validate(): List<ConfigurationError> {
         val errors = mutableListOf<ConfigurationError>()

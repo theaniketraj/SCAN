@@ -51,7 +51,7 @@ interface DetectorInterface {
      * @return List of findings, empty if no secrets detected
      * @throws DetectorException if detection fails critically
      */
-    fun detect(context: ScanContext): List<Finding>
+    fun detect(context: ScanContext): List<ScanResult.Finding>
 
     /**
      * Validates detector configuration and readiness. Called once during detector initialization.
