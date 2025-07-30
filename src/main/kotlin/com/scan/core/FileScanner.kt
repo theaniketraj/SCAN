@@ -134,7 +134,7 @@ class FileScanner(
             scanContext.lines = content.lines()
 
             // Check if content has changed (for incremental scans)
-            if (configuration.incrementalScan && !hasFileChanged(filePath, content)) {
+            if (configuration.performance.incrementalScan && !hasFileChanged(filePath, content)) {
                 return null // Skip unchanged files
             }
 
@@ -194,7 +194,7 @@ class FileScanner(
 
         // Check file size limits
         if (file.length() > MAX_FILE_SIZE_BYTES) {
-            if (configuration.verbose) {
+            if (configuration.reporting.verbose) {
                 println("Skipping large file: ${file.path} (${file.length()} bytes)")
             }
             return false
@@ -214,7 +214,7 @@ class FileScanner(
         }
 
         // Only scan known text file extensions if strict mode is enabled
-        if (configuration.strictMode && extension !in SCANNABLE_EXTENSIONS) {
+        if (configuration.buildIntegration.strictMode && extension !in SCANNABLE_EXTENSIONS) {
             return false
         }
 
@@ -225,7 +225,7 @@ class FileScanner(
     private fun shouldSkipFile(filePath: Path, scanContext: ScanContext): Boolean {
         return filters.any { filter ->
             try {
-                !filter.shouldInclude(scanContext)
+                !filter.shouldIncludeFile(filePath.toFile(), scanContext.relativePath ?: filePath.toString())
             } catch (e: Exception) {
                 System.err.println(
                         "Filter ${filter.javaClass.simpleName} failed for ${filePath}: ${e.message}"
@@ -243,7 +243,7 @@ class FileScanner(
             val sample = Files.readAllBytes(file.toPath()).take(sampleSize).toByteArray()
 
             if (isBinaryContent(sample)) {
-                if (configuration.verbose) {
+                if (configuration.reporting.verbose) {
                     println("Skipping binary file: ${file.path}")
                 }
                 return null
@@ -253,8 +253,8 @@ class FileScanner(
             val content = Files.readString(file.toPath(), StandardCharsets.UTF_8)
 
             // Validate content length and line lengths
-            if (content.length > configuration.maxContentLength) {
-                if (configuration.verbose) {
+            if (content.length > configuration.maxFileSize) {
+                if (configuration.reporting.verbose) {
                     println("Skipping large content file: ${file.path} (${content.length} chars)")
                 }
                 return null
@@ -263,8 +263,8 @@ class FileScanner(
             // Check for extremely long lines that might indicate binary or generated content
             val lines = content.lines()
             val hasLongLines = lines.any { it.length > MAX_LINE_LENGTH }
-            if (hasLongLines && !configuration.scanLongLines) {
-                if (configuration.verbose) {
+            if (hasLongLines) {
+                if (configuration.reporting.verbose) {
                     println("Skipping file with long lines: ${file.path}")
                 }
                 return null

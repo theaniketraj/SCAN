@@ -590,6 +590,9 @@ data class ReportingConfiguration(
         val json: JsonReportConfiguration = JsonReportConfiguration(),
         val html: HtmlReportConfiguration = HtmlReportConfiguration()
 ) {
+    /** Helper property to check if verbose logging is enabled */
+    val verbose: Boolean get() = verbosity == Verbosity.VERBOSE || verbosity == Verbosity.DEBUG
+
     fun validate(): List<ConfigurationError> {
         val errors = mutableListOf<ConfigurationError>()
 
@@ -737,7 +740,8 @@ data class BuildIntegrationConfiguration(
         val requireApprovalForFindings: Boolean = false,
         val generateReports: Boolean = true,
         val uploadReports: Boolean = false,
-        val reportUploadUrl: String? = null
+        val reportUploadUrl: String? = null,
+        val strictMode: Boolean = false
 ) {
     fun mergeWith(other: BuildIntegrationConfiguration): BuildIntegrationConfiguration {
         return copy(
