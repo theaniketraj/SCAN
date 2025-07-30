@@ -484,39 +484,5 @@ data class ScanContext(
         var content: String = "",
         var lines: List<String> = emptyList()
 )
-
-/** Represents a potential security finding in a file. */
-data class Finding(
-        val type: String, // Type of secret (API_KEY, PASSWORD, etc.)
-        val value: String, // The actual secret value found
-        val lineNumber: Int, // Line number where found (1-based)
-        val columnStart: Int, // Starting column (0-based)
-        val columnEnd: Int, // Ending column (0-based)
-        val confidence: Double, // Confidence score (0.0 to 1.0)
-        val rule: String, // Rule or pattern that triggered the finding
-        val context: String = "", // Surrounding context for better understanding
-        val severity: Severity = Severity.MEDIUM
-)
-
-/** Severity levels for findings. */
-enum class Severity {
-    LOW,
-    MEDIUM,
-    HIGH,
-    CRITICAL
-}
-
-/** Result of scanning a single file. */
-data class ScanResult(
-        val filePath: String,
-        val findings: List<Finding>,
-        val scanTime: Long,
-        val fileSize: Long,
-        val linesScanned: Int,
-        val error: String? = null
-) {
-    val hasFindings: Boolean
-        get() = findings.isNotEmpty()
-    val highConfidenceFindings: List<Finding>
         get() = findings.filter { it.confidence >= 0.8 }
 }

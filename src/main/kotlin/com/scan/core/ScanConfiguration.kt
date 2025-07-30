@@ -890,17 +890,6 @@ enum class Verbosity {
     DEBUG
 }
 
-enum class Severity {
-    LOW,
-    MEDIUM,
-    HIGH,
-    CRITICAL;
-
-    fun isGreaterOrEqual(other: Severity): Boolean {
-        return this.ordinal >= other.ordinal
-    }
-}
-
 enum class Confidence {
     LOW,
     MEDIUM,

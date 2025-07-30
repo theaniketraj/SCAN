@@ -1,6 +1,8 @@
 package com.scan.reporting
 
 import com.scan.core.ScanResult
+import com.scan.core.Finding
+import com.scan.core.Severity
 import java.io.File
 import java.time.format.DateTimeFormatter
 import org.gradle.api.logging.Logger
@@ -416,7 +418,7 @@ enum class ConsoleColor(val code: String) {
 }
 
 /** Represents a security finding for console reporting */
-data class Finding(
+data class ConsoleFinding(
         val description: String,
         val severity: FindingSeverity,
         val ruleName: String = "",
