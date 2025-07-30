@@ -484,5 +484,3 @@ data class ScanContext(
         var content: String = "",
         var lines: List<String> = emptyList()
 )
-        get() = findings.filter { it.confidence >= 0.8 }
-}

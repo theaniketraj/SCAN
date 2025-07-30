@@ -890,39 +890,6 @@ enum class Verbosity {
     DEBUG
 }
 
-enum class Confidence {
-    LOW,
-    MEDIUM,
-    HIGH;
-
-    fun isGreaterOrEqual(other: Confidence): Boolean {
-        return this.ordinal >= other.ordinal
-    }
-}
-
-enum class SecretType {
-    UNKNOWN,
-    API_KEY,
-    ACCESS_TOKEN,
-    DATABASE_CONNECTION,
-    PRIVATE_KEY,
-    CERTIFICATE,
-    PASSWORD,
-    SSH_KEY,
-    JWT_TOKEN,
-    OAUTH_TOKEN,
-    AWS_KEY,
-    GCP_KEY,
-    AZURE_KEY,
-    GITHUB_TOKEN,
-    DOCKER_TOKEN,
-    ENCRYPTION_KEY,
-    SIGNING_KEY;
-
-    fun isSensitive(): Boolean {
-        return this != UNKNOWN
-    }
-}
 /** Configuration error */
 data class ConfigurationError(
         val message: String,
