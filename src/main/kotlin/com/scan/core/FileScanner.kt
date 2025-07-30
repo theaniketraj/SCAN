@@ -181,7 +181,8 @@ class FileScanner(
                 fileExtension = extension,
                 isTestFile = isTestFile,
                 fileSize = file.length(),
-                configuration = configuration
+                configuration = configuration,
+                relativePath = filePath.toString()
         )
     }
 
@@ -467,15 +468,3 @@ class FileScanner(
         )
     }
 }
-
-/** Context object passed to detectors containing file information and content. */
-data class ScanContext(
-        val filePath: Path,
-        val fileName: String,
-        val fileExtension: String,
-        val isTestFile: Boolean,
-        val fileSize: Long,
-        val configuration: ScanConfiguration,
-        var content: String = "",
-        var lines: List<String> = emptyList()
-)

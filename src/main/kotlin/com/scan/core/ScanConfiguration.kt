@@ -420,9 +420,9 @@ data class PatternConfiguration(
 /** Entropy detection configuration */
 data class EntropyConfiguration(
         val enabled: Boolean = true,
-        val threshold: Double = DEFAULT_ENTROPY_THRESHOLD,
-        val minLength: Int = DEFAULT_MIN_SECRET_LENGTH,
-        val maxLength: Int = DEFAULT_MAX_SECRET_LENGTH,
+        val threshold: Double = ScanConfiguration.DEFAULT_ENTROPY_THRESHOLD,
+        val minLength: Int = ScanConfiguration.DEFAULT_MIN_SECRET_LENGTH,
+        val maxLength: Int = ScanConfiguration.DEFAULT_MAX_SECRET_LENGTH,
         val charset: String = "base64", // base64, hex, alphanumeric, ascii
         val contextRequired: Boolean = true,
         val skipCommonWords: Boolean = true,

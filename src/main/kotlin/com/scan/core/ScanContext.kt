@@ -15,7 +15,8 @@ data class ScanContext(
     val configuration: ScanConfiguration,
     var content: String = "",
     var lines: List<String> = emptyList(),
-    val metadata: MutableMap<String, Any> = mutableMapOf()
+    val metadata: MutableMap<String, Any> = mutableMapOf(),
+    val relativePath: String? = null
 ) {
     /** Get the normalized file extension (lowercase, without dot) */
     fun getNormalizedExtension(): String = fileExtension.lowercase().removePrefix(".")
