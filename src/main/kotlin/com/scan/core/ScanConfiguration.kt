@@ -249,6 +249,11 @@ data class ScanConfiguration(
         return excludePatterns.map { Pattern.compile(convertGlobToRegex(it)) }
     }
 
+    /** Get effective path exclude patterns */
+    fun getEffectivePathExcludePatterns(): List<Pattern> {
+        return excludePatterns.map { Pattern.compile(convertGlobToRegex(it)) }
+    }
+
     /** Check if a file should be scanned based on configuration */
     fun shouldScanFile(file: File): Boolean {
         val path = file.path
@@ -456,13 +461,13 @@ data class EntropyConfiguration(
         return copy(
                 enabled = other.enabled,
                 threshold =
-                        if (other.threshold != DEFAULT_ENTROPY_THRESHOLD) other.threshold
+                        if (other.threshold != ScanConfiguration.DEFAULT_ENTROPY_THRESHOLD) other.threshold
                         else this.threshold,
                 minLength =
-                        if (other.minLength != DEFAULT_MIN_SECRET_LENGTH) other.minLength
+                        if (other.minLength != ScanConfiguration.DEFAULT_MIN_SECRET_LENGTH) other.minLength
                         else this.minLength,
                 maxLength =
-                        if (other.maxLength != DEFAULT_MAX_SECRET_LENGTH) other.maxLength
+                        if (other.maxLength != ScanConfiguration.DEFAULT_MAX_SECRET_LENGTH) other.maxLength
                         else this.maxLength,
                 charset = if (other.charset != "base64") other.charset else this.charset,
                 contextRequired = other.contextRequired,
@@ -479,7 +484,7 @@ data class ContextConfiguration(
         val analyzeStrings: Boolean = true,
         val analyzeVariableNames: Boolean = true,
         val analyzeFunctionNames: Boolean = true,
-        val contextLines: Int = DEFAULT_CONTEXT_LINES,
+        val contextLines: Int = ScanConfiguration.DEFAULT_CONTEXT_LINES,
         val weightByContext: Boolean = true,
         val testFileHandling: TestFileHandling = TestFileHandling.REDUCED_SEVERITY
 ) {
@@ -491,7 +496,7 @@ data class ContextConfiguration(
                 analyzeVariableNames = other.analyzeVariableNames,
                 analyzeFunctionNames = other.analyzeFunctionNames,
                 contextLines =
-                        if (other.contextLines != DEFAULT_CONTEXT_LINES) other.contextLines
+                        if (other.contextLines != ScanConfiguration.DEFAULT_CONTEXT_LINES) other.contextLines
                         else this.contextLines,
                 weightByContext = other.weightByContext,
                 testFileHandling = other.testFileHandling
@@ -502,7 +507,7 @@ data class ContextConfiguration(
 /** Filter configuration */
 data class FilterConfiguration(
         val enabledFilters: Set<String> = setOf("extension", "path", "whitelist", "test"),
-        val maxLineLength: Int = DEFAULT_MAX_LINE_LENGTH,
+        val maxLineLength: Int = ScanConfiguration.DEFAULT_MAX_LINE_LENGTH,
         val skipBinaryFiles: Boolean = true,
         val skipEmptyFiles: Boolean = true,
         val skipGeneratedFiles: Boolean = true,
@@ -522,7 +527,7 @@ data class FilterConfiguration(
                                 other.enabledFilters
                         else this.enabledFilters,
                 maxLineLength =
-                        if (other.maxLineLength != DEFAULT_MAX_LINE_LENGTH) other.maxLineLength
+                        if (other.maxLineLength != ScanConfiguration.DEFAULT_MAX_LINE_LENGTH) other.maxLineLength
                         else this.maxLineLength,
                 skipBinaryFiles = other.skipBinaryFiles,
                 skipEmptyFiles = other.skipEmptyFiles,
