@@ -1,7 +1,7 @@
 package com.scan.detectors
 
-import com.scan.core.Finding
 import com.scan.core.ScanContext
+import com.scan.core.ScanResult
 import com.scan.core.Severity
 import java.util.regex.Pattern
 
