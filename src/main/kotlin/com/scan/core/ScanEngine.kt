@@ -14,7 +14,7 @@ import kotlinx.coroutines.*
 /**
  * Core scanning engine that orchestrates the entire security scanning process
  *
- * This engine coordinates file discovery, filtering, detection, and reporting while managing
+ * This engine coordinates file discovery, filtering, Finding, and reporting while managing
  * performance optimizations like parallel processing and caching.
  */
 class ScanEngine(private val configuration: ScanConfiguration) {
@@ -72,7 +72,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
                 // Execute scanning with parallel processing
                 val scanResults =
-                        if (configuration.performance.enableParallelScanning) {
+                        if (configuration.performance.maxConcurrency > 1) {
                             scanFilesParallel(filesToScan)
                         } else {
                             scanFilesSequential(filesToScan)
@@ -82,15 +82,18 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 val aggregatedResults = aggregateResults(scanResults)
 
                 // Apply baseline comparison if configured
-                val finalResults =
-                        if (configuration.baselineFile != null) {
+                val finalResults = aggregatedResults
+                // TODO: Add baseline support
+                /*
+                        if (configuration.reporting.baselineFile != null) {
                             compareWithBaseline(aggregatedResults)
                         } else {
                             aggregatedResults
                         }
+                */
 
                 // Save cache if enabled
-                if (configuration.enableCaching) {
+                if (configuration.performance.enableCaching) {
                     saveCache()
                 }
 
@@ -157,7 +160,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         val totalFiles = files.size
 
         // Create coroutine scope with limited parallelism
-        val dispatcher = Dispatchers.IO.limitedParallelism(configuration.scanThreadCount)
+        val dispatcher = Dispatchers.IO.limitedParallelism(configuration.performance.maxConcurrency)
 
         withContext(dispatcher) {
             files
@@ -215,7 +218,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         val fileHash = calculateFileHash(file)
 
         // Check cache first
-        if (configuration.enableCaching) {
+        if (configuration.performance.enableCaching) {
             val cachedResult = scanCache[filePath]
             if (cachedResult != null && cachedResult.fileHash == fileHash) {
                 stats.cacheHits++
@@ -224,7 +227,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         }
 
         // Check file size limits
-        if (file.length() > configuration.maxFileSizeBytes) {
+        if (file.length() > configuration.maxFileSize) {
             logger.debug("Skipping large file: $filePath (${file.length()} bytes)")
             stats.skippedFiles++
             return FileScanResult.skipped(filePath, "File too large")
@@ -248,13 +251,13 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // Create file scanner and scan
         val fileScanner = FileScanner(file, content, configuration)
-        val detections = compositeDetector.detect(fileScanner)
+        val Findings = compositeDetector.detect(fileScanner)
 
         // Create scan result
         val result =
                 FileScanResult(
                         filePath = filePath,
-                        detections = detections,
+                        Findings = Findings,
                         scanTimeMs = 0L, // Will be set by caller
                         fileSize = file.length(),
                         isError = false,
@@ -262,7 +265,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 )
 
         // Cache result if enabled
-        if (configuration.enableCaching) {
+        if (configuration.performance.enableCaching) {
             scanCache[filePath] = CachedScanResult(fileHash, result)
         }
 
@@ -273,60 +276,60 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     /** Aggregate results from all scanned files */
-    private fun aggregateResults(results: List<FileScanResult>): List<Detection> {
-        val allDetections = mutableListOf<Detection>()
+    private fun aggregateResults(results: List<FileScanResult>): List<Finding> {
+        val allFindings = mutableListOf<Finding>()
 
         results.forEach { result ->
             if (!result.isError) {
-                allDetections.addAll(result.detections)
+                allFindings.addAll(result.Findings)
             }
         }
 
         // Sort by severity and file path
-        return allDetections.sortedWith(
-                compareByDescending<Detection> { it.severity }.thenBy { it.filePath }.thenBy {
+        return allFindings.sortedWith(
+                compareByDescending<Finding> { it.severity }.thenBy { it.filePath }.thenBy {
                     it.lineNumber
                 }
         )
     }
 
     /** Compare current results with baseline if configured */
-    private fun compareWithBaseline(detections: List<Detection>): List<Detection> {
+    private fun compareWithBaseline(Findings: List<Finding>): List<Finding> {
         val baselineFile = File(configuration.baselineFile!!)
         if (!baselineFile.exists()) {
             logger.warn("Baseline file not found: ${configuration.baselineFile}")
-            return detections
+            return Findings
         }
 
         return try {
             val baseline = loadBaseline(baselineFile)
             if (configuration.onlyReportNew) {
-                filterNewDetections(detections, baseline)
+                filterNewFindings(Findings, baseline)
             } else {
-                detections
+                Findings
             }
         } catch (e: Exception) {
             logger.error("Failed to load baseline file", e)
-            detections
+            Findings
         }
     }
 
     /** Create the final scan result with all metadata */
-    private fun createFinalResult(detections: List<Detection>, rootPath: String): ScanResult {
+    private fun createFinalResult(Findings: List<Finding>, rootPath: String): ScanResult {
         stats.endTime = System.currentTimeMillis()
-        stats.totalDetections = detections.size
-        stats.criticalIssues = detections.count { it.severity == DetectionSeverity.CRITICAL }
-        stats.highIssues = detections.count { it.severity == DetectionSeverity.HIGH }
-        stats.mediumIssues = detections.count { it.severity == DetectionSeverity.MEDIUM }
-        stats.lowIssues = detections.count { it.severity == DetectionSeverity.LOW }
+        stats.totalFindings = Findings.size
+        stats.criticalIssues = Findings.count { it.severity == FindingSeverity.CRITICAL }
+        stats.highIssues = Findings.count { it.severity == FindingSeverity.HIGH }
+        stats.mediumIssues = Findings.count { it.severity == FindingSeverity.MEDIUM }
+        stats.lowIssues = Findings.count { it.severity == FindingSeverity.LOW }
 
         return ScanResult(
                 rootPath = rootPath,
-                detections = detections,
+                Findings = Findings,
                 statistics = stats,
                 configuration = configuration,
                 scanTimestamp = System.currentTimeMillis(),
-                success = detections.isEmpty() || !configuration.failOnSecretsFound
+                success = Findings.isEmpty() || !configuration.failOnSecretsFound
         )
     }
 
@@ -349,13 +352,13 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     private fun getEnabledDetectors(): List<com.scan.detectors.CompositeDetector.DetectorConfig> {
         val detectorConfigs = mutableListOf<com.scan.detectors.CompositeDetector.DetectorConfig>()
 
-        if (configuration.patterns.enablePatternDetector) {
+        if (configuration.detectors.enabledDetectors.contains("pattern")) {
             detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(patternDetector))
         }
-        if (configuration.entropy.enableEntropyDetector) {
+        if (configuration.detectors.enabledDetectors.contains("entropy")) {
             detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(entropyDetector))
         }
-        if (configuration.context.enableContextAwareDetector) {
+        if (configuration.detectors.enabledDetectors.contains("context")) {
             detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(contextAwareDetector))
         }
 
@@ -447,24 +450,24 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         }
     }
 
-    private fun loadBaseline(baselineFile: File): List<Detection> {
-        // Load baseline detections from file
+    private fun loadBaseline(baselineFile: File): List<Finding> {
+        // Load baseline Findings from file
         return emptyList() // TODO: Implement baseline loading
     }
 
-    private fun filterNewDetections(
-            current: List<Detection>,
-            baseline: List<Detection>
-    ): List<Detection> {
-        // Compare current detections with baseline to find new ones
-        return current.filter { detection ->
-            !baseline.any { baselineDetection -> baselineDetection.isSameAs(detection) }
+    private fun filterNewFindings(
+            current: List<Finding>,
+            baseline: List<Finding>
+    ): List<Finding> {
+        // Compare current Findings with baseline to find new ones
+        return current.filter { Finding ->
+            !baseline.any { baselineFinding -> baselineFinding.isSameAs(Finding) }
         }
     }
 
     private fun updateStatistics(result: FileScanResult) {
         stats.scannedFiles++
-        if (result.detections.isNotEmpty()) {
+        if (result.Findings.isNotEmpty()) {
             stats.filesWithSecrets++
         }
     }
@@ -491,7 +494,7 @@ data class ScanStatistics(
         var errorFiles: Int = 0,
         var emptyFiles: Int = 0,
         var filesWithSecrets: Int = 0,
-        var totalDetections: Int = 0,
+        var totalFindings: Int = 0,
         var criticalIssues: Int = 0,
         var highIssues: Int = 0,
         var mediumIssues: Int = 0,
