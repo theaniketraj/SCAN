@@ -16,7 +16,7 @@ import java.util.regex.Pattern
  * - Understands common false positive patterns
  * - Analyzes surrounding code for contextual clues
  */
-class ContextAwareDetector(
+class ContextAwareDetectorImpl(
     private val patternMatcher: PatternMatcher,
     private val entropyThreshold: Double = 4.5,
     private val minimumSecretLength: Int = 12
