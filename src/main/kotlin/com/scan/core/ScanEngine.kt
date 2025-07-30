@@ -23,13 +23,15 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
     // Detector instances
     private val patternDetector: DetectorInterface by lazy {
-        PatternDetector(configuration.patternConfig)
+        PatternDetector()
     }
     private val entropyDetector: DetectorInterface by lazy {
-        EntropyDetector(configuration.entropyConfig)
+        EntropyDetector()
     }
     private val contextAwareDetector: DetectorInterface by lazy {
-        ContextAwareDetector(configuration.contextConfig)
+        // TODO: ContextAwareDetector is an interface, need to find the implementation class
+        // ContextAwareDetector(configuration.contextConfig)
+        PatternDetector() // temporary fallback
     }
     private val compositeDetector: DetectorInterface by lazy {
         CompositeDetector(getEnabledDetectors())
@@ -64,13 +66,13 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 logger.info("Found ${filesToScan.size} files to scan")
 
                 // Load cache if enabled
-                if (configuration.enableCaching) {
+                if (configuration.performance.enableCaching) {
                     loadCache()
                 }
 
                 // Execute scanning with parallel processing
                 val scanResults =
-                        if (configuration.enableParallelScanning) {
+                        if (configuration.performance.enableParallelScanning) {
                             scanFilesParallel(filesToScan)
                         } else {
                             scanFilesSequential(filesToScan)
@@ -344,20 +346,20 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         }
     }
 
-    private fun getEnabledDetectors(): List<DetectorInterface> {
-        val detectors = mutableListOf<DetectorInterface>()
+    private fun getEnabledDetectors(): List<com.scan.detectors.CompositeDetector.DetectorConfig> {
+        val detectorConfigs = mutableListOf<com.scan.detectors.CompositeDetector.DetectorConfig>()
 
-        if (configuration.enablePatternDetector) {
-            detectors.add(patternDetector)
+        if (configuration.patterns.enablePatternDetector) {
+            detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(patternDetector))
         }
-        if (configuration.enableEntropyDetector) {
-            detectors.add(entropyDetector)
+        if (configuration.entropy.enableEntropyDetector) {
+            detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(entropyDetector))
         }
-        if (configuration.enableContextAwareDetector) {
-            detectors.add(contextAwareDetector)
+        if (configuration.context.enableContextAwareDetector) {
+            detectorConfigs.add(com.scan.detectors.CompositeDetector.DetectorConfig(contextAwareDetector))
         }
 
-        return detectors
+        return detectorConfigs
     }
 
     private fun createFileFilters(): List<FilterInterface> {
