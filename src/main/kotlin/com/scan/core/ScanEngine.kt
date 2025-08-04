@@ -244,7 +244,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 try {
                     file.readText(Charsets.UTF_8)
                 } catch (e: Exception) {
-                    logger.debug("Failed to read file as UTF-8: $filePath", e)
+                    logger.debug("Failed to read file as UTF-8: $filePath - ${e.message}")
                     stats.errorFiles++
                     return FileScanResult.error(filePath, "Failed to read file: ${e.message}")
                 }
@@ -417,36 +417,28 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // Path filter
         filters.add(
-                PathFilter(
-                        includePaths = configuration.includePatterns.toSet(),
-                        excludePaths = configuration.excludePatterns.toSet()
+                com.scan.filters.PathFilter(
+                        includeGlobs = configuration.includePatterns.toSet(),
+                        excludeGlobs = configuration.excludePatterns.toSet()
                 )
         )
 
-        // Test file filter
-        if (!configuration.scanTestFiles) {
-            filters.add(TestFileFilter(configuration.testFilePatterns.toSet()))
+        // Test file filter - only add if test filter is enabled
+        if (configuration.filters.enabledFilters.contains("test")) {
+            filters.add(TestFileFilter())
         }
 
-        // Whitelist filter
-        if (configuration.ignoredFiles.isNotEmpty()) {
-            filters.add(WhitelistFilter(configuration.ignoredFiles.toSet()))
+        // Whitelist filter - only add if whitelist filter is enabled  
+        if (configuration.filters.enabledFilters.contains("whitelist")) {
+            filters.add(WhitelistFilter())
         }
 
         return filters
     }
 
     private fun initializeDetectors() {
-        // Initialize each detector with its configuration
-        if (configuration.enablePatternDetector) {
-            patternDetector.initialize()
-        }
-        if (configuration.enableEntropyDetector) {
-            entropyDetector.initialize()
-        }
-        if (configuration.enableContextAwareDetector) {
-            contextAwareDetector.initialize()
-        }
+        // Detectors are initialized lazily, no need for explicit initialization
+        // They will be configured when accessed via the lazy properties
     }
 
     private fun setupOutputDirectories() {
