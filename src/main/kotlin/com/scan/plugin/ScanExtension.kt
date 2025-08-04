@@ -48,13 +48,13 @@ abstract class ScanExtension {
     
     /**
      * File patterns to include in scanning
-     * Default: ["**/*.kt", "**/*.java", "**/*.xml", "**/*.properties", "**/*.yml", "**/*.yaml", "**/*.json", "**/*.gradle", "**/*.gradle.kts"]
+     * Default: ["**\/*.kt", "**\/*.java", "**\/*.xml", "**\/*.properties", "**\/*.yml", "**\/*.yaml", "**\/*.json", "**\/*.gradle", "**\/*.gradle.kts"]
      */
     abstract val includePatterns: SetProperty<String>
     
     /**
      * File patterns to exclude from scanning
-     * Default: ["**/build/**", "**/.*/**", "**/.git/**", "**/node_modules/**", "**/target/**"]
+     * Default: ["**\/build\/**", "**\/.*\/**", "**\/.git\/**", "**\/node_modules\/**", "**\/target\/**"]
      */
     abstract val excludePatterns: SetProperty<String>
     
@@ -72,7 +72,7 @@ abstract class ScanExtension {
     
     /**
      * Test file patterns to identify test files
-     * Default: ["**/test/**", "**/androidTest/**", "**/*Test.*", "**/*Tests.*", "**/*Spec.*"]
+     * Default: ["**\/test\/**", "**\/androidTest\/**", "**\/*Test.*", "**\/*Tests.*", "**\/*Spec.*"]
      */
     abstract val testFilePatterns: SetProperty<String>
     
