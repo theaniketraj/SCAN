@@ -1,6 +1,6 @@
 package com.scan.detectors
 
-import com.scan.core.ScanResult
+import com.scan.core.*
 import java.io.File
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
@@ -9,7 +9,12 @@ import java.util.regex.PatternSyntaxException
  * Pattern-based detector that uses regular expressions to identify potential secrets in source code
  * files. This detector supports custom patterns, confidence scoring, and context-aware matching.
  */
-class PatternDetector : DetectorInterface {
+class PatternDetector : AbstractDetector() {
+    
+    override val detectorId: String = "pattern"
+    override val detectorName: String = "Pattern Detector"
+    override val version: String = "1.0.0"
+    override val supportedFileTypes: Set<String> = emptySet() // Supports all file types
 
     private val compiledPatterns = mutableMapOf<String, CompiledPattern>()
     private var caseSensitive: Boolean = true
@@ -121,57 +126,40 @@ class PatternDetector : DetectorInterface {
     /** Get all loaded pattern names */
     fun getLoadedPatterns(): Set<String> = compiledPatterns.keys.toSet()
 
-    override fun detect(file: File, content: String): List<ScanResult.Finding> {
+    override fun performDetection(context: ScanContext): List<Finding> {
         if (compiledPatterns.isEmpty()) {
             return emptyList()
         }
 
-        val findings = mutableListOf<ScanResult.Finding>()
-        val lines = content.lines()
+        val findings = mutableListOf<Finding>()
 
         // Process each pattern
         compiledPatterns.values.forEach { compiledPattern ->
-            val matches = findMatches(content, compiledPattern, lines)
+            val matches = findMatches(context.content, compiledPattern, context.lines)
             matches.forEach { match ->
                 if (match.confidence >= minimumConfidence) {
-                    findings.add(createFinding(file, match, compiledPattern))
+                    findings.add(createFinding(
+                        type = compiledPattern.category,
+                        value = match.matchedText,
+                        lineNumber = match.lineNumber,
+                        columnStart = match.columnNumber,
+                        columnEnd = match.columnNumber + match.matchedText.length,
+                        confidence = match.confidence,
+                        rule = compiledPattern.name,
+                        context = context
+                    ))
                 }
             }
         }
 
         return findings.sortedWith(
-                compareByDescending<ScanResult.Finding> { it.confidence }
-                        .thenBy { it.lineNumber }
-                        .thenBy { it.columnNumber }
+            compareByDescending<Finding> { it.confidence }
+                .thenBy { it.location.lineNumber }
+                .thenBy { it.location.columnStart }
         )
     }
 
-    override fun getName(): String = "PatternDetector"
-
-    override fun getDescription(): String =
-            "Detects secrets using regular expression patterns with confidence scoring"
-
-    override fun getSupportedFileTypes(): Set<String> = setOf("*") // Supports all file types
-
-    override fun configure(options: Map<String, Any>): DetectorInterface {
-        options["caseSensitive"]?.let { if (it is Boolean) caseSensitive = it }
-        options["multilineMode"]?.let { if (it is Boolean) multilineMode = it }
-        options["minimumConfidence"]?.let {
-            when (it) {
-                is Double -> minimumConfidence = it
-                is Number -> minimumConfidence = it.toDouble()
-            }
-        }
-        options["customPatterns"]?.let { patterns ->
-            if (patterns is Map<*, *>) {
-                @Suppress("UNCHECKED_CAST")
-                val patternMap = patterns as Map<String, PatternDefinition>
-                addPatterns(patternMap)
-            }
-        }
-
-        return this
-    }
+    // Configuration methods removed - handled by base class
 
     /** Find all matches for a given pattern in the content */
     private fun findMatches(
@@ -254,7 +242,7 @@ class PatternDetector : DetectorInterface {
         }
 
         // Reduce confidence if the match appears to be in a comment
-        if (isInComment(line, matchedText)) {
+        if (isInComment(line)) {
             confidence *= 0.7
         }
 
@@ -269,32 +257,6 @@ class PatternDetector : DetectorInterface {
         }
 
         return minOf(1.0, maxOf(0.0, confidence))
-    }
-
-    /** Create a ScanResult.Finding from a pattern match */
-    private fun createFinding(
-            file: File,
-            match: PatternMatch,
-            compiledPattern: CompiledPattern
-    ): ScanResult.Finding {
-        return ScanResult.Finding(
-                file = file,
-                lineNumber = match.lineNumber,
-                columnNumber = match.columnNumber,
-                message =
-                        "Potential ${compiledPattern.category} detected: ${compiledPattern.description}",
-                severity =
-                        when {
-                            match.confidence >= 0.9 -> ScanResult.Severity.HIGH
-                            match.confidence >= 0.7 -> ScanResult.Severity.MEDIUM
-                            else -> ScanResult.Severity.LOW
-                        },
-                ruleId = match.patternName,
-                matchedText = match.matchedText,
-                confidence = match.confidence,
-                context = match.context,
-                category = compiledPattern.category
-        )
     }
 
     /** Load default patterns from SecretPatterns */
@@ -386,7 +348,7 @@ class PatternDetector : DetectorInterface {
     }
 
     /** Check if a match appears to be in a comment */
-    private fun isInComment(line: String, matchedText: String): Boolean {
+    private fun isInComment(line: String): Boolean {
         val trimmedLine = line.trim()
         return trimmedLine.startsWith("//") ||
                 trimmedLine.startsWith("#") ||
