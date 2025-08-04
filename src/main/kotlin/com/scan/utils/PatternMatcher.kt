@@ -398,24 +398,81 @@ object PatternMatcher {
         }
     }
 
-    companion object {
-        /** Default context keywords that might indicate secrets. */
-        val DEFAULT_CONTEXT_KEYWORDS =
-                listOf(
-                        "key",
-                        "secret",
-                        "password",
-                        "token",
-                        "auth",
-                        "api",
-                        "credential",
-                        "private",
-                        "public",
-                        "cert",
-                        "signature",
-                        "hash",
-                        "salt"
-                )
+    /** Default context keywords that might indicate secrets. */
+    val DEFAULT_CONTEXT_KEYWORDS =
+            listOf(
+                    "key",
+                    "secret",
+                    "password",
+                    "token",
+                    "auth",
+                    "api",
+                    "credential",
+                    "private",
+                    "public",
+                    "cert",
+                    "signature",
+                    "hash",
+                    "salt"
+            )
+
+    // Pattern matching convenience methods for ContextAwareDetector
+    fun matchesApiKeyPattern(value: String): Boolean {
+        val apiKeyPatterns = listOf(
+            "AIza[0-9A-Za-z-_]{35}", // Google API key
+            "AKIA[0-9A-Z]{16}", // AWS Access Key
+            "xox[baprs]-([0-9a-zA-Z]{10,48})?", // Slack token
+            "sk-[a-zA-Z0-9]{48}" // OpenAI API key
+        )
+        return apiKeyPatterns.any { hasMatch(value, it, false) }
+    }
+
+    fun matchesPrivateKeyPattern(value: String): Boolean {
+        val privateKeyPatterns = listOf(
+            "-----BEGIN PRIVATE KEY-----",
+            "-----BEGIN RSA PRIVATE KEY-----",
+            "-----BEGIN OPENSSH PRIVATE KEY-----",
+            "-----BEGIN EC PRIVATE KEY-----"
+        )
+        return privateKeyPatterns.any { value.contains(it, ignoreCase = true) }
+    }
+
+    fun matchesPasswordPattern(value: String): Boolean {
+        val passwordPatterns = listOf(
+            "password\\s*[=:]\\s*['\"]?([^'\"\\s]+)",
+            "passwd\\s*[=:]\\s*['\"]?([^'\"\\s]+)",
+            "pwd\\s*[=:]\\s*['\"]?([^'\"\\s]+)"
+        )
+        return passwordPatterns.any { hasMatch(value, it, false) }
+    }
+
+    fun matchesTokenPattern(value: String): Boolean {
+        val tokenPatterns = listOf(
+            "gh[pousr]_[A-Za-z0-9_]{36}", // GitHub token
+            "xox[baprs]-([0-9a-zA-Z]{10,48})?", // Slack token
+            "[a-zA-Z0-9]{40}" // Generic 40-char token
+        )
+        return tokenPatterns.any { hasMatch(value, it, false) }
+    }
+
+    fun matchesDatabaseUrlPattern(value: String): Boolean {
+        val dbPatterns = listOf(
+            "jdbc:[a-zA-Z0-9]+://[^\\s]+",
+            "mongodb://[^\\s]+",
+            "mysql://[^\\s]+",
+            "postgresql://[^\\s]+",
+            "redis://[^\\s]+"
+        )
+        return dbPatterns.any { hasMatch(value, it, false) }
+    }
+
+    fun matchesCertificatePattern(value: String): Boolean {
+        val certPatterns = listOf(
+            "-----BEGIN CERTIFICATE-----",
+            "-----BEGIN X509 CERTIFICATE-----",
+            "-----BEGIN TRUSTED CERTIFICATE-----"
+        )
+        return certPatterns.any { value.contains(it, ignoreCase = true) }
     }
 }
 
@@ -467,5 +524,8 @@ enum class SecretType(val displayName: String) {
     PRIVATE_KEY("Private Key"),
     PUBLIC_KEY("Public Key"),
     HASH("Hash"),
+    CERTIFICATE("Certificate"),
+    DATABASE_URL("Database URL"),
+    HIGH_ENTROPY("High Entropy String"),
     UNKNOWN("Unknown Secret")
 }
