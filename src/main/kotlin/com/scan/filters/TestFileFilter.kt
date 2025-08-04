@@ -1,5 +1,6 @@
 package com.scan.filters
 
+import com.scan.core.Finding
 import com.scan.core.ScanResult
 import java.io.File
 import java.util.regex.Pattern
@@ -99,7 +100,7 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
                 )
     }
 
-    override fun shouldInclude(file: File): Boolean {
+    override fun shouldIncludeFile(file: File, relativePath: String): Boolean {
         val isTestFile = isTestFile(file)
 
         return when (config.policy) {
@@ -110,8 +111,16 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         }
     }
 
-    override fun shouldIncludeResult(result: ScanResult): Boolean {
-        val file = File(result.filePath)
+    override fun shouldIncludeLine(line: String, lineNumber: Int, file: File): Boolean {
+        return shouldIncludeFile(file, file.path)
+    }
+
+    override fun getDescription(): String {
+        return "Filter that handles test files with policy: ${config.policy}"
+    }
+
+    fun shouldIncludeFinding(finding: Finding): Boolean {
+        val file = File(finding.location.filePath)
         val isTestFile = isTestFile(file)
 
         if (!isTestFile) {
@@ -121,19 +130,19 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         return when (config.policy) {
             TestFilePolicy.EXCLUDE_ALL -> false
             TestFilePolicy.INCLUDE_ALL -> true
-            TestFilePolicy.RELAXED_SCANNING -> shouldIncludeTestResult(result, file)
+            TestFilePolicy.RELAXED_SCANNING -> shouldIncludeTestFinding(finding, file)
             TestFilePolicy.INTEGRATION_ONLY -> isIntegrationTest(file)
         }
     }
 
-    private fun shouldIncludeTestResult(result: ScanResult, file: File): Boolean {
+    private fun shouldIncludeTestFinding(finding: Finding, file: File): Boolean {
         // If configured to allow real secrets in tests, don't filter
         if (config.allowRealSecrets) {
             return true
         }
 
         // Check if this looks like a real secret vs test data
-        if (looksLikeRealSecret(result)) {
+        if (looksLikeRealSecret(finding)) {
             return true
         }
 
@@ -151,7 +160,7 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         }
 
         // Filter out obvious test patterns
-        return !isObviousTestSecret(result)
+        return !isObviousTestSecret(finding)
     }
 
     private fun isTestFile(file: File): Boolean {
@@ -368,9 +377,9 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         }
     }
 
-    private fun looksLikeRealSecret(result: ScanResult): Boolean {
-        val secretValue = result.secretValue
-        val lineContent = result.lineContent
+    private fun looksLikeRealSecret(finding: Finding): Boolean {
+        val secretValue = finding.secretInfo.detectedValue
+        val lineContent = finding.location.lineContent
 
         // Check for production-like environment indicators
         val productionIndicators = listOf("prod", "production", "live", "staging", "stage")
@@ -392,11 +401,11 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         return hasRealSecretCharacteristics(secretValue)
     }
 
-    private fun isObviousTestSecret(result: ScanResult): Boolean {
+    private fun isObviousTestSecret(finding: Finding): Boolean {
         val secretValue =
-                if (config.caseSensitive) result.secretValue else result.secretValue.lowercase()
+                if (config.caseSensitive) finding.secretInfo.detectedValue else finding.secretInfo.detectedValue.lowercase()
         val lineContent =
-                if (config.caseSensitive) result.lineContent else result.lineContent.lowercase()
+                if (config.caseSensitive) finding.location.lineContent else finding.location.lineContent.lowercase()
 
         val testIndicators =
                 listOf(
