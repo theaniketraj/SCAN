@@ -8,7 +8,7 @@ import java.util.regex.PatternSyntaxException
  * Filter implementation that includes or excludes files based on their file paths.
  * 
  * This filter supports multiple pattern matching strategies:
- * - Glob patterns (like *.kt, **/*.test.*, etc.)
+ * - Glob patterns (like *.kt, **\/*.test.*, etc.)
  * - Regular expressions
  * - Exact path matching
  * - Directory-based filtering
@@ -17,8 +17,8 @@ import java.util.regex.PatternSyntaxException
  * supports both absolute and relative path patterns.
  * 
  * Examples:
- * - Exclude test directories: PathFilter(excludeGlobs = setOf("**/test/**", "**/tests/**"))
- * - Include only source directories: PathFilter(includeGlobs = setOf("src/**", "main/**"))
+ * - Exclude test directories: PathFilter(excludeGlobs = setOf("**\/test\/**", "**\/tests\/**"))
+ * - Include only source directories: PathFilter(includeGlobs = setOf("src\/**", "main\/**"))
  * - Exclude specific files: PathFilter(excludeExact = setOf("build.gradle.kts"))
  */
 class PathFilter(
