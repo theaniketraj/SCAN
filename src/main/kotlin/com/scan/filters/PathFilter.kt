@@ -577,3 +577,4 @@ class PathFilterBuilder {
  * Extension function to create PathFilterBuilder
  */
 fun pathFilter(): PathFilterBuilder = PathFilterBuilder()
+fun pathFilter(): PathFilterBuilder = PathFilterBuilder()
