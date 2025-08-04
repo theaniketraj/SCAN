@@ -1,9 +1,8 @@
 package com.scan.detectors
 
-import com.scan.core.ScanContext
-import com.scan.core.ScanResult
-import com.scan.core.Severity
+import com.scan.core.*
 import java.util.regex.Pattern
+import java.util.UUID
 
 /**
  * Common interface for all secret detection strategies.
@@ -51,7 +50,7 @@ interface DetectorInterface {
      * @return List of findings, empty if no secrets detected
      * @throws DetectorException if detection fails critically
      */
-    fun detect(context: ScanContext): List<ScanResult.Finding>
+    fun detect(context: ScanContext): List<Finding>
 
     /**
      * Validates detector configuration and readiness. Called once during detector initialization.
@@ -123,7 +122,7 @@ abstract class AbstractDetector : DetectorInterface {
 
             // Update statistics
             findingCount += findings.size
-            findings.groupBy { it.type }.forEach { (type, typeFindings) ->
+            findings.groupBy { it.detectorType }.forEach { (type, typeFindings) ->
                 findingsByType[type] = findingsByType.getOrDefault(type, 0) + typeFindings.size
             }
 
@@ -171,19 +170,57 @@ abstract class AbstractDetector : DetectorInterface {
             severity: Severity = Severity.MEDIUM,
             contextText: String = ""
     ): Finding {
+        val confidenceEnum = when {
+            confidence >= 0.8 -> Confidence.HIGH
+            confidence >= 0.5 -> Confidence.MEDIUM
+            else -> Confidence.LOW
+        }
+        
+        val location = FindingLocation(
+            filePath = context.filePath.toString(),
+            relativePath = context.relativePath ?: context.fileName,
+            lineNumber = lineNumber,
+            columnStart = columnStart,
+            columnEnd = columnEnd,
+            lineContent = context.getLine(lineNumber) ?: ""
+        )
+        
+        val secretInfo = SecretInfo(
+            detectedValue = value,
+            patternName = rule,
+            patternDescription = "Detected by $detectorName",
+            secretType = SecretType.fromString(type) ?: SecretType.UNKNOWN
+        )
+        
+        val findingContext = FindingContext(
+            surroundingLines = context.getContextLines(lineNumber, 2),
+            isInComment = false, // TODO: Implement comment detection
+            isInString = false,  // TODO: Implement string detection  
+            isInTestFile = context.isTestFile,
+            isInConfigFile = context.fileExtension.lowercase() in setOf("yml", "yaml", "json", "xml", "properties", "conf", "config")
+        )
+        
+        val remediation = RemediationInfo(
+            recommendation = "Remove or secure this sensitive information",
+            actionItems = listOf(
+                "Remove the sensitive value from the code",
+                "Use environment variables or secure configuration",
+                "Rotate the secret if it has been committed"
+            )
+        )
+        
         return Finding(
-                type = type,
-                value = value,
-                lineNumber = lineNumber,
-                columnStart = columnStart,
-                columnEnd = columnEnd,
-                confidence = confidence.coerceIn(0.0, 1.0),
-                rule = "${detectorId}:${rule}",
-                context =
-                        contextText.ifEmpty {
-                            extractContext(context, lineNumber, columnStart, columnEnd)
-                        },
-                severity = severity
+            id = UUID.randomUUID().toString(),
+            title = "Potential ${type.replace("_", " ").lowercase().capitalize()} detected",
+            description = "Found potential sensitive information: ${type.replace("_", " ").lowercase()}",
+            severity = severity,
+            confidence = confidenceEnum,
+            detectorType = detectorId,
+            detectorName = detectorName,
+            location = location,
+            secretInfo = secretInfo,
+            context = findingContext,
+            remediation = remediation
         )
     }
 
