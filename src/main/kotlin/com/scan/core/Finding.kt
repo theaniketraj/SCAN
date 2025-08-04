@@ -55,9 +55,11 @@ data class Finding(
 /** Location information for a finding */
 data class FindingLocation(
     val filePath: String,
+    val relativePath: String,
     val lineNumber: Int,
     val columnStart: Int,
     val columnEnd: Int,
+    val lineContent: String,
     val startIndex: Int = 0,
     val endIndex: Int = 0
 ) {
@@ -77,6 +79,8 @@ data class FindingLocation(
 data class SecretInfo(
     val detectedValue: String,
     val secretType: SecretType,
+    val patternName: String,
+    val patternDescription: String,
     val entropy: Double = 0.0,
     val matchedPattern: String? = null,
     val validationStatus: ValidationStatus = ValidationStatus.NOT_VALIDATED,
@@ -97,8 +101,11 @@ data class SecretInfo(
 /** Context information around the finding */
 data class FindingContext(
     val lineContent: String,
+    val surroundingLines: List<String> = emptyList(),
     val before: List<String> = emptyList(),
     val after: List<String> = emptyList(),
+    val linesBefore: List<String> = emptyList(),
+    val linesAfter: List<String> = emptyList(),
     val isInComment: Boolean = false,
     val isInString: Boolean = false,
     val isInTestFile: Boolean = false,
