@@ -1,6 +1,6 @@
 package com.scan.detectors
 
-import com.scan.core.ScanResult
+import com.scan.core.*
 import java.io.File
 import kotlin.math.log2
 import kotlin.math.max
@@ -10,7 +10,7 @@ import kotlin.math.min
  * Entropy-based detector that identifies potential secrets by analyzing the randomness of strings.
  * High entropy strings are often indicators of cryptographic keys, tokens, or other sensitive data.
  */
-class EntropyDetector : DetectorInterface {
+class EntropyDetector : AbstractDetector() {
 
     companion object {
         private const val DEFAULT_MIN_LENGTH = 8
@@ -126,19 +126,19 @@ class EntropyDetector : DetectorInterface {
         return this
     }
 
-    override fun detect(file: File, content: String): List<ScanResult.Finding> {
-        val findings = mutableListOf<ScanResult.Finding>()
-        val lines = content.lines()
+    override fun performDetection(context: ScanContext): List<Finding> {
+        val findings = mutableListOf<Finding>()
+        val lines = context.lines
 
         // Extract potential strings from content using different strategies
-        val candidates = extractStringCandidates(content)
+        val candidates = extractStringCandidates(context.content)
 
         candidates.forEach { candidate ->
             val analysis = analyzeEntropy(candidate.text)
 
             if (analysis.isLikelySecret && passesFilters(candidate.text, analysis)) {
-                val (lineNumber, columnNumber) = getLineAndColumn(content, candidate.startIndex)
-                val context = getContext(lines, lineNumber - 1, 2)
+                val (lineNumber, columnNumber) = getLineAndColumn(context.content, candidate.startIndex)
+                val contextLines = getContext(lines, lineNumber - 1, 2)
 
                 val match =
                         EntropyMatch(
@@ -148,62 +148,21 @@ class EntropyDetector : DetectorInterface {
                                 lineNumber = lineNumber,
                                 columnNumber = columnNumber,
                                 analysis = analysis,
-                                context = context
+                                context = contextLines
                         )
 
-                findings.add(createFinding(file, match))
+                findings.add(createFinding(context, match))
             }
         }
 
         return findings.sortedWith(
-                compareByDescending<ScanResult.Finding> { it.confidence }
-                        .thenBy { it.lineNumber }
-                        .thenBy { it.columnNumber }
+                compareByDescending<Finding> { it.confidence }
+                        .thenBy { it.location.lineNumber }
+                        .thenBy { it.location.columnStart }
         )
     }
 
-    override fun getName(): String = "EntropyDetector"
-
-    override fun getDescription(): String =
-            "Detects secrets by analyzing string entropy (randomness) to identify cryptographic keys and tokens"
-
-    override fun getSupportedFileTypes(): Set<String> = setOf("*") // Supports all file types
-
-    override fun configure(options: Map<String, Any>): DetectorInterface {
-        options["minLength"]?.let { if (it is Number) minLength = it.toInt() }
-        options["maxLength"]?.let { if (it is Number) maxLength = it.toInt() }
-        options["entropyThreshold"]?.let {
-            when (it) {
-                is Double -> entropyThreshold = it
-                is Number -> entropyThreshold = it.toDouble()
-            }
-        }
-        options["base64Threshold"]?.let {
-            when (it) {
-                is Double -> base64Threshold = it
-                is Number -> base64Threshold = it.toDouble()
-            }
-        }
-        options["hexThreshold"]?.let {
-            when (it) {
-                is Double -> hexThreshold = it
-                is Number -> hexThreshold = it.toDouble()
-            }
-        }
-        options["confidenceMultiplier"]?.let {
-            when (it) {
-                is Double -> confidenceMultiplier = it
-                is Number -> confidenceMultiplier = it.toDouble()
-            }
-        }
-        options["enableCharsetSpecificThresholds"]?.let {
-            if (it is Boolean) enableCharsetSpecificThresholds = it
-        }
-        options["excludeCommonWords"]?.let { if (it is Boolean) excludeCommonWords = it }
-        options["excludePlaceholders"]?.let { if (it is Boolean) excludePlaceholders = it }
-
-        return this
-    }
+    // Configuration methods removed - handled by base class
 
     /** Analyze the entropy of a given string */
     fun analyzeEntropy(text: String): EntropyAnalysis {
@@ -576,35 +535,21 @@ class EntropyDetector : DetectorInterface {
         return lines.subList(start, end).joinToString("\n")
     }
 
-    /** Create a ScanResult.Finding from an entropy match */
-    private fun createFinding(file: File, match: EntropyMatch): ScanResult.Finding {
+    /** Create a Finding using the base class helper method */
+    private fun createFinding(context: ScanContext, match: EntropyMatch): Finding {
         val analysis = match.analysis
 
-        return ScanResult.Finding(
-                file = file,
-                lineNumber = match.lineNumber,
-                columnNumber = match.columnNumber,
-                message =
-                        "High entropy ${analysis.charsetType.description.lowercase()} detected (entropy: ${String.format("%.2f", analysis.entropy)})",
-                severity =
-                        when {
-                            analysis.confidence >= 0.8 -> ScanResult.Severity.HIGH
-                            analysis.confidence >= 0.6 -> ScanResult.Severity.MEDIUM
-                            else -> ScanResult.Severity.LOW
-                        },
-                ruleId = "entropy_${analysis.charsetType.name.lowercase()}",
-                matchedText = match.text,
-                confidence = analysis.confidence,
-                context = match.context,
-                category = "High Entropy String",
-                metadata =
-                        mapOf(
-                                "entropy" to analysis.entropy,
-                                "normalizedEntropy" to analysis.normalizedEntropy,
-                                "charsetType" to analysis.charsetType.name,
-                                "length" to analysis.length
-                        )
+        return createFinding(
+            type = "High Entropy String",
+            value = match.text,
+            lineNumber = match.lineNumber,
+            columnStart = match.columnNumber,
+            columnEnd = match.columnNumber + match.text.length,
+            confidence = analysis.confidence,
+            rule = "entropy_${analysis.charsetType.name.lowercase()}",
+            context = context
         )
+    }
     }
 
     /** Data class for string candidates */
