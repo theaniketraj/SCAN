@@ -29,8 +29,10 @@ class CompositeDetector(
         private val timeoutMillis: Long = 30000
 ) : AbstractDetector() {
 
+    override val detectorId: String = "composite"
+
     private val resultCache =
-            if (enableCaching) ConcurrentHashMap<String, List<ScanResult.Finding>>() else null
+            if (enableCaching) ConcurrentHashMap<String, List<Finding>>() else null
     private val detectorInstances = detectors.map { it.detector }
 
     companion object {
