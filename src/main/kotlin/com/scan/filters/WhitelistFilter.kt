@@ -1,5 +1,6 @@
 package com.scan.filters
 
+import com.scan.core.Finding
 import com.scan.core.ScanResult
 import java.io.File
 import java.util.regex.Pattern
@@ -111,7 +112,7 @@ class WhitelistFilter(private val whitelistConfig: WhitelistConfig = WhitelistCo
                 )
     }
 
-    override fun shouldInclude(file: File): Boolean {
+    override fun shouldIncludeFile(file: File, relativePath: String): Boolean {
         val filePath = file.absolutePath.replace("\\", "/")
 
         // Check if file is in excluded directory
@@ -142,19 +143,27 @@ class WhitelistFilter(private val whitelistConfig: WhitelistConfig = WhitelistCo
         return true
     }
 
-    override fun shouldIncludeResult(result: ScanResult): Boolean {
+    override fun shouldIncludeLine(line: String, lineNumber: Int, file: File): Boolean {
+        return shouldIncludeFile(file, file.path)
+    }
+
+    override fun getDescription(): String {
+        return "Whitelist filter that excludes files and content based on patterns and paths"
+    }
+
+    fun shouldIncludeFinding(finding: Finding): Boolean {
         // Check if the secret value itself should be excluded
-        if (isSecretExcluded(result.secretValue)) {
+        if (isSecretExcluded(finding.secretInfo.detectedValue)) {
             return false
         }
 
         // Check if the line content should be excluded
-        if (isLineContentExcluded(result.lineContent)) {
+        if (isLineContentExcluded(finding.location.lineContent)) {
             return false
         }
 
         // Check if it's in a comment and comments are excluded
-        if (isCommentExcluded(result.lineContent)) {
+        if (isCommentExcluded(finding.location.lineContent)) {
             return false
         }
 
