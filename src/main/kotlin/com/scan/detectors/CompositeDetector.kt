@@ -1,6 +1,6 @@
 package com.scan.detectors
 
-import com.scan.core.ScanResult
+import com.scan.core.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
@@ -27,7 +27,7 @@ class CompositeDetector(
         private val enableCaching: Boolean = true,
         private val maxCacheSize: Int = 1000,
         private val timeoutMillis: Long = 30000
-) : DetectorInterface {
+) : AbstractDetector() {
 
     private val resultCache =
             if (enableCaching) ConcurrentHashMap<String, List<ScanResult.Finding>>() else null
@@ -119,28 +119,28 @@ class CompositeDetector(
         }
     }
 
-    override fun detect(file: File, content: String): List<ScanResult.Finding> {
+    override fun performDetection(context: ScanContext): List<Finding> {
         if (detectorInstances.isEmpty()) {
             return emptyList()
         }
 
         // Check cache first
-        val cacheKey = generateCacheKey(file, content)
+        val cacheKey = generateCacheKey(context)
         resultCache?.get(cacheKey)?.let { cachedResult ->
             return cachedResult
         }
 
         val results =
                 when (executionMode) {
-                    ExecutionMode.SEQUENTIAL -> executeSequential(file, content)
-                    ExecutionMode.PARALLEL -> executeParallel(file, content)
-                    ExecutionMode.FAIL_FAST -> executeFailFast(file, content)
-                    ExecutionMode.PRIORITY_BASED -> executePriorityBased(file, content)
+                    ExecutionMode.SEQUENTIAL -> executeSequential(context)
+                    ExecutionMode.PARALLEL -> executeParallel(context)
+                    ExecutionMode.FAIL_FAST -> executeFailFast(context)
+                    ExecutionMode.PRIORITY_BASED -> executePriorityBased(context)
                 }
 
-        val mergedResults = mergeResults(results, file)
+        val mergedResults = mergeResults(results, context)
         val deduplicatedResults = deduplicateResults(mergedResults)
-        val finalResults = postProcessResults(deduplicatedResults, file, content)
+        val finalResults = postProcessResults(deduplicatedResults, context)
 
         // Cache results
         resultCache?.let { cache ->
@@ -155,12 +155,12 @@ class CompositeDetector(
         return finalResults
     }
 
-    private fun executeSequential(file: File, content: String): List<DetectorResult> {
+    private fun executeSequential(context: ScanContext): List<DetectorResult> {
         val results = mutableListOf<DetectorResult>()
 
         detectors.forEach { config ->
             try {
-                val findings = config.detector.detect(file, content)
+                val findings = config.detector.detect(context)
                 results.add(DetectorResult(config, findings, null))
             } catch (e: Exception) {
                 results.add(DetectorResult(config, emptyList(), e))
@@ -170,14 +170,14 @@ class CompositeDetector(
         return results
     }
 
-    private fun executeParallel(file: File, content: String): List<DetectorResult> {
+    private fun executeParallel(context: ScanContext): List<DetectorResult> {
         return runBlocking {
             val deferredResults =
                     detectors.map { config ->
                         async(Dispatchers.Default) {
                             try {
                                 withTimeout(timeoutMillis) {
-                                    val findings = config.detector.detect(file, content)
+                                    val findings = config.detector.detect(context)
                                     DetectorResult(config, findings, null)
                                 }
                             } catch (e: TimeoutCancellationException) {
@@ -198,7 +198,7 @@ class CompositeDetector(
         }
     }
 
-    private fun executeFailFast(file: File, content: String): List<DetectorResult> {
+    private fun executeFailFast(context: ScanContext): List<DetectorResult> {
         val results = mutableListOf<DetectorResult>()
 
         // Sort detectors by priority (high priority first)
@@ -206,7 +206,7 @@ class CompositeDetector(
 
         for (config in sortedDetectors) {
             try {
-                val findings = config.detector.detect(file, content)
+                val findings = config.detector.detect(context)
                 results.add(DetectorResult(config, findings, null))
 
                 // If high-priority detector finds high-confidence results, we can stop early
@@ -222,7 +222,7 @@ class CompositeDetector(
         return results
     }
 
-    private fun executePriorityBased(file: File, content: String): List<DetectorResult> {
+    private fun executePriorityBased(context: ScanContext): List<DetectorResult> {
         val results = mutableListOf<DetectorResult>()
         val detectorsByPriority = detectors.groupBy { it.priority }
 
@@ -234,7 +234,7 @@ class CompositeDetector(
                             .map { config ->
                                 async(Dispatchers.Default) {
                                     try {
-                                        val findings = config.detector.detect(file, content)
+                                        val findings = config.detector.detect(context)
                                         DetectorResult(config, findings, null)
                                     } catch (e: Exception) {
                                         DetectorResult(config, emptyList(), e)
