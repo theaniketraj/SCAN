@@ -1,6 +1,6 @@
 package com.scan.detectors
 
-import com.scan.core.ScanResult
+import com.scan.core.*
 import com.scan.utils.PatternMatcher
 import java.io.File
 import java.util.regex.Pattern
@@ -20,7 +20,12 @@ class ContextAwareDetectorImpl(
     private val patternMatcher: PatternMatcher,
     private val entropyThreshold: Double = 4.5,
     private val minimumSecretLength: Int = 12
-) : DetectorInterface {
+) : AbstractDetector() {
+
+    override val detectorId: String = "context-aware"
+    override val detectorName: String = "Context-Aware Detector"
+    override val version: String = "1.0.0"
+    override val supportedFileTypes: Set<String> = setOf("*")
 
     companion object {
         // Context patterns for different programming languages
@@ -60,7 +65,7 @@ class ContextAwareDetectorImpl(
             "(?i)\\b(example|sample|test|dummy|fake|mock|placeholder|your[_-]?key|api[_-]?key[_-]?here)\\b",
             "(?i)\\b(todo|fixme|replace|change|update)\\b",
             "\\b(123456|abcdef|qwerty|password|secret)\\b",
-            "\\${[^}]+}", // Environment variable placeholders
+            "\\$\\{[^}]+\\}", // Environment variable placeholders
             "\\[[^\\]]+\\]", // Placeholder brackets
             "<[^>]+>", // XML/HTML-like placeholders
             "(?i)\\b(localhost|127\\.0\\.0\\.1|example\\.com)\\b"
@@ -80,17 +85,17 @@ class ContextAwareDetectorImpl(
         )
     }
 
-    override fun detect(file: File, content: String): List<ScanResult.Finding> {
-        val findings = mutableListOf<ScanResult.Finding>()
-        val fileExtension = file.extension.lowercase()
-        val fileName = file.name.lowercase()
-        val isTestFile = isTestFile(file, fileName)
+    override fun performDetection(context: ScanContext): List<Finding> {
+        val findings = mutableListOf<Finding>()
+        val fileExtension = context.fileExtension.lowercase()
+        val fileName = context.fileName.lowercase()
+        val isTestFile = isTestFile(context.filePath.toFile(), fileName)
         
         // Parse file content into structured data
-        val fileContext = parseFileContext(content, fileExtension)
+        val fileContext = parseFileContext(context.content, fileExtension)
         
         // Analyze each line with context
-        content.lines().forEachIndexed { lineIndex, line ->
+        context.content.lines().forEachIndexed { lineIndex, line ->
             val lineNumber = lineIndex + 1
             val lineContext = determineLineContext(line, lineIndex, fileContext, fileExtension)
             
@@ -108,29 +113,20 @@ class ContextAwareDetectorImpl(
                     lineContext, 
                     fileContext, 
                     isTestFile,
-                    file
+                    context.filePath.toFile()
                 )
                 
                 if (confidence > 0.3) { // Only report findings with reasonable confidence
-                    val severity = when {
-                        confidence >= 0.8 -> ScanResult.Severity.HIGH
-                        confidence >= 0.6 -> ScanResult.Severity.MEDIUM
-                        else -> ScanResult.Severity.LOW
-                    }
-                    
-                    findings.add(
-                        ScanResult.Finding(
-                            file = file,
-                            lineNumber = lineNumber,
-                            columnStart = line.indexOf(secretCandidate.value),
-                            columnEnd = line.indexOf(secretCandidate.value) + secretCandidate.value.length,
-                            message = buildContextualMessage(secretCandidate, lineContext),
-                            severity = severity,
-                            ruleId = "context-aware-${secretCandidate.type}",
-                            confidence = confidence,
-                            context = lineContext.toString()
-                        )
-                    )
+                    findings.add(createFinding(
+                        type = secretCandidate.type.toString(),
+                        value = secretCandidate.value,
+                        lineNumber = lineNumber,
+                        columnStart = line.indexOf(secretCandidate.value),
+                        columnEnd = line.indexOf(secretCandidate.value) + secretCandidate.value.length,
+                        confidence = confidence,
+                        rule = "context-aware-${secretCandidate.type}",
+                        context = context
+                    ))
                 }
             }
         }
