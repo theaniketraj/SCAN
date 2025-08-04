@@ -30,6 +30,11 @@ class CompositeDetector(
 ) : AbstractDetector() {
 
     override val detectorId: String = "composite"
+    override val detectorName: String = "Composite Detector"
+    override val version: String = "1.0.0"
+    override val supportedFileTypes: Set<String> = emptySet() // supports all file types
+
+    override val detectorId: String = "composite"
 
     private val resultCache =
             if (enableCaching) ConcurrentHashMap<String, List<Finding>>() else null
