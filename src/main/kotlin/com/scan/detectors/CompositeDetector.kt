@@ -268,7 +268,7 @@ class CompositeDetector(
         return results
     }
 
-    private fun mergeResults(results: List<DetectorResult>, file: File): List<ScanResult.Finding> {
+    private fun mergeResults(results: List<DetectorResult>, file: File): List<Finding> {
         val allFindings = results.flatMap { it.findings }
 
         if (allFindings.isEmpty()) {
@@ -283,7 +283,7 @@ class CompositeDetector(
         }
     }
 
-    private fun mergeWithWeightedAverage(results: List<DetectorResult>): List<ScanResult.Finding> {
+    private fun mergeWithWeightedAverage(results: List<DetectorResult>): List<Finding> {
         val findingGroups =
                 groupSimilarFindings(
                         results.flatMap { result ->
@@ -311,7 +311,7 @@ class CompositeDetector(
         }
     }
 
-    private fun mergeConservatively(results: List<DetectorResult>): List<ScanResult.Finding> {
+    private fun mergeConservatively(results: List<DetectorResult>): List<Finding> {
         val allFindings = results.flatMap { it.findings }
         val findingGroups = groupSimilarFindings(allFindings.map { WeightedFinding(it, 1.0, "") })
 
@@ -334,7 +334,7 @@ class CompositeDetector(
         }
     }
 
-    private fun mergeOptimistically(results: List<DetectorResult>): List<ScanResult.Finding> {
+    private fun mergeOptimistically(results: List<DetectorResult>): List<Finding> {
         val allFindings = results.flatMap { it.findings }
         val findingGroups = groupSimilarFindings(allFindings.map { WeightedFinding(it, 1.0, "") })
 
@@ -351,7 +351,7 @@ class CompositeDetector(
         }
     }
 
-    private fun deduplicateResults(findings: List<ScanResult.Finding>): List<ScanResult.Finding> {
+    private fun deduplicateResults(findings: List<Finding>): List<Finding> {
         return when (deduplicationStrategy) {
             DeduplicationStrategy.NONE -> findings
             DeduplicationStrategy.EXACT_MATCH -> deduplicateExactMatches(findings)
@@ -362,14 +362,14 @@ class CompositeDetector(
     }
 
     private fun deduplicateExactMatches(
-            findings: List<ScanResult.Finding>
-    ): List<ScanResult.Finding> {
+            findings: List<Finding>
+    ): List<Finding> {
         return findings.distinctBy { Triple(it.file.absolutePath, it.lineNumber, it.message) }
     }
 
     private fun deduplicateByPosition(
-            findings: List<ScanResult.Finding>
-    ): List<ScanResult.Finding> {
+            findings: List<Finding>
+    ): List<Finding> {
         return findings
                 .groupBy { Triple(it.file.absolutePath, it.lineNumber, it.columnStart) }
                 .map { (_, group) ->
@@ -379,8 +379,8 @@ class CompositeDetector(
     }
 
     private fun deduplicateByPositionAndContent(
-            findings: List<ScanResult.Finding>
-    ): List<ScanResult.Finding> {
+            findings: List<Finding>
+    ): List<Finding> {
         return findings
                 .groupBy { finding ->
                     QuadTuple(
@@ -396,8 +396,8 @@ class CompositeDetector(
                 }
     }
 
-    private fun smartMergeFindings(findings: List<ScanResult.Finding>): List<ScanResult.Finding> {
-        val groups = mutableListOf<MutableList<ScanResult.Finding>>()
+    private fun smartMergeFindings(findings: List<Finding>): List<Finding> {
+        val groups = mutableListOf<MutableList<Finding>>()
 
         findings.forEach { finding ->
             val existingGroup =
@@ -445,8 +445,8 @@ class CompositeDetector(
     }
 
     private fun areSimilarFindings(
-            finding1: ScanResult.Finding,
-            finding2: ScanResult.Finding
+            finding1: Finding,
+            finding2: Finding
     ): Boolean {
         // Same file and line
         if (finding1.file.absolutePath == finding2.file.absolutePath &&
@@ -464,7 +464,7 @@ class CompositeDetector(
         return false
     }
 
-    private fun mergeIdenticalFindings(findings: List<ScanResult.Finding>): ScanResult.Finding {
+    private fun mergeIdenticalFindings(findings: List<Finding>): Finding {
         if (findings.size == 1) return findings.first()
 
         val baseFinding = findings.first()
@@ -482,14 +482,14 @@ class CompositeDetector(
     }
 
     private fun postProcessResults(
-            findings: List<ScanResult.Finding>,
+            findings: List<Finding>,
             file: File,
             content: String
-    ): List<ScanResult.Finding> {
+    ): List<Finding> {
         return findings
                 .filter { it.confidence > 0.1 } // Remove very low confidence findings
                 .sortedWith(
-                        compareByDescending<ScanResult.Finding> { it.severity }
+                        compareByDescending<Finding> { it.severity }
                                 .thenByDescending { it.confidence }
                                 .thenBy { it.lineNumber }
                 )
@@ -497,10 +497,10 @@ class CompositeDetector(
     }
 
     private fun enhanceFindingWithMetadata(
-            finding: ScanResult.Finding,
+            finding: Finding,
             file: File,
             content: String
-    ): ScanResult.Finding {
+    ): Finding {
         val lines = content.lines()
         val lineContent =
                 if (finding.lineNumber <= lines.size) {
@@ -523,7 +523,7 @@ class CompositeDetector(
         return "${file.absolutePath}:${content.hashCode()}"
     }
 
-    private fun extractSecretValue(finding: ScanResult.Finding): String {
+    private fun extractSecretValue(finding: Finding): String {
         // This is a simplified extraction - in practice, you'd parse the context
         // or store the actual secret value in the Finding object
         return finding.message.substringAfter("'").substringBefore("'").ifEmpty {
@@ -558,12 +558,12 @@ class CompositeDetector(
 
     private data class DetectorResult(
             val config: DetectorConfig,
-            val findings: List<ScanResult.Finding>,
+            val findings: List<Finding>,
             val error: Exception?
     )
 
     private data class WeightedFinding(
-            val finding: ScanResult.Finding,
+            val finding: Finding,
             val weight: Double,
             val detectorName: String
     )
