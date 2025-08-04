@@ -193,6 +193,7 @@ abstract class AbstractDetector : DetectorInterface {
         )
         
         val findingContext = FindingContext(
+            lineContent = context.getLine(lineNumber) ?: "",
             surroundingLines = context.getContextLines(lineNumber, 2),
             isInComment = false, // TODO: Implement comment detection
             isInString = false,  // TODO: Implement string detection  
@@ -211,7 +212,7 @@ abstract class AbstractDetector : DetectorInterface {
         
         return Finding(
             id = UUID.randomUUID().toString(),
-            title = "Potential ${type.replace("_", " ").lowercase().capitalize()} detected",
+            title = "Potential ${type.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }} detected",
             description = "Found potential sensitive information: ${type.replace("_", " ").lowercase()}",
             severity = severity,
             confidence = confidenceEnum,
