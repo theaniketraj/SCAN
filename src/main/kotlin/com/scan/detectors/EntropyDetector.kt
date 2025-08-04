@@ -12,6 +12,11 @@ import kotlin.math.min
  */
 class EntropyDetector : AbstractDetector() {
 
+    override val detectorId: String = "entropy"
+    override val detectorName: String = "Entropy Detector"
+    override val version: String = "1.0.0"
+    override val supportedFileTypes: Set<String> = setOf("*")
+
     companion object {
         private const val DEFAULT_MIN_LENGTH = 8
         private const val DEFAULT_MAX_LENGTH = 512
@@ -101,30 +106,6 @@ class EntropyDetector : AbstractDetector() {
             val analysis: EntropyAnalysis,
             val context: String
     )
-
-    /** Configure the detector with custom settings */
-    fun configure(
-            minLength: Int = DEFAULT_MIN_LENGTH,
-            maxLength: Int = DEFAULT_MAX_LENGTH,
-            entropyThreshold: Double = DEFAULT_ENTROPY_THRESHOLD,
-            base64Threshold: Double = DEFAULT_BASE64_THRESHOLD,
-            hexThreshold: Double = DEFAULT_HEX_THRESHOLD,
-            confidenceMultiplier: Double = DEFAULT_CONFIDENCE_MULTIPLIER,
-            enableCharsetSpecificThresholds: Boolean = true,
-            excludeCommonWords: Boolean = true,
-            excludePlaceholders: Boolean = true
-    ): EntropyDetector {
-        this.minLength = max(1, minLength)
-        this.maxLength = max(minLength, maxLength)
-        this.entropyThreshold = max(0.0, entropyThreshold)
-        this.base64Threshold = max(0.0, base64Threshold)
-        this.hexThreshold = max(0.0, hexThreshold)
-        this.confidenceMultiplier = max(0.1, confidenceMultiplier)
-        this.enableCharsetSpecificThresholds = enableCharsetSpecificThresholds
-        this.excludeCommonWords = excludeCommonWords
-        this.excludePlaceholders = excludePlaceholders
-        return this
-    }
 
     override fun performDetection(context: ScanContext): List<Finding> {
         val findings = mutableListOf<Finding>()
@@ -549,7 +530,6 @@ class EntropyDetector : AbstractDetector() {
             rule = "entropy_${analysis.charsetType.name.lowercase()}",
             context = context
         )
-    }
     }
 
     /** Data class for string candidates */
