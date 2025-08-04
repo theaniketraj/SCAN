@@ -67,6 +67,7 @@ replay_pid*
 
 # Kotlin
 *.hprof
+.kotlin/
 
 # Test Results
 /test-results/
