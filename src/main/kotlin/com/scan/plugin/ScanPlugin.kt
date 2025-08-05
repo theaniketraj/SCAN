@@ -5,9 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.AbstractCompile
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 
 /**
  * SCAN (Sensitive Code Analyzer for Nerds) Gradle Plugin
@@ -94,7 +92,7 @@ class ScanPlugin : Plugin<Project> {
     private fun createScanExtension(project: Project): ScanExtension {
         project.logger.debug("Creating SCAN extension for project configuration")
 
-        return project.extensions.create<ScanExtension>(EXTENSION_NAME).apply {
+        return project.extensions.create(EXTENSION_NAME, ScanExtension::class.java).apply {
             // Set sensible defaults that work for most projects out of the box
             // Users can override these in their build.gradle.kts if needed
 
@@ -165,7 +163,7 @@ class ScanPlugin : Plugin<Project> {
     ): TaskProvider<ScanTask> {
         project.logger.debug("Registering main scan task: $SCAN_TASK_NAME")
 
-        return project.tasks.register<ScanTask>(SCAN_TASK_NAME) {
+        return project.tasks.register(SCAN_TASK_NAME, ScanTask::class.java) {
             // Set up task metadata that appears in 'gradle tasks' output
             group = TASK_GROUP
             description =
@@ -200,7 +198,7 @@ class ScanPlugin : Plugin<Project> {
         project.afterEvaluate {
             // Hook into the compilation process - we want to scan before compilation
             // so developers get feedback about secrets before their code is compiled
-            project.tasks.withType<AbstractCompile>().configureEach {
+            project.tasks.withType(AbstractCompile::class.java).configureEach {
                 // Make compilation depend on our security scan
                 // This means 'gradle build' will automatically run security scanning
                 dependsOn(scanTaskProvider)
@@ -306,7 +304,7 @@ class ScanPlugin : Plugin<Project> {
         project.logger.debug("Configuring integration with other plugins")
 
         // Integration with Java plugin if present
-        project.plugins.withType<JavaPlugin> {
+        project.plugins.withType(JavaPlugin::class.java) {
             project.logger.debug("Java plugin detected - configuring Java-specific integration")
 
             // Make sure we scan before the 'classes' task compiles anything
@@ -314,7 +312,7 @@ class ScanPlugin : Plugin<Project> {
 
             // Include Java-specific file patterns if user hasn't customized
             project.afterEvaluate {
-                val extension = project.extensions.getByType<ScanExtension>()
+                val extension = project.extensions.getByType(ScanExtension::class.java)
                 val currentPatterns = extension.includePatterns.get().toMutableList()
 
                 // Add Java-specific patterns if they're not already there
