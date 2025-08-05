@@ -281,5 +281,9 @@ package com.scan.filters
  * includeDirectories.toSet(), excludeDirectories = excludeDirectories.toSet(), caseSensitive =
  * caseSensitive, matchRelativePaths = matchRelativePaths, priority = priority ) } }
  *
- * /** Extension function to create PathFilterBuilder
+/**
+ * Extension function to create PathFilterBuilder
  */
+fun pathFilter(action: PathFilterBuilder.() -> Unit): PathFilter {
+    return PathFilterBuilder().apply(action).build()
+}
