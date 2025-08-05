@@ -1,9 +1,8 @@
 package com.scan.core
 
-/**
- * Severity levels for security findings
- */
+/** Severity levels for security findings */
 enum class Severity {
+    INFO,
     LOW,
     MEDIUM,
     HIGH,
