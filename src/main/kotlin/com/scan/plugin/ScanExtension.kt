@@ -423,67 +423,65 @@ abstract class ScanExtension {
         action(config)
         // Apply reporting configuration
     }
-}
 
-// =====================================
-// CONFIGURATION CLASSES
-// =====================================
+    // =====================================
+    // CONFIGURATION CLASSES
+    // =====================================
 
-/**
- * Pattern detection configuration
- */
-class PatternConfig {
-    var enableApiKeys: Boolean = true
-    var enableAwsKeys: Boolean = true
-    var enableGoogleKeys: Boolean = true
-    var enableGitHubTokens: Boolean = true
-    var enableSlackTokens: Boolean = true
-    var enableDatabaseUrls: Boolean = true
-    var enableJwtTokens: Boolean = true
-    var enableRsaKeys: Boolean = true
-    var enableSshKeys: Boolean = true
-    var customPatterns: MutableMap<String, String> = mutableMapOf()
-    var patternSensitivity: String = "medium" // low, medium, high
-}
+    /**
+     * Pattern detection configuration
+     */
+    class PatternConfig {
+        var enableApiKeys: Boolean = true
+        var enableAwsKeys: Boolean = true
+        var enableGoogleKeys: Boolean = true
+        var enableGitHubTokens: Boolean = true
+        var enableSlackTokens: Boolean = true
+        var enableDatabaseUrls: Boolean = true
+        var enableJwtTokens: Boolean = true
+        var enableRsaKeys: Boolean = true
+        var enableSshKeys: Boolean = true
+        var customPatterns: MutableMap<String, String> = mutableMapOf()
+        var patternSensitivity: String = "medium" // low, medium, high
+    }
 
-/**
- * Entropy detection configuration
- */
-class EntropyConfig {
-    var threshold: Double = 4.5
-    var minLength: Int = 12
-    var maxLength: Int = 200
-    var enableBase64Detection: Boolean = true
-    var enableHexDetection: Boolean = true
-    var skipCommonWords: Boolean = true
-    var commonWordsFile: String? = null
-}
+    /**
+     * Entropy detection configuration
+     */
+    class EntropyConfig {
+        var threshold: Double = 4.5
+        var minLength: Int = 12
+        var maxLength: Int = 200
+        var enableBase64Detection: Boolean = true
+        var enableHexDetection: Boolean = true
+        var skipCommonWords: Boolean = true
+        var commonWordsFile: String? = null
+    }
 
-/**
- * Filter configuration
- */
-class FilterConfig {
-    var includeExtensions: MutableSet<String> = mutableSetOf()
-    var excludeExtensions: MutableSet<String> = mutableSetOf()
-    var includePaths: MutableSet<String> = mutableSetOf()
-    var excludePaths: MutableSet<String> = mutableSetOf()
-    var maxFileSize: Long = 10 * 1024 * 1024 // 10MB
-    var skipBinaryFiles: Boolean = true
-    var skipLargeFiles: Boolean = true
-}
+    /**
+     * Filter configuration
+     */
+    class FilterConfig {
+        var includeExtensions: MutableSet<String> = mutableSetOf()
+        var excludeExtensions: MutableSet<String> = mutableSetOf()
+        var includePaths: MutableSet<String> = mutableSetOf()
+        var excludePaths: MutableSet<String> = mutableSetOf()
+        var maxFileSize: Long = 10 * 1024 * 1024 // 10MB
+        var skipBinaryFiles: Boolean = true
+        var skipLargeFiles: Boolean = true
+    }
 
-}
-
-/**
- * Reporting configuration
- */
-class ReportingConfig {
-    var outputDir: String = "build/reports/scan"
-    var formats: MutableSet<String> = mutableSetOf("console", "json")
-    var includeMetadata: Boolean = true
-    var includeStatistics: Boolean = true
-    var groupByFileType: Boolean = false
-    var sortByRisk: Boolean = true
-    var maskSecrets: Boolean = true
-    var maxSecretLength: Int = 50
+    /**
+     * Reporting configuration
+     */
+    class ReportingConfig {
+        var outputDir: String = "build/reports/scan"
+        var formats: MutableSet<String> = mutableSetOf("console", "json")
+        var includeMetadata: Boolean = true
+        var includeStatistics: Boolean = true
+        var groupByFileType: Boolean = false
+        var sortByRisk: Boolean = true
+        var maskSecrets: Boolean = true
+        var maxSecretLength: Int = 50
+    }
 }
