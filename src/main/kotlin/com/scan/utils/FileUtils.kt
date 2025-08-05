@@ -1,5 +1,6 @@
 package com.scan.utils
 
+import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -188,7 +189,7 @@ object FileUtils {
             )
 
     // File size limits for safety (configurable)
-    private const val DEFAULT_MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+    private const val DEFAULT_MAX_FILE_SIZE = 50L * 1024 * 1024 // 50MB
     private const val LARGE_FILE_THRESHOLD = 10 * 1024 * 1024 // 10MB
 
     // Encoding detection cache
