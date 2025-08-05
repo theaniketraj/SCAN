@@ -25,10 +25,28 @@ abstract class ScanExtension {
     abstract val enabled: Property<Boolean>
     
     /**
+     * Enable strict mode for more thorough scanning
+     * Default: false
+     */
+    abstract val strictMode: Property<Boolean>
+    
+    /**
      * Fail the build if secrets are detected
      * Default: true
      */
     abstract val failOnSecretsFound: Property<Boolean>
+    
+    /**
+     * Fail on secrets (alternative naming)
+     * Default: true
+     */
+    abstract val failOnSecrets: Property<Boolean>
+    
+    /**
+     * Warn on secrets instead of failing
+     * Default: true
+     */
+    abstract val warnOnSecrets: Property<Boolean>
     
     /**
      * Enable verbose logging for debugging
@@ -69,6 +87,12 @@ abstract class ScanExtension {
      * Default: false (test files usually contain dummy secrets)
      */
     abstract val scanTestFiles: Property<Boolean>
+    
+    /**
+     * Ignore test files (opposite of scanTestFiles)
+     * Default: true
+     */
+    abstract val ignoreTestFiles: Property<Boolean>
     
     /**
      * Test file patterns to identify test files
@@ -208,10 +232,22 @@ abstract class ScanExtension {
     abstract val enableJsonReport: Property<Boolean>
     
     /**
+     * Generate JSON report (alternative naming)
+     * Default: false
+     */
+    abstract val generateJsonReport: Property<Boolean>
+    
+    /**
      * Enable HTML report generation
      * Default: false
      */
     abstract val enableHtmlReport: Property<Boolean>
+    
+    /**
+     * Generate HTML report (alternative naming)
+     * Default: false
+     */
+    abstract val generateHtmlReport: Property<Boolean>
     
     /**
      * JSON report filename
@@ -246,6 +282,12 @@ abstract class ScanExtension {
      * Default: true
      */
     abstract val enableParallelScanning: Property<Boolean>
+    
+    /**
+     * Enable parallel scanning (alternative naming)
+     * Default: true
+     */
+    abstract val parallelScanning: Property<Boolean>
     
     /**
      * Number of threads for parallel scanning
@@ -428,6 +470,8 @@ class FilterConfig {
     var maxFileSize: Long = 10 * 1024 * 1024 // 10MB
     var skipBinaryFiles: Boolean = true
     var skipLargeFiles: Boolean = true
+}
+
 }
 
 /**
