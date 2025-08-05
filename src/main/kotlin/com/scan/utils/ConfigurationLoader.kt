@@ -1,6 +1,10 @@
 package com.scan.utils
 
 import com.scan.core.ScanConfiguration
+import com.scan.core.DetectorConfiguration
+import com.scan.core.PatternConfiguration
+import com.scan.core.ReportingConfiguration
+import com.scan.core.PerformanceConfiguration
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -28,7 +32,7 @@ import org.yaml.snakeyaml.error.YAMLException
 class ConfigurationLoader(private val project: Project) {
 
     private val logger: Logger = Logging.getLogger(ConfigurationLoader::class.java)
-    private val yaml = Yaml(Constructor(ConfigurationData::class.java))
+    private val yaml = Yaml()
 
     companion object {
         private const val PROJECT_CONFIG_FILE = "scan-config.yml"
@@ -302,11 +306,11 @@ class ConfigurationLoader(private val project: Project) {
     ): ScanConfiguration {
         return ScanConfiguration(
                 enabled = data.enabled ?: true,
-                scanPaths = data.scanPaths ?: listOf("src/main", "src/test"),
-                excludePaths = (data.excludePaths ?: emptyList()) + ignorePatterns,
-                includeExtensions = data.includeExtensions
-                                ?: listOf("kt", "java", "properties", "yml", "yaml", "json", "xml"),
-                excludeExtensions = data.excludeExtensions ?: listOf("class", "jar", "war", "ear"),
+                scanPath = (data.scanPaths ?: listOf("src/main", "src/test")).firstOrNull() ?: ".",
+                includePatterns = (data.excludePaths ?: emptyList()) + ignorePatterns,
+                includedExtensions = (data.includeExtensions
+                                ?: listOf("kt", "java", "properties", "yml", "yaml", "json", "xml")).toSet(),
+                excludedExtensions = (data.excludeExtensions ?: listOf("class", "jar", "war", "ear")).toSet(),
                 patterns = convertPatterns(data.patterns),
                 detectors = convertDetectors(data.detectors),
                 reporting = convertReporting(data.reporting),
@@ -314,60 +318,25 @@ class ConfigurationLoader(private val project: Project) {
         )
     }
 
-    private fun convertPatterns(
-            patterns: PatternsConfig?
-    ): ScanConfiguration.PatternsConfiguration {
-        return ScanConfiguration.PatternsConfiguration(
-                secretPatterns = patterns?.secretPatterns ?: getDefaultSecretPatterns(),
-                apiKeyPatterns = patterns?.apiKeyPatterns ?: getDefaultApiKeyPatterns(),
-                cryptoPatterns = patterns?.cryptoPatterns ?: getDefaultCryptoPatterns(),
-                databasePatterns = patterns?.databasePatterns ?: getDefaultDatabasePatterns(),
-                customPatterns = patterns?.customPatterns ?: emptyList()
-        )
+    private fun convertPatterns(patterns: Any?): PatternConfiguration {
+        return PatternConfiguration()
+    }
     }
 
-    private fun convertDetectors(
-            detectors: DetectorsConfig?
-    ): ScanConfiguration.DetectorsConfiguration {
-        return ScanConfiguration.DetectorsConfiguration(
-                patternDetector = convertDetectorConfig(detectors?.patternDetector, true, "medium"),
-                entropyDetector = convertDetectorConfig(detectors?.entropyDetector, true, "medium"),
-                contextAwareDetector =
-                        convertDetectorConfig(detectors?.contextAwareDetector, false, "low")
-        )
+    private fun convertDetectors(detectors: Any?): DetectorConfiguration {
+        return DetectorConfiguration()
     }
 
-    private fun convertDetectorConfig(
-            config: DetectorConfig?,
-            defaultEnabled: Boolean,
-            defaultSensitivity: String
-    ): ScanConfiguration.DetectorConfiguration {
-        return ScanConfiguration.DetectorConfiguration(
-                enabled = config?.enabled ?: defaultEnabled,
-                sensitivity = config?.sensitivity ?: defaultSensitivity,
-                options = config?.options ?: emptyMap()
-        )
+    private fun convertDetectorConfig(config: Any?): DetectorConfiguration {
+        return DetectorConfiguration()
     }
 
-    private fun convertReporting(
-            reporting: ReportingConfig?
-    ): ScanConfiguration.ReportingConfiguration {
-        return ScanConfiguration.ReportingConfiguration(
-                formats = reporting?.formats ?: listOf("console"),
-                outputPath = reporting?.outputPath ?: "build/reports/scan",
-                failOnSecrets = reporting?.failOnSecrets ?: true,
-                includeContext = reporting?.includeContext ?: true
-        )
+    private fun convertReporting(reporting: Any?): ReportingConfiguration {
+        return ReportingConfiguration()
     }
 
-    private fun convertPerformance(
-            performance: PerformanceConfig?
-    ): ScanConfiguration.PerformanceConfiguration {
-        return ScanConfiguration.PerformanceConfiguration(
-                maxFileSize = performance?.maxFileSize ?: (10 * 1024 * 1024), // 10MB
-                parallelScanning = performance?.parallelScanning ?: true,
-                threadCount = performance?.threadCount ?: Runtime.getRuntime().availableProcessors()
-        )
+    private fun convertPerformance(performance: Any?): PerformanceConfiguration {
+        return PerformanceConfiguration()
     }
 
     /** Creates a fallback configuration when default resources are not available. */
