@@ -31,7 +31,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         PatternDetector() // temporary fallback
     }
     private val compositeDetector: DetectorInterface by lazy {
-        CompositeDetector(getEnabledDetectors())
+        CompositeDetector()
     }
 
     // Filter instances
