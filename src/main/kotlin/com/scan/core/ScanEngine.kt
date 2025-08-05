@@ -2,7 +2,6 @@ package com.scan.core
 
 import com.scan.detectors.*
 import com.scan.filters.*
-import com.scan.filters.PathFilter
 import com.scan.reporting.*
 import com.scan.utils.*
 import java.io.File
