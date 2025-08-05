@@ -163,20 +163,20 @@ class ScanPlugin : Plugin<Project> {
     ): TaskProvider<ScanTask> {
         project.logger.debug("Registering main scan task: $SCAN_TASK_NAME")
 
-        return project.tasks.register(SCAN_TASK_NAME, ScanTask::class.java) {
+        return project.tasks.register(SCAN_TASK_NAME, ScanTask::class.java) { task ->
             // Set up task metadata that appears in 'gradle tasks' output
-            group = TASK_GROUP
-            description =
+            task.group = TASK_GROUP
+            task.description =
                     "Scans the codebase for sensitive information like API keys, passwords, and tokens"
 
             // Connect the task to the user's configuration
             // This is how the task knows what the user wants to scan and how to behave
-            scanConfiguration.set(extension)
+            task.scanConfiguration.set(extension)
 
             // Configure task inputs and outputs for Gradle's up-to-date checking
             // This is crucial for build performance - Gradle can skip this task if
             // nothing has changed since the last run
-            setupTaskInputsAndOutputs(project, extension)
+            task.setupTaskInputsAndOutputs(project, extension)
 
             project.logger.debug("Scan task registered successfully")
         }
@@ -198,12 +198,12 @@ class ScanPlugin : Plugin<Project> {
         project.afterEvaluate {
             // Hook into the compilation process - we want to scan before compilation
             // so developers get feedback about secrets before their code is compiled
-            project.tasks.withType(AbstractCompile::class.java).configureEach {
+            project.tasks.withType(AbstractCompile::class.java).configureEach { compileTask ->
                 // Make compilation depend on our security scan
                 // This means 'gradle build' will automatically run security scanning
-                dependsOn(scanTaskProvider)
+                compileTask.dependsOn(scanTaskProvider)
 
-                project.logger.debug("Configured ${this.name} to depend on security scanning")
+                project.logger.debug("Configured ${compileTask.name} to depend on security scanning")
             }
 
             // Special integration with the 'check' task if it exists
@@ -238,11 +238,11 @@ class ScanPlugin : Plugin<Project> {
             project.logger.info("CI environment detected - enabling strict security scanning")
 
             // In CI, we want to be more aggressive about failing builds
-            scanTaskProvider.configure {
+            scanTaskProvider.configure { task ->
                 // Make sure secrets always fail the build in CI
-                scanConfiguration.get().failOnSecrets.set(true)
+                task.scanConfiguration.get().failOnSecrets.set(true)
                 // Enable detailed reporting for CI logs
-                scanConfiguration.get().generateJsonReport.set(true)
+                task.scanConfiguration.get().generateJsonReport.set(true)
             }
         } else {
             project.logger.debug("Local development environment - using balanced security scanning")
@@ -362,12 +362,7 @@ class ScanPlugin : Plugin<Project> {
         inputs.property("maxFileSizeBytes", extension.maxFileSizeBytes)
 
         // The actual source files are inputs too - if they change, we need to re-scan
-        inputs.files(
-                        project.fileTree(project.projectDir) {
-                            include(extension.includePatterns.get())
-                            exclude(extension.excludePatterns.get())
-                        }
-                )
+        inputs.files(project.fileTree(project.projectDir))
                 .withPropertyName("sourceFiles")
 
         // Configure outputs - these are the files the task produces
