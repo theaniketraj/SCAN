@@ -326,7 +326,7 @@ class CompositeDetector(
                                     "${baseFinding.description} (confirmed by ${group.size} detectors)"
                     )
                 }
-                baseFinding.confidence > 0.8 -> baseFinding
+                baseFinding.confidence.value > 0.8 -> baseFinding
                 else -> null
             }
         }
@@ -447,16 +447,16 @@ class CompositeDetector(
             finding2: Finding
     ): Boolean {
         // Same file and line
-        if (finding1.file.absolutePath == finding2.file.absolutePath &&
-                        finding1.lineNumber == finding2.lineNumber
+        if (finding1.location.filePath == finding2.location.filePath &&
+                        finding1.location.lineNumber == finding2.location.lineNumber
         ) {
 
             // Check if positions overlap or are very close
-            val pos1Range = finding1.columnStart..finding1.columnEnd
-            val pos2Range = finding2.columnStart..finding2.columnEnd
+            val pos1Range = finding1.location.columnStart..finding1.location.columnEnd
+            val pos2Range = finding2.location.columnStart..finding2.location.columnEnd
 
             return pos1Range.intersect(pos2Range).isNotEmpty() ||
-                    kotlin.math.abs(finding1.columnStart - finding2.columnStart) <= 3
+                    kotlin.math.abs(finding1.location.columnStart - finding2.location.columnStart) <= 3
         }
 
         return false
@@ -468,14 +468,12 @@ class CompositeDetector(
         val baseFinding = findings.first()
         val maxConfidence = findings.maxOf { it.confidence }
         val maxSeverity = findings.maxOf { it.severity }
-        val allRuleIds = findings.map { it.ruleId }.distinct()
+        val allRuleIds = findings.map { it.detectorType }.distinct()
 
         return baseFinding.copy(
                 confidence = maxConfidence,
                 severity = maxSeverity,
-                ruleId = allRuleIds.joinToString(","),
-                description = "${baseFinding.description} (merged from ${findings.size} detections)",
-                context = findings.map { it.context }.distinct().joinToString(" | ")
+                description = "${baseFinding.description} (merged from ${findings.size} detections)"
         )
     }
 
@@ -485,11 +483,11 @@ class CompositeDetector(
             content: String
     ): List<Finding> {
         return findings
-                .filter { it.confidence > 0.1 } // Remove very low confidence findings
+                .filter { it.confidence.value > 0.1 } // Remove very low confidence findings
                 .sortedWith(
                         compareByDescending<Finding> { it.severity }
                                 .thenByDescending { it.confidence }
-                                .thenBy { it.lineNumber }
+                                .thenBy { it.location.lineNumber }
                 )
                 .map { enhanceFindingWithMetadata(it, file, content) }
     }
@@ -501,19 +499,20 @@ class CompositeDetector(
     ): Finding {
         val lines = content.lines()
         val lineContent =
-                if (finding.lineNumber <= lines.size) {
-                    lines[finding.lineNumber - 1]
+                if (finding.location.lineNumber <= lines.size) {
+                    lines[finding.location.lineNumber - 1]
                 } else {
                     ""
                 }
 
         return finding.copy(
-                context =
-                        if (finding.context.isBlank()) {
+                context = finding.context.copy(
+                        lineContent = if (finding.context.lineContent.isBlank()) {
                             "Line: ${lineContent.trim()}"
                         } else {
-                            "${finding.context} | Line: ${lineContent.trim()}"
+                            "${finding.context.lineContent} | Line: ${lineContent.trim()}"
                         }
+                )
         )
     }
 
@@ -525,7 +524,7 @@ class CompositeDetector(
         // This is a simplified extraction - in practice, you'd parse the context
         // or store the actual secret value in the Finding object
         return finding.description.substringAfter("'").substringBefore("'").ifEmpty {
-            finding.context.substringAfter(": ").take(20)
+            finding.context.lineContent.substringAfter(": ").take(20)
         }
     }
 
