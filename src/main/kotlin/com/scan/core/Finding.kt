@@ -50,6 +50,15 @@ data class Finding(
         Confidence.MEDIUM -> 65
         Confidence.LOW -> 40
     }
+    
+    /** Check if this finding is the same as another (for baseline comparison) */
+    fun isSameAs(other: Finding): Boolean {
+        return this.location.filePath == other.location.filePath &&
+               this.location.lineNumber == other.location.lineNumber &&
+               this.location.columnStart == other.location.columnStart &&
+               this.secretInfo.detectedValue == other.secretInfo.detectedValue &&
+               this.detectorType == other.detectorType
+    }
 }
 
 /** Location information for a finding */
