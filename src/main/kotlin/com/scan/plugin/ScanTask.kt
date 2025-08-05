@@ -1,6 +1,6 @@
 package com.scan.plugin
 
-import com.scan.core.ScanConfiguration
+import com.scan.core.*
 import com.scan.core.ScanEngine
 import com.scan.core.ScanResult
 import com.scan.reporting.ConsoleReporter
@@ -49,19 +49,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val sourceFiles: FileTree
-        get() =
-                project.fileTree(project.projectDir) {
-                    val config = scanConfiguration.get()
-                    include(config.includePatterns.get())
-                    exclude(config.excludePatterns.get())
-
-                    // Apply file size filtering at the Gradle level for better performance
-                    // This prevents large files from even being considered for scanning
-                    exclude { fileTreeElement ->
-                        val file = fileTreeElement.file
-                        file.isFile && file.length() > config.maxFileSizeBytes.get()
-                    }
-                }
+        get() = project.fileTree(project.projectDir)
 
     /**
      * The main output file that always gets generated, even if no secrets are found. This ensures
@@ -212,16 +200,25 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         // Transform the Gradle extension configuration into the internal configuration format
         val internalConfig =
                 ScanConfiguration(
-                        strictMode = config.strictMode.get(),
-                        ignoreTestFiles = config.ignoreTestFiles.get(),
-                        customPatterns = config.customPatterns.get(),
-                        maxFileSizeBytes = config.maxFileSizeBytes.get(),
-                        parallelScanning = config.parallelScanning.get(),
-                        entropyThreshold =
-                                if (config.strictMode.get()) 3.5
-                                else 4.0, // Stricter entropy detection in strict mode
-                        contextAwareScanning =
-                                true // Always enable context-aware scanning for better accuracy
+                        includePatterns = config.includePatterns.getOrElse(emptySet()).toList(),
+                        excludePatterns = config.excludePatterns.getOrElse(emptySet()).toList(),
+                        maxFileSize = config.maxFileSizeBytes.getOrElse(10 * 1024 * 1024),
+                        performance = PerformanceConfiguration(
+                                maxConcurrency = if (config.parallelScanning.getOrElse(true)) 
+                                    Runtime.getRuntime().availableProcessors() else 1
+                        ),
+                        entropy = EntropyConfiguration(
+                                threshold = if (config.strictMode.getOrElse(false)) 3.5 else 4.0
+                        ),
+                        reporting = ReportingConfiguration(
+                                console = ConsoleReportConfiguration(),
+                                json = if (config.generateJsonReport.getOrElse(false))
+                                    JsonReportConfiguration()
+                                else JsonReportConfiguration(),
+                                html = if (config.generateHtmlReport.getOrElse(false))
+                                    HtmlReportConfiguration()
+                                else HtmlReportConfiguration()
+                        )
                 )
 
         logger.debug(
