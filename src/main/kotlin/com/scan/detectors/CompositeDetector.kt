@@ -304,7 +304,7 @@ class CompositeDetector(
             baseFinding.copy(
                     confidence = Confidence.fromValue(weightedConfidence),
                     context = buildMergedContext(baseFinding.context, detectorSources),
-                    message = enhanceMessageWithSources(baseFinding.message, detectorSources)
+                    description = enhanceMessageWithSources(baseFinding.description, detectorSources)
             )
         }
     }
@@ -322,8 +322,8 @@ class CompositeDetector(
                     val avgConfidence = group.map { it.finding.confidence.value }.average()
                     baseFinding.copy(
                             confidence = Confidence.fromValue(min(1.0, avgConfidence * 1.2)),
-                            message =
-                                    "${baseFinding.message} (confirmed by ${group.size} detectors)"
+                            description =
+                                    "${baseFinding.description} (confirmed by ${group.size} detectors)"
                     )
                 }
                 baseFinding.confidence > 0.8 -> baseFinding
@@ -343,8 +343,8 @@ class CompositeDetector(
             baseFinding.copy(
                     confidence = maxConfidence,
                     severity = group.maxOf { it.finding.severity },
-                    message =
-                            "${baseFinding.message} (detected by ${group.size} detector${if (group.size > 1) "s" else ""})"
+                    description =
+                            "${baseFinding.description} (detected by ${group.size} detector${if (group.size > 1) "s" else ""})"
             )
         }
     }
@@ -362,14 +362,14 @@ class CompositeDetector(
     private fun deduplicateExactMatches(
             findings: List<Finding>
     ): List<Finding> {
-        return findings.distinctBy { Triple(it.file.absolutePath, it.lineNumber, it.message) }
+        return findings.distinctBy { Triple(it.location.filePath, it.location.lineNumber, it.description) }
     }
 
     private fun deduplicateByPosition(
             findings: List<Finding>
     ): List<Finding> {
         return findings
-                .groupBy { Triple(it.file.absolutePath, it.lineNumber, it.columnStart) }
+                .groupBy { Triple(it.location.filePath, it.location.lineNumber, it.location.columnStart) }
                 .map { (_, group) ->
                     // Keep the finding with highest confidence
                     group.maxByOrNull { it.confidence } ?: group.first()
@@ -382,9 +382,9 @@ class CompositeDetector(
         return findings
                 .groupBy { finding ->
                     QuadTuple(
-                            finding.file.absolutePath,
-                            finding.lineNumber,
-                            finding.columnStart,
+                            finding.location.filePath,
+                            finding.location.lineNumber,
+                            finding.location.columnStart,
                             extractSecretValue(finding)
                     )
                 }
@@ -474,7 +474,7 @@ class CompositeDetector(
                 confidence = maxConfidence,
                 severity = maxSeverity,
                 ruleId = allRuleIds.joinToString(","),
-                message = "${baseFinding.message} (merged from ${findings.size} detections)",
+                description = "${baseFinding.description} (merged from ${findings.size} detections)",
                 context = findings.map { it.context }.distinct().joinToString(" | ")
         )
     }
@@ -524,7 +524,7 @@ class CompositeDetector(
     private fun extractSecretValue(finding: Finding): String {
         // This is a simplified extraction - in practice, you'd parse the context
         // or store the actual secret value in the Finding object
-        return finding.message.substringAfter("'").substringBefore("'").ifEmpty {
+        return finding.description.substringAfter("'").substringBefore("'").ifEmpty {
             finding.context.substringAfter(": ").take(20)
         }
     }
