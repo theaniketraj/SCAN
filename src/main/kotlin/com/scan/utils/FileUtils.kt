@@ -667,6 +667,19 @@ object FileUtils {
         return String.format("%.1f %s", size, units[unitIndex])
     }
 
+    /** Calculate SHA-256 hash of a file */
+    fun calculateSHA256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        return file.inputStream().use { input ->
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+            digest.digest().joinToString("") { "%02x".format(it) }
+        }
+    }
+
     /** Validate file path for security (prevent path traversal attacks) */
     fun isSecurePath(basePath: Path, targetPath: Path): Boolean {
         return try {
