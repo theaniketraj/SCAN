@@ -2,10 +2,12 @@ package com.scan.core
 
 import com.scan.detectors.*
 import com.scan.filters.*
+import com.scan.filters.PathFilter
 import com.scan.reporting.*
 import com.scan.utils.*
 import java.io.File
 import java.nio.file.*
+import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
@@ -459,13 +461,13 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     private fun setupOutputDirectories() {
-        val outputDir = File(configuration.reportOutputDir)
+        val outputDir = File(configuration.reporting.outputPath)
         if (!outputDir.exists()) {
             outputDir.mkdirs()
         }
 
-        if (configuration.enableCaching) {
-            val cacheDir = File(configuration.cacheDirectory)
+        if (configuration.performance.enableCaching) {
+            val cacheDir = File(configuration.performance.cacheDirectory)
             if (!cacheDir.exists()) {
                 cacheDir.mkdirs()
             }
@@ -478,7 +480,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
     private fun loadCache() {
         try {
-            val cacheFile = File(configuration.cacheDirectory, "scan-cache.json")
+            val cacheFile = File(configuration.performance.cacheDirectory, "scan-cache.json")
             if (cacheFile.exists()) {
                 // Load cached results (implementation depends on serialization choice)
                 logger.debug("Loaded scan cache with ${scanCache.size} entries")
@@ -490,7 +492,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
     private fun saveCache() {
         try {
-            val cacheFile = File(configuration.cacheDirectory, "scan-cache.json")
+            val cacheFile = File(configuration.performance.cacheDirectory, "scan-cache.json")
             // Save cache to file (implementation depends on serialization choice)
             logger.debug("Saved scan cache with ${scanCache.size} entries")
         } catch (e: Exception) {
@@ -505,14 +507,14 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
     private fun filterNewFindings(current: List<Finding>, baseline: List<Finding>): List<Finding> {
         // Compare current Findings with baseline to find new ones
-        return current.filter { Finding ->
-            !baseline.any { baselineFinding -> baselineFinding.isSameAs(Finding) }
+        return current.filter { finding ->
+            !baseline.any { baselineFinding -> baselineFinding.isSameAs(finding) }
         }
     }
 
     private fun updateStatistics(result: FileScanResult) {
         stats.scannedFiles++
-        if (result.findings.isNotEmpty()) {
+        if (result.detections.isNotEmpty()) {
             stats.filesWithSecrets++
         }
     }
