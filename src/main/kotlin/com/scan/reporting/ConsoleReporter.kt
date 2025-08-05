@@ -94,7 +94,7 @@ class ConsoleReporter {
         logger.lifecycle("📈 Findings by Severity:")
         logger.lifecycle("")
 
-        FindingSeverity.values().reversed().forEach { severity ->
+        Severity.values().reversed().forEach { severity ->
             val count = findingsBySeverity[severity]?.size ?: 0
             if (count > 0) {
                 val icon = getSeverityIcon(severity)
@@ -142,39 +142,33 @@ class ConsoleReporter {
         )
 
         // Print location information
-        finding.lineNumber?.let { lineNumber ->
-            logger.lifecycle("      ${colorize("📍 Line $lineNumber", ConsoleColor.GRAY)}")
+        logger.lifecycle("      ${colorize("📍 Line ${finding.location.lineNumber}", ConsoleColor.GRAY)}")
 
-            finding.columnStart?.let { col ->
-                logger.lifecycle("      ${colorize("   Column $col", ConsoleColor.GRAY)}")
-            }
-        }
+        logger.lifecycle("      ${colorize("   Column ${finding.location.columnStart}", ConsoleColor.GRAY)}")
 
         // Print matched pattern/rule
-        if (finding.ruleName.isNotEmpty()) {
-            logger.lifecycle("      ${colorize("🎯 Rule: ${finding.ruleName}", ConsoleColor.GRAY)}")
+        if (finding.secretInfo.patternName.isNotEmpty()) {
+            logger.lifecycle("      ${colorize("🎯 Rule: ${finding.secretInfo.patternName}", ConsoleColor.GRAY)}")
         }
 
-        // Print confidence score if available
-        finding.confidence?.let { confidence ->
-            val confidenceColor =
-                    when {
-                        confidence >= 0.8 -> ConsoleColor.GREEN
-                        confidence >= 0.6 -> ConsoleColor.YELLOW
-                        else -> ConsoleColor.RED
-                    }
-            logger.lifecycle(
-                    "      ${colorize("🎲 Confidence: ${(confidence * 100).toInt()}%", confidenceColor)}"
-            )
+        // Print confidence score
+        val confidencePercentage = finding.getConfidencePercentage()
+        val confidenceColor = when {
+            confidencePercentage >= 80 -> ConsoleColor.GREEN
+            confidencePercentage >= 60 -> ConsoleColor.YELLOW
+            else -> ConsoleColor.RED
         }
+        logger.lifecycle(
+            "      ${colorize("🎲 Confidence: $confidencePercentage%", confidenceColor)}"
+        )
 
-        // Print code snippet if available
-        finding.codeSnippet?.let { snippet -> printCodeSnippet(snippet, finding.lineNumber ?: 1) }
+        // Print code snippet
+        printCodeSnippet(finding.context.lineContent, finding.location.lineNumber)
 
         // Print recommendations
-        if (finding.recommendations.isNotEmpty()) {
+        if (finding.remediation.actionItems.isNotEmpty()) {
             logger.lifecycle("      ${colorize("💡 Recommendations:", ConsoleColor.CYAN)}")
-            finding.recommendations.forEach { recommendation ->
+            finding.remediation.actionItems.forEach { recommendation ->
                 logger.lifecycle("         • $recommendation")
             }
         }
@@ -225,7 +219,7 @@ class ConsoleReporter {
         if (severityBreakdown.isNotEmpty()) {
             logger.lifecycle("")
             logger.lifecycle("   Severity Breakdown:")
-            FindingSeverity.values().reversed().forEach { severity ->
+            Severity.values().reversed().forEach { severity ->
                 val count = severityBreakdown[severity]?.size ?: 0
                 if (count > 0) {
                     val percentage = (count * 100.0 / findings.size).toInt()
@@ -253,8 +247,8 @@ class ConsoleReporter {
 
     /** Print actionable recommendations */
     private fun printRecommendations(findings: List<Finding>) {
-        val criticalCount = findings.count { it.severity == FindingSeverity.CRITICAL }
-        val highCount = findings.count { it.severity == FindingSeverity.HIGH }
+        val criticalCount = findings.count { it.severity == Severity.CRITICAL }
+        val highCount = findings.count { it.severity == Severity.HIGH }
 
         logger.lifecycle(colorize("🚨 Recommendations:", ConsoleColor.YELLOW, bold = true))
         logger.lifecycle(colorize("─".repeat(40), ConsoleColor.YELLOW))
@@ -310,21 +304,23 @@ class ConsoleReporter {
     }
 
     /** Get icon for severity level */
-    private fun getSeverityIcon(severity: FindingSeverity): String =
+    private fun getSeverityIcon(severity: Severity): String =
             when (severity) {
-                FindingSeverity.CRITICAL -> "🔴"
-                FindingSeverity.HIGH -> "🟠"
-                FindingSeverity.MEDIUM -> "🟡"
-                FindingSeverity.LOW -> "🔵"
+                Severity.CRITICAL -> "🔴"
+                Severity.HIGH -> "🟠"
+                Severity.MEDIUM -> "🟡"
+                Severity.LOW -> "🔵"
+                Severity.INFO -> "ℹ️"
             }
 
     /** Get color for severity level */
-    private fun getSeverityColor(severity: FindingSeverity): ConsoleColor =
+    private fun getSeverityColor(severity: Severity): ConsoleColor =
             when (severity) {
-                FindingSeverity.CRITICAL -> ConsoleColor.RED
-                FindingSeverity.HIGH -> ConsoleColor.YELLOW
-                FindingSeverity.MEDIUM -> ConsoleColor.BLUE
-                FindingSeverity.LOW -> ConsoleColor.GREEN
+                Severity.CRITICAL -> ConsoleColor.RED
+                Severity.HIGH -> ConsoleColor.YELLOW
+                Severity.MEDIUM -> ConsoleColor.BLUE
+                Severity.LOW -> ConsoleColor.GREEN
+                Severity.INFO -> ConsoleColor.GRAY
             }
 
     /** Format timestamp for display */
@@ -341,14 +337,14 @@ class ConsoleReporter {
             }
 
     /** Get scanned file count from summary */
-    private fun getScannedFileCount(summary: ReportSummary): Int {
+    private fun getScannedFileCount(@Suppress("UNUSED_PARAMETER") summary: ReportSummary): Int {
         // This would be implemented based on how ScanResult tracks file counts
         // Placeholder implementation
         return 0
     }
 
     /** Get file type breakdown */
-    private fun getFileTypeBreakdown(summary: ReportSummary): Map<String, Int> {
+    private fun getFileTypeBreakdown(@Suppress("UNUSED_PARAMETER") summary: ReportSummary): Map<String, Int> {
         // This would be implemented based on scan results
         // Placeholder implementation
         return emptyMap()
