@@ -34,8 +34,6 @@ class CompositeDetector(
     override val version: String = "1.0.0"
     override val supportedFileTypes: Set<String> = emptySet() // supports all file types
 
-    override val detectorId: String = "composite"
-
     private val resultCache =
             if (enableCaching) ConcurrentHashMap<String, List<Finding>>() else null
     private val detectorInstances = detectors.map { it.detector }
@@ -132,7 +130,7 @@ class CompositeDetector(
         }
 
         // Check cache first
-        val cacheKey = generateCacheKey(context)
+        val cacheKey = generateCacheKey(context.filePath.toFile(), context.content)
         resultCache?.get(cacheKey)?.let { cachedResult ->
             return cachedResult
         }
@@ -145,9 +143,9 @@ class CompositeDetector(
                     ExecutionMode.PRIORITY_BASED -> executePriorityBased(context)
                 }
 
-        val mergedResults = mergeResults(results, context)
+        val mergedResults = mergeResults(results, context.filePath.toFile())
         val deduplicatedResults = deduplicateResults(mergedResults)
-        val finalResults = postProcessResults(deduplicatedResults, context)
+        val finalResults = postProcessResults(deduplicatedResults, context.filePath.toFile(), context.content)
 
         // Cache results
         resultCache?.let { cache ->
@@ -217,7 +215,7 @@ class CompositeDetector(
                 results.add(DetectorResult(config, findings, null))
 
                 // If high-priority detector finds high-confidence results, we can stop early
-                if (config.priority == DetectorPriority.HIGH && findings.any { it.confidence > 0.8 }
+                if (config.priority == DetectorPriority.HIGH && findings.any { it.confidence.value > 0.8 }
                 ) {
                     break
                 }
@@ -256,7 +254,7 @@ class CompositeDetector(
                 // priority ones
                 if (priority == DetectorPriority.HIGH &&
                                 priorityResults.any {
-                                    it.findings.any { finding -> finding.confidence > 0.7 }
+                                    it.findings.any { finding -> finding.confidence.value > 0.7 }
                                 }
                 ) {
                     // Continue with lower priority but with reduced timeout
@@ -300,11 +298,11 @@ class CompositeDetector(
         return findingGroups.map { group ->
             val baseFinding = group.first().finding
             val totalWeight = group.sumOf { it.weight }
-            val weightedConfidence = group.sumOf { it.finding.confidence * it.weight } / totalWeight
+            val weightedConfidence = group.sumOf { it.finding.confidence.value * it.weight } / totalWeight
             val detectorSources = group.map { it.detectorName }.distinct()
 
             baseFinding.copy(
-                    confidence = weightedConfidence,
+                    confidence = Confidence.fromValue(weightedConfidence),
                     context = buildMergedContext(baseFinding.context, detectorSources),
                     message = enhanceMessageWithSources(baseFinding.message, detectorSources)
             )
@@ -321,9 +319,9 @@ class CompositeDetector(
             when {
                 group.size > 1 -> {
                     // Multiple detectors found this - increase confidence
-                    val avgConfidence = group.map { it.finding.confidence }.average()
+                    val avgConfidence = group.map { it.finding.confidence.value }.average()
                     baseFinding.copy(
-                            confidence = min(1.0, avgConfidence * 1.2),
+                            confidence = Confidence.fromValue(min(1.0, avgConfidence * 1.2)),
                             message =
                                     "${baseFinding.message} (confirmed by ${group.size} detectors)"
                     )
@@ -531,9 +529,17 @@ class CompositeDetector(
         }
     }
 
-    private fun buildMergedContext(originalContext: String, detectorSources: List<String>): String {
-        val sources = "Detected by: ${detectorSources.joinToString(", ")}"
-        return if (originalContext.isBlank()) sources else "$originalContext | $sources"
+    private fun buildMergedContext(originalContext: FindingContext, detectorSources: List<String>): FindingContext {
+        // Create an enhanced context description that includes detector sources
+        val enhancedDescription = if (detectorSources.size > 1) {
+            "Detected by: ${detectorSources.joinToString(", ")}"
+        } else {
+            originalContext.getContextDescription()
+        }
+        
+        // Return the original context (since we can't easily merge the metadata)
+        // The enhanced information will be in the message instead
+        return originalContext
     }
 
     private fun enhanceMessageWithSources(
