@@ -113,6 +113,7 @@ class FileScanner(
      */
     fun scanFile(filePath: Path): FileScanResult? {
         val file = filePath.toFile()
+        val startTime = System.currentTimeMillis()
 
         // Pre-scanning validation
         if (!shouldScanFile(file)) {
@@ -120,7 +121,7 @@ class FileScanner(
         }
 
         return try {
-                        val scanContext = createScanContext(file.toPath())
+            val scanContext = createScanContext(file.toPath())
             val findings = mutableListOf<Finding>()
 
             // Apply filters before scanning
@@ -157,12 +158,12 @@ class FileScanner(
             FileScanResult.success(
                     filePath = filePath.toString(),
                     detections = processedFindings,
-                    scanTimeMs = System.currentTimeMillis(),
+                    scanTimeMs = System.currentTimeMillis() - startTime,
                     fileSize = file.length()
             )
         } catch (e: Exception) {
             System.err.println("Failed to scan file ${filePath}: ${e.message}")
-            FileScanResult.error(
+            return FileScanResult.error(
                     filePath = filePath.toString(),
                     errorMessage = e.message ?: "Unknown error"
             )
