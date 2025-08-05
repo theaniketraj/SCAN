@@ -443,4 +443,3 @@ class ReportingConfig {
     var maskSecrets: Boolean = true
     var maxSecretLength: Int = 50
 }
-}
