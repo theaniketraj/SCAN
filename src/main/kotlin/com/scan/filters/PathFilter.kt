@@ -6,16 +6,7 @@ import java.util.regex.PatternSyntaxException
 import kotlin.math.min
 
 /**
- * Filter implementation that includes or excludes files based on their file paths.
- *
- * This filter supports multiple pattern matching strategies:
- * - Glob patterns (like *.kt, **/*.test.*, etc.)
- * - Regular expressions
- * - Exact path matching
- * - Directory-based filtering
- *
- * Path matching is performed on normalized paths (using forward slashes) and supports both absolute
- * and relative path patterns.
+ * PathFilter class for filtering files based on path patterns.
  */
 class PathFilter(
     private val includeGlobs: Set<String> = emptySet(),
@@ -154,7 +145,7 @@ class PathFilter(
 
     override fun getPriority(): Int = priority
 
-    override fun validateConfiguration(): List<String> {
+    fun isApplicable(file: File): Boolean {
         // Path filter is always applicable
         return true
     }
