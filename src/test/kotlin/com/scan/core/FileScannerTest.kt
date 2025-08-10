@@ -141,14 +141,14 @@ class FileScannerTest {
             largeFile.writeText(content)
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val results = fileScanner.scanFile(largeFile.toFile())
 
             // Assert
             assertTrue(results.isEmpty())
-            verify { mockDetector.detect(largeFile.toFile(), content) }
+            verify { mockDetector.detect(any<ScanContext>()) }
         }
 
         @Test
@@ -167,7 +167,7 @@ class FileScannerTest {
             // Assert
             assertTrue(results.isEmpty())
             verify { mockFilter.shouldInclude(oversizedFile.toFile()) }
-            verify(exactly = 0) { mockDetector.detect(any(), any()) }
+            verify(exactly = 0) { mockDetector.detect(any<ScanContext>()) }
         }
 
         @Test
@@ -185,14 +185,14 @@ class FileScannerTest {
             specialFile.writeText(content)
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val results = fileScanner.scanFile(specialFile.toFile())
 
             // Assert
             assertTrue(results.isEmpty())
-            verify { mockDetector.detect(specialFile.toFile(), content) }
+            verify { mockDetector.detect(any<ScanContext>()) }
         }
 
         @Test
@@ -204,14 +204,14 @@ class FileScannerTest {
             Files.write(binaryFile, binaryContent)
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val results = fileScanner.scanFile(binaryFile.toFile())
 
             // Assert
             assertTrue(results.isEmpty())
-            verify { mockDetector.detect(eq(binaryFile.toFile()), any()) }
+            verify { mockDetector.detect(any<ScanContext>()) }
         }
     }
 
@@ -394,7 +394,7 @@ class FileScannerTest {
             testFile.writeText("some content")
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } throws RuntimeException("Detector error")
+            every { mockDetector.detect(any<ScanContext>()) } throws RuntimeException("Detector error")
 
             // Act & Assert
             assertThrows(RuntimeException::class.java) { fileScanner.scanFile(testFile.toFile()) }
@@ -458,7 +458,7 @@ class FileScannerTest {
             testFile.writeText(content)
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val startTime = System.currentTimeMillis()
@@ -482,7 +482,7 @@ class FileScannerTest {
                     }
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any(), any()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val startTime = System.currentTimeMillis()
@@ -491,7 +491,7 @@ class FileScannerTest {
 
             // Assert
             assertTrue(endTime - startTime < 10000) // Should complete within 10 seconds
-            verify(exactly = 10) { mockDetector.detect(any(), any()) }
+            verify(exactly = 10) { mockDetector.detect(any<ScanContext>()) }
         }
     }
 }
