@@ -1,13 +1,10 @@
 package com.scan.detectors
 
-import com.scan.core.ScanConfiguration
+import com.scan.core.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -26,14 +23,15 @@ class EntropyDetectorTest {
 
     @BeforeEach
     fun setUp() {
-        defaultConfig =
-                ScanConfiguration(
-                        entropyThreshold = 4.5,
-                        minSecretLength = 20,
-                        maxSecretLength = 200,
-                        enableEntropyDetection = true
-                )
-        detector = EntropyDetector(defaultConfig)
+        defaultConfig = ScanConfiguration(
+            entropy = EntropyConfiguration(
+                enabled = true,
+                threshold = 4.5,
+                minLength = 20,
+                maxLength = 200
+            )
+        )
+        detector = EntropyDetector()
         tempDir = Files.createTempDirectory("scan-test")
     }
 
@@ -46,7 +44,7 @@ class EntropyDetectorTest {
         fun testUniformDistributionEntropy() {
             // String with uniform character distribution should have high entropy
             val highEntropyString = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ123456789"
-            val entropy = detector.calculateEntropy(highEntropyString)
+            val entropy = detector.analyzeEntropy(highEntropyString).entropy
             assertTrue(entropy > 4.0, "High entropy string should have entropy > 4.0, got $entropy")
         }
 
@@ -54,21 +52,21 @@ class EntropyDetectorTest {
         @DisplayName("Should calculate low entropy for repetitive strings")
         fun testRepetitiveStringEntropy() {
             val lowEntropyString = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            val entropy = detector.calculateEntropy(lowEntropyString)
+            val entropy = detector.analyzeEntropy(lowEntropyString).entropy
             assertTrue(entropy < 1.0, "Repetitive string should have low entropy, got $entropy")
         }
 
         @Test
         @DisplayName("Should handle empty string")
         fun testEmptyStringEntropy() {
-            val entropy = detector.calculateEntropy("")
+            val entropy = detector.analyzeEntropy("").entropy
             assertEquals(0.0, entropy, "Empty string should have zero entropy")
         }
 
         @Test
         @DisplayName("Should handle single character string")
         fun testSingleCharacterEntropy() {
-            val entropy = detector.calculateEntropy("a")
+            val entropy = detector.analyzeEntropy("a").entropy
             assertEquals(0.0, entropy, "Single character should have zero entropy")
         }
 
@@ -86,7 +84,7 @@ class EntropyDetectorTest {
         )
         @DisplayName("Should detect high entropy in typical secrets")
         fun testTypicalSecretsHighEntropy(secret: String) {
-            val entropy = detector.calculateEntropy(secret)
+            val entropy = detector.analyzeEntropy(secret).entropy
             assertTrue(entropy > 3.5, "Secret '$secret' should have high entropy, got $entropy")
         }
 
@@ -103,7 +101,7 @@ class EntropyDetectorTest {
         )
         @DisplayName("Should detect low entropy in normal text")
         fun testNormalTextLowEntropy(text: String) {
-            val entropy = detector.calculateEntropy(text)
+            val entropy = detector.analyzeEntropy(text).entropy
             assertTrue(entropy < 4.0, "Normal text '$text' should have low entropy, got $entropy")
         }
     }
@@ -122,15 +120,16 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertTrue(results.isNotEmpty(), "Should detect high entropy string")
             val result = results.first()
             assertTrue(
-                    result.message.contains("High entropy"),
-                    "Result should mention high entropy"
+                    result.description.contains("entropy") || result.title.contains("entropy"),
+                    "Result should mention entropy"
             )
-            assertTrue(result.line > 0, "Should have valid line number")
+            assertTrue(result.location.lineNumber > 0, "Should have valid line number")
         }
 
         @Test
@@ -144,7 +143,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertTrue(results.isEmpty(), "Should not detect low entropy strings")
         }
@@ -152,14 +152,15 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should respect minimum length configuration")
         fun testMinimumLengthRespected() {
-            val shortConfig =
-                    ScanConfiguration(
-                            entropyThreshold = 3.0,
-                            minSecretLength = 50, // High minimum length
-                            maxSecretLength = 200,
-                            enableEntropyDetection = true
-                    )
-            val shortDetector = EntropyDetector(shortConfig)
+            val shortConfig = ScanConfiguration(
+                entropy = EntropyConfiguration(
+                    enabled = true,
+                    threshold = 3.0,
+                    minLength = 50, // High minimum length
+                    maxLength = 200
+                )
+            )
+            val shortDetector = EntropyDetector() // Config passed via context
 
             val content =
                     """
@@ -167,7 +168,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = shortDetector.detect(testFile, content)
+            val context = createScanContext(testFile, content).copy(configuration = shortConfig)
+            val results = shortDetector.detect(context)
 
             assertTrue(results.isEmpty(), "Should not detect strings shorter than minimum length")
         }
@@ -175,14 +177,15 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should respect maximum length configuration")
         fun testMaximumLengthRespected() {
-            val shortConfig =
-                    ScanConfiguration(
-                            entropyThreshold = 3.0,
-                            minSecretLength = 10,
-                            maxSecretLength = 30, // Low maximum length
-                            enableEntropyDetection = true
-                    )
-            val shortDetector = EntropyDetector(shortConfig)
+            val shortConfig = ScanConfiguration(
+                entropy = EntropyConfiguration(
+                    enabled = true,
+                    threshold = 3.0,
+                    minLength = 10,
+                    maxLength = 30 // Low maximum length
+                )
+            )
+            val shortDetector = EntropyDetector()
 
             val longHighEntropyString =
                     "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv24TkELVR3LrKxN5HKgfKLdEQkM/wQ2V8dW1234567890"
@@ -192,7 +195,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = shortDetector.detect(testFile, content)
+            val context = createScanContext(testFile, content).copy(configuration = shortConfig)
+            val results = shortDetector.detect(context)
 
             assertTrue(results.isEmpty(), "Should not detect strings longer than maximum length")
         }
@@ -209,11 +213,12 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertEquals(3, results.size, "Should detect exactly 3 high entropy strings")
 
-            val lines = results.map { it.line }.sorted()
+            val lines = results.map { it.location.lineNumber }.sorted()
             assertEquals(listOf(1, 2, 4), lines, "Should detect secrets on correct lines")
         }
     }
@@ -241,7 +246,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile(fileName, content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertTrue(results.isNotEmpty(), "Should detect secrets in $expectedType files")
         }
@@ -251,9 +257,10 @@ class EntropyDetectorTest {
         fun testBinaryFileHandling() {
             val binaryContent = ByteArray(100) { it.toByte() }.toString(Charsets.ISO_8859_1)
             val testFile = createTestFile("test.bin", binaryContent)
+            val context = createScanContext(testFile, binaryContent)
 
             // Should not throw exception
-            val results = detector.detect(testFile, binaryContent)
+            val results = detector.detect(context)
 
             // Binary content detection depends on implementation
             assertNotNull(results, "Should return results without throwing exception")
@@ -280,10 +287,11 @@ class EntropyDetectorTest {
             }
 
             val testFile = createTestFile("large.js", largeContent)
-            val results = detector.detect(testFile, largeContent)
+            val context = createScanContext(testFile, largeContent)
+            val results = detector.detect(context)
 
             assertEquals(1, results.size, "Should find exactly one secret in large file")
-            assertEquals(501, results.first().line, "Should find secret on correct line")
+            assertEquals(501, results.first().location.lineNumber, "Should find secret on correct line")
         }
 
         @Test
@@ -297,7 +305,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("special.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertTrue(
                     results.size >= 2,
@@ -309,7 +318,8 @@ class EntropyDetectorTest {
         @DisplayName("Should handle empty file")
         fun testEmptyFile() {
             val testFile = createTestFile("empty.js", "")
-            val results = detector.detect(testFile, "")
+            val context = createScanContext(testFile, "")
+            val results = detector.detect(context)
 
             assertTrue(results.isEmpty(), "Empty file should produce no results")
         }
@@ -319,7 +329,8 @@ class EntropyDetectorTest {
         fun testWhitespaceOnlyFile() {
             val content = "   \n\t  \n   \r\n  "
             val testFile = createTestFile("whitespace.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertTrue(results.isEmpty(), "Whitespace-only file should produce no results")
         }
@@ -327,14 +338,15 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should handle disabled entropy detection")
         fun testDisabledEntropyDetection() {
-            val disabledConfig =
-                    ScanConfiguration(
-                            entropyThreshold = 3.0,
-                            minSecretLength = 10,
-                            maxSecretLength = 200,
-                            enableEntropyDetection = false
-                    )
-            val disabledDetector = EntropyDetector(disabledConfig)
+            val disabledConfig = ScanConfiguration(
+                entropy = EntropyConfiguration(
+                    enabled = false,
+                    threshold = 3.0,
+                    minLength = 10,
+                    maxLength = 200
+                )
+            )
+            val disabledDetector = EntropyDetector()
 
             val content =
                     """
@@ -342,7 +354,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = disabledDetector.detect(testFile, content)
+            val context = createScanContext(testFile, content).copy(configuration = disabledConfig)
+            val results = disabledDetector.detect(context)
 
             assertTrue(
                     results.isEmpty(),
@@ -358,33 +371,44 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should validate entropy threshold bounds")
         fun testEntropyThresholdValidation() {
-            assertThrows<IllegalArgumentException> {
-                EntropyDetector(ScanConfiguration(entropyThreshold = -1.0))
-            }
+            // Configuration validation is now done at the configuration level
+            val invalidConfig1 = ScanConfiguration(
+                entropy = EntropyConfiguration(threshold = -1.0)
+            )
+            val errors1 = invalidConfig1.validate()
+            assertTrue(errors1.isNotEmpty(), "Should have validation error for negative threshold")
 
-            assertThrows<IllegalArgumentException> {
-                EntropyDetector(ScanConfiguration(entropyThreshold = 10.0))
-            }
+            val invalidConfig2 = ScanConfiguration(
+                entropy = EntropyConfiguration(threshold = 10.0)
+            )
+            val errors2 = invalidConfig2.validate()
+            assertTrue(errors2.isNotEmpty(), "Should have validation error for too high threshold")
         }
 
         @Test
         @DisplayName("Should validate length configuration")
         fun testLengthConfigurationValidation() {
-            assertThrows<IllegalArgumentException> {
-                EntropyDetector(ScanConfiguration(minSecretLength = 0))
-            }
+            val invalidConfig1 = ScanConfiguration(
+                entropy = EntropyConfiguration(minLength = 0)
+            )
+            val errors1 = invalidConfig1.validate()
+            assertTrue(errors1.isNotEmpty(), "Should have validation error for zero minLength")
 
-            assertThrows<IllegalArgumentException> {
-                EntropyDetector(ScanConfiguration(maxSecretLength = 5, minSecretLength = 10))
-            }
+            val invalidConfig2 = ScanConfiguration(
+                entropy = EntropyConfiguration(maxLength = 5, minLength = 10)
+            )
+            val errors2 = invalidConfig2.validate()
+            assertTrue(errors2.isNotEmpty(), "Should have validation error for maxLength < minLength")
         }
 
         @ParameterizedTest
         @ValueSource(doubles = [2.0, 3.5, 4.0, 4.5, 5.0, 6.0])
         @DisplayName("Should work with different entropy thresholds")
         fun testDifferentEntropyThresholds(threshold: Double) {
-            val config = ScanConfiguration(entropyThreshold = threshold)
-            val customDetector = EntropyDetector(config)
+            val config = ScanConfiguration(
+                entropy = EntropyConfiguration(threshold = threshold)
+            )
+            val customDetector = EntropyDetector()
 
             val content =
                     """
@@ -393,7 +417,8 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("test.js", content)
-            val results = customDetector.detect(testFile, content)
+            val context = createScanContext(testFile, content).copy(configuration = config)
+            val results = customDetector.detect(context)
 
             // Results should vary based on threshold
             assertNotNull(results, "Should return results for threshold $threshold")
@@ -423,9 +448,10 @@ class EntropyDetectorTest {
             }
 
             val testFile = createTestFile("performance.js", content)
+            val context = createScanContext(testFile, content)
 
             val startTime = System.currentTimeMillis()
-            val results = detector.detect(testFile, content)
+            val results = detector.detect(context)
             val endTime = System.currentTimeMillis()
 
             val duration = endTime - startTime
@@ -445,12 +471,13 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("concurrent.js", content)
+            val context = createScanContext(testFile, content)
 
             // Run multiple detections concurrently
             val results =
                     (1..10).toList()
                             .parallelStream()
-                            .map { detector.detect(testFile, content) }
+                            .map { detector.detect(context) }
                             .toList()
 
             // All results should be identical
@@ -481,10 +508,11 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("lines.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             assertEquals(1, results.size, "Should find exactly one secret")
-            assertEquals(4, results.first().line, "Should report correct line number")
+            assertEquals(4, results.first().location.lineNumber, "Should report correct line number")
         }
 
         @Test
@@ -496,15 +524,16 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("message.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             val result = results.first()
-            assertTrue(result.message.contains("entropy"), "Message should mention entropy")
+            assertTrue(result.description.contains("entropy") || result.title.contains("entropy"), "Message should mention entropy")
             assertTrue(
-                    result.message.contains("detected") || result.message.contains("found"),
+                    result.description.contains("detected") || result.description.contains("found") || result.title.contains("detected"),
                     "Message should indicate detection"
             )
-            assertFalse(result.message.isBlank(), "Message should not be empty")
+            assertFalse(result.description.isBlank(), "Message should not be empty")
         }
 
         @Test
@@ -516,11 +545,12 @@ class EntropyDetectorTest {
             """.trimIndent()
 
             val testFile = createTestFile("entropy-value.js", content)
-            val results = detector.detect(testFile, content)
+            val context = createScanContext(testFile, content)
+            val results = detector.detect(context)
 
             val result = results.first()
-            assertTrue(result.severity.isNotEmpty(), "Should have severity level")
-            assertTrue(result.ruleId.isNotEmpty(), "Should have rule ID")
+            assertTrue(result.severity.name.isNotEmpty(), "Should have severity level")
+            assertTrue(result.secretInfo.patternName.isNotEmpty(), "Should have rule ID")
         }
     }
 
@@ -529,5 +559,20 @@ class EntropyDetectorTest {
         val file = tempDir.resolve(fileName).toFile()
         file.writeText(content)
         return file
+    }
+
+    // Helper method to create ScanContext
+    private fun createScanContext(file: File, content: String): ScanContext {
+        return ScanContext(
+            filePath = file.toPath(),
+            fileName = file.name,
+            fileExtension = file.extension,
+            isTestFile = file.name.contains("test", ignoreCase = true),
+            fileSize = file.length(),
+            configuration = defaultConfig,
+            content = content,
+            lines = content.lines(),
+            relativePath = file.name
+        )
     }
 }
