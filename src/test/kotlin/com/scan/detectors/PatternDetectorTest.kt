@@ -1,6 +1,6 @@
 package com.scan.detectors
 
-import com.scan.core.ScanResult
+import com.scan.core.*
 import com.scan.patterns.ApiKeyPatterns
 import com.scan.patterns.CryptoPatterns
 import com.scan.patterns.DatabasePatterns
@@ -72,7 +72,7 @@ class PatternDetectorTest {
                         "slack-token" to listOf(Regex("xox[baprs]-[0-9a-zA-Z]{10,48}"))
                 )
 
-        patternDetector = PatternDetector(patterns)
+        patternDetector = PatternDetector()
         testFile = tempDir.resolve("test-file.kt").toFile()
     }
 
@@ -93,20 +93,32 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt")
+            tempFile.writeText(content)
+            val scanContext = ScanContext(
+                filePath = tempFile.toPath(),
+                fileName = "PaymentService.kt",
+                fileExtension = "kt",
+                isTestFile = false,
+                fileSize = content.length.toLong(),
+                configuration = ScanConfiguration(),
+                content = content,
+                lines = content.lines()
+            )
+            val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(2, results.size)
 
-            val secretKeyResult = results.find { it.content.startsWith("sk-") }
+            val secretKeyResult = results.find { it.secretInfo.detectedValue.startsWith("sk-") }
             assertNotNull(secretKeyResult)
-            assertEquals("sk-test_1234567890abcdefghijklmnopqr", secretKeyResult?.content)
-            assertEquals("api-key", secretKeyResult?.ruleId)
-            assertEquals(ScanResult.Severity.HIGH, secretKeyResult?.severity)
+            assertEquals("sk-test_1234567890abcdefghijklmnopqr", secretKeyResult?.secretInfo?.detectedValue)
+            assertEquals("api-key", secretKeyResult?.secretInfo?.patternName)
+            assertEquals(Severity.HIGH, secretKeyResult?.severity)
 
-            val pubKeyResult = results.find { it.content.startsWith("pk-") }
+            val pubKeyResult = results.find { it.secretInfo.detectedValue.startsWith("pk-") }
             assertNotNull(pubKeyResult)
-            assertEquals("pk-test_1234567890abcdefghijklmnopqr", pubKeyResult?.content)
+            assertEquals("pk-test_1234567890abcdefghijklmnopqr", pubKeyResult?.secretInfo?.detectedValue)
         }
 
         @Test
@@ -123,16 +135,16 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(3, results.size)
-            assertTrue(results.any { it.content.startsWith("ghp_") })
-            assertTrue(results.any { it.content.startsWith("gho_") })
-            assertTrue(results.any { it.content.startsWith("ghu_") })
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("ghp_") })
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("gho_") })
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("ghu_") })
             results.forEach { result ->
-                assertEquals("github-token", result.ruleId)
-                assertEquals(ScanResult.Severity.HIGH, result.severity)
+                assertEquals("github-token", result.secretInfo.patternName)
+                assertEquals(Severity.HIGH, result.severity)
             }
         }
 
@@ -148,14 +160,14 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(3, results.size)
             results.forEach { result ->
-                assertTrue(result.content.startsWith("xox"))
-                assertEquals("slack-token", result.ruleId)
-                assertEquals(ScanResult.Severity.HIGH, result.severity)
+                assertTrue(result.secretInfo.detectedValue.startsWith("xox"))
+                assertEquals("slack-token", result.secretInfo.patternName)
+                assertEquals(Severity.HIGH, result.severity)
             }
         }
     }
@@ -184,15 +196,15 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(2, results.size)
-            assertTrue(results.any { it.content.contains("RSA PRIVATE KEY") })
-            assertTrue(results.any { it.content.contains("-----BEGIN PRIVATE KEY-----") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("RSA PRIVATE KEY") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("-----BEGIN PRIVATE KEY-----") })
             results.forEach { result ->
-                assertEquals("private-key", result.ruleId)
-                assertEquals(ScanResult.Severity.CRITICAL, result.severity)
+                assertEquals("private-key", result.secretInfo.patternName)
+                assertEquals(Severity.CRITICAL, result.severity)
             }
         }
 
@@ -209,14 +221,14 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             val secretResult =
-                    results.find { it.content == "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
+                    results.find { it.secretInfo.detectedValue == "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
             assertNotNull(secretResult)
-            assertEquals("aws-secret", secretResult?.ruleId)
-            assertEquals(ScanResult.Severity.CRITICAL, secretResult?.severity)
+            assertEquals("aws-secret", secretResult?.secretInfo.patternName)
+            assertEquals(Severity.CRITICAL, secretResult?.severity)
         }
     }
 
@@ -238,16 +250,16 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(3, results.size)
-            assertTrue(results.any { it.content.contains("jdbc:mysql") })
-            assertTrue(results.any { it.content.contains("jdbc:postgresql") })
-            assertTrue(results.any { it.content.contains("jdbc:oracle") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("jdbc:mysql") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("jdbc:postgresql") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("jdbc:oracle") })
             results.forEach { result ->
-                assertEquals("database-url", result.ruleId)
-                assertEquals(ScanResult.Severity.MEDIUM, result.severity)
+                assertEquals("database-url", result.secretInfo.patternName)
+                assertEquals(Severity.MEDIUM, result.severity)
             }
         }
 
@@ -262,12 +274,12 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.size >= 1)
-            assertTrue(results.any { it.content.startsWith("mongodb://") })
-            results.forEach { result -> assertEquals("database-url", result.ruleId) }
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("mongodb://") })
+            results.forEach { result -> assertEquals("database-url", result.secretInfo.patternName) }
         }
 
         @Test
@@ -281,11 +293,11 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.size >= 1)
-            assertTrue(results.any { it.content.startsWith("postgres://") })
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("postgres://") })
         }
     }
 
@@ -306,14 +318,14 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.size >= 1)
-            assertTrue(results.any { it.content.startsWith("eyJ") })
+            assertTrue(results.any { it.secretInfo.detectedValue.startsWith("eyJ") })
             results.forEach { result ->
-                assertEquals("jwt-token", result.ruleId)
-                assertEquals(ScanResult.Severity.MEDIUM, result.severity)
+                assertEquals("jwt-token", result.secretInfo.patternName)
+                assertEquals(Severity.MEDIUM, result.severity)
             }
         }
 
@@ -328,12 +340,12 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             // Should only detect the valid JWT
             assertEquals(1, results.size)
-            assertTrue(results[0].content.contains("eyJhbGciOiJIUzI1NiJ9"))
+            assertTrue(results[0].secretInfo.detectedValue.contains("eyJhbGciOiJIUzI1NiJ9"))
         }
     }
 
@@ -355,15 +367,15 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.size >= 2)
-            assertTrue(results.any { it.content == "mySecretPassword123" })
-            assertTrue(results.any { it.content == "anotherSecret456" })
+            assertTrue(results.any { it.secretInfo.detectedValue == "mySecretPassword123" })
+            assertTrue(results.any { it.secretInfo.detectedValue == "anotherSecret456" })
             results.forEach { result ->
-                assertEquals("password", result.ruleId)
-                assertEquals(ScanResult.Severity.MEDIUM, result.severity)
+                assertEquals("password", result.secretInfo.patternName)
+                assertEquals(Severity.MEDIUM, result.severity)
             }
         }
 
@@ -379,11 +391,11 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(1, results.size)
-            assertEquals("thisIsLongEnough123", results[0].content)
+            assertEquals("thisIsLongEnough123", results[0].secretInfo.detectedValue)
         }
     }
 
@@ -406,16 +418,16 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(2, results.size)
 
-            val secretResult = results.find { it.content.startsWith("sk-") }
-            assertEquals(3, secretResult?.lineNumber)
+            val secretResult = results.find { it.secretInfo.detectedValue.startsWith("sk-") }
+            assertEquals(3, secretResult?.location.lineNumber)
 
-            val tokenResult = results.find { it.content.startsWith("ghp_") }
-            assertEquals(5, tokenResult?.lineNumber)
+            val tokenResult = results.find { it.secretInfo.detectedValue.startsWith("ghp_") }
+            assertEquals(5, tokenResult?.location.lineNumber)
         }
 
         @Test
@@ -425,14 +437,14 @@ class PatternDetectorTest {
             val content = "val key = \"sk-1234567890abcdefghijklmnopqr\""
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(1, results.size)
             val result = results[0]
             assertTrue(result.columnStart > 0)
             assertTrue(result.columnEnd > result.columnStart)
-            assertEquals("sk-1234567890abcdefghijklmnopqr", result.content)
+            assertEquals("sk-1234567890abcdefghijklmnopqr", result.secretInfo.detectedValue)
         }
 
         @Test
@@ -443,11 +455,11 @@ class PatternDetectorTest {
                     "val keys = \"sk-1234567890abcdefghijklmnopqr and pk-1234567890abcdefghijklmnopqr\""
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(2, results.size)
-            results.forEach { result -> assertEquals(1, result.lineNumber) }
+            results.forEach { result -> assertEquals(1, result.location.lineNumber) }
 
             val firstResult = results.minByOrNull { it.columnStart }
             val secondResult = results.maxByOrNull { it.columnStart }
@@ -485,7 +497,7 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.isEmpty())
@@ -503,11 +515,11 @@ class PatternDetectorTest {
             """.trimIndent()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(1, results.size)
-            assertEquals("sk-1234567890abcdefghijklmnopqr", results[0].content)
+            assertEquals("sk-1234567890abcdefghijklmnopqr", results[0].secretInfo.detectedValue)
         }
 
         @Test
@@ -519,11 +531,11 @@ class PatternDetectorTest {
                     "val longVar = \"$longString\" val secret = \"sk-1234567890abcdefghijklmnopqr\""
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(1, results.size)
-            assertEquals("sk-1234567890abcdefghijklmnopqr", results[0].content)
+            assertEquals("sk-1234567890abcdefghijklmnopqr", results[0].secretInfo.detectedValue)
         }
 
         @Test
@@ -536,12 +548,12 @@ class PatternDetectorTest {
                 |ghp_1234567890abcdefghijklmnopqrstuvwxyz""".trimMargin()
 
             // Act
-            val results = patternDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertEquals(2, results.size)
-            assertTrue(results.any { it.lineNumber == 1 })
-            assertTrue(results.any { it.lineNumber == 3 })
+            assertTrue(results.any { it.location.lineNumber == 1 })
+            assertTrue(results.any { it.location.lineNumber == 3 })
         }
     }
 
@@ -553,7 +565,7 @@ class PatternDetectorTest {
         @DisplayName("Should work with empty pattern map")
         fun testEmptyPatternMap() {
             // Arrange
-            val emptyDetector = PatternDetector(emptyMap())
+            val emptyDetector = PatternDetector())
             val content = "val secret = \"sk-1234567890abcdefghijklmnopqr\""
 
             // Act
@@ -568,7 +580,7 @@ class PatternDetectorTest {
         fun testSinglePattern() {
             // Arrange
             val singlePatternMap = mapOf("test-pattern" to listOf(Regex("test-\\d+")))
-            val singleDetector = PatternDetector(singlePatternMap)
+            val singleDetector = PatternDetector()
             val content = "val value = \"test-123\""
 
             // Act
@@ -576,8 +588,8 @@ class PatternDetectorTest {
 
             // Assert
             assertEquals(1, results.size)
-            assertEquals("test-123", results[0].content)
-            assertEquals("test-pattern", results[0].ruleId)
+            assertEquals("test-123", results[0].secretInfo.detectedValue)
+            assertEquals("test-pattern", results[0].secretInfo.patternName)
         }
 
         @Test
@@ -593,7 +605,7 @@ class PatternDetectorTest {
                                             Regex("pattern3-[A-Z]+")
                                     )
                     )
-            val multiDetector = PatternDetector(multiPatternMap)
+            val multiDetector = PatternDetector()
             val content =
                     """
                 val val1 = "pattern1-123"
@@ -606,7 +618,7 @@ class PatternDetectorTest {
 
             // Assert
             assertEquals(3, results.size)
-            results.forEach { result -> assertEquals("multi-test", result.ruleId) }
+            results.forEach { result -> assertEquals("multi-test", result.secretInfo.patternName) }
         }
 
         @Test
@@ -623,7 +635,7 @@ class PatternDetectorTest {
                                             )
                                     )
                     )
-            val flagDetector = PatternDetector(flagPatternMap)
+            val flagDetector = PatternDetector()
             val content =
                     """
                 val secret = "mySecret"
@@ -647,7 +659,7 @@ class PatternDetectorTest {
         @DisplayName("Should work with SecretPatterns")
         fun testWithSecretPatterns() {
             // Arrange
-            val realDetector = PatternDetector(SecretPatterns.getAllPatterns())
+            val realDetector = PatternDetector())
             val content =
                     """
                 class RealSecrets {
@@ -662,16 +674,16 @@ class PatternDetectorTest {
 
             // Assert
             assertFalse(results.isEmpty())
-            assertTrue(results.any { it.content.contains("sk-") })
-            assertTrue(results.any { it.content.contains("wJalrXUtnFEMI") })
-            assertTrue(results.any { it.content.contains("ghp_") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("sk-") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("wJalrXUtnFEMI") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("ghp_") })
         }
 
         @Test
         @DisplayName("Should work with ApiKeyPatterns")
         fun testWithApiKeyPatterns() {
             // Arrange
-            val realDetector = PatternDetector(ApiKeyPatterns.getAllPatterns())
+            val realDetector = PatternDetector())
             val content =
                     """
                 val stripeKey = "sk-test_1234567890abcdefghijklmnopqr"
@@ -689,7 +701,7 @@ class PatternDetectorTest {
         @DisplayName("Should work with CryptoPatterns")
         fun testWithCryptoPatterns() {
             // Arrange
-            val realDetector = PatternDetector(CryptoPatterns.getAllPatterns())
+            val realDetector = PatternDetector())
             val content =
                     """
                 val privateKey = '''
@@ -704,14 +716,14 @@ class PatternDetectorTest {
 
             // Assert
             assertFalse(results.isEmpty())
-            assertTrue(results.any { it.content.contains("RSA PRIVATE KEY") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("RSA PRIVATE KEY") })
         }
 
         @Test
         @DisplayName("Should work with DatabasePatterns")
         fun testWithDatabasePatterns() {
             // Arrange
-            val realDetector = PatternDetector(DatabasePatterns.getAllPatterns())
+            val realDetector = PatternDetector())
             val content =
                     """
                 val dbUrl = "jdbc:postgresql://localhost:5432/mydb"
@@ -723,8 +735,8 @@ class PatternDetectorTest {
 
             // Assert
             assertFalse(results.isEmpty())
-            assertTrue(results.any { it.content.contains("jdbc:") })
-            assertTrue(results.any { it.content.contains("mongodb://") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("jdbc:") })
+            assertTrue(results.any { it.secretInfo.detectedValue.contains("mongodb://") })
         }
     }
 
@@ -744,11 +756,11 @@ class PatternDetectorTest {
         val content = "val secret = \"$secretValue\""
 
         // Act
-        val results = patternDetector.detect(testFile, content)
+        val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
         // Assert
         assertFalse(results.isEmpty())
-        assertTrue(results.any { it.content == secretValue })
+        assertTrue(results.any { it.secretInfo.detectedValue == secretValue })
     }
 
     @ParameterizedTest
@@ -764,13 +776,13 @@ class PatternDetectorTest {
         val content = "val secret = \"$secretValue\""
 
         // Act
-        val results = patternDetector.detect(testFile, content)
+        val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = patternDetector.detect(scanContext)
 
         // Assert
         assertFalse(results.isEmpty())
-        val result = results.find { it.content == secretValue }
+        val result = results.find { it.secretInfo.detectedValue == secretValue }
         assertNotNull(result)
-        assertEquals(expectedRuleId, result?.ruleId)
-        assertEquals(ScanResult.Severity.valueOf(expectedSeverity), result?.severity)
+        assertEquals(expectedRuleId, result?.secretInfo.patternName)
+        assertEquals(Severity.valueOf(expectedSeverity), result?.severity)
     }
 }
