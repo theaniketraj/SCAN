@@ -227,7 +227,7 @@ class PatternDetectorTest {
             val secretResult =
                     results.find { it.secretInfo.detectedValue == "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
             assertNotNull(secretResult)
-            assertEquals("aws-secret", secretResult?.secretInfo.patternName)
+            assertEquals("aws-secret", secretResult?.secretInfo?.patternName)
             assertEquals(Severity.CRITICAL, secretResult?.severity)
         }
     }
@@ -424,10 +424,10 @@ class PatternDetectorTest {
             assertEquals(2, results.size)
 
             val secretResult = results.find { it.secretInfo.detectedValue.startsWith("sk-") }
-            assertEquals(3, secretResult?.location.lineNumber)
+            assertEquals(3, secretResult?.location?.lineNumber)
 
             val tokenResult = results.find { it.secretInfo.detectedValue.startsWith("ghp_") }
-            assertEquals(5, tokenResult?.location.lineNumber)
+            assertEquals(5, tokenResult?.location?.lineNumber)
         }
 
         @Test
@@ -442,8 +442,8 @@ class PatternDetectorTest {
             // Assert
             assertEquals(1, results.size)
             val result = results[0]
-            assertTrue(result.columnStart > 0)
-            assertTrue(result.columnEnd > result.columnStart)
+            assertTrue(result.location.columnStart > 0)
+            assertTrue(result.location.columnEnd > result.location.columnStart)
             assertEquals("sk-1234567890abcdefghijklmnopqr", result.secretInfo.detectedValue)
         }
 
@@ -461,12 +461,12 @@ class PatternDetectorTest {
             assertEquals(2, results.size)
             results.forEach { result -> assertEquals(1, result.location.lineNumber) }
 
-            val firstResult = results.minByOrNull { it.columnStart }
-            val secondResult = results.maxByOrNull { it.columnStart }
+            val firstResult = results.minByOrNull { it.location.columnStart }
+            val secondResult = results.maxByOrNull { it.location.columnStart }
 
             assertNotNull(firstResult)
             assertNotNull(secondResult)
-            assertTrue(firstResult!!.columnStart < secondResult!!.columnStart)
+            assertTrue(firstResult!!.location.columnStart < secondResult!!.location.columnStart)
         }
     }
 
@@ -478,7 +478,7 @@ class PatternDetectorTest {
         @DisplayName("Should handle empty content")
         fun testEmptyContent() {
             // Act
-            val results = patternDetector.detect(testFile, "")
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(""); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = 0L, configuration = ScanConfiguration(), content = "", lines = emptyList()); val results = patternDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.isEmpty())
@@ -565,11 +565,11 @@ class PatternDetectorTest {
         @DisplayName("Should work with empty pattern map")
         fun testEmptyPatternMap() {
             // Arrange
-            val emptyDetector = PatternDetector())
+            val emptyDetector = PatternDetector()
             val content = "val secret = \"sk-1234567890abcdefghijklmnopqr\""
 
             // Act
-            val results = emptyDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = emptyDetector.detect(scanContext)
 
             // Assert
             assertTrue(results.isEmpty())
@@ -584,7 +584,7 @@ class PatternDetectorTest {
             val content = "val value = \"test-123\""
 
             // Act
-            val results = singleDetector.detect(testFile, content)
+            val tempFile = File.createTempFile("test", ".kt"); tempFile.writeText(content); val scanContext = ScanContext(filePath = tempFile.toPath(), fileName = "test.kt", fileExtension = "kt", isTestFile = false, fileSize = content.length.toLong(), configuration = ScanConfiguration(), content = content, lines = content.lines()); val results = singleDetector.detect(scanContext)
 
             // Assert
             assertEquals(1, results.size)
