@@ -18,9 +18,16 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class FileScanner(
         private val configuration: ScanConfiguration,
-        private val detectors: List<DetectorInterface>,
-        private val filters: List<FilterInterface>
+        private val detectors: List<DetectorInterface> = emptyList(),
+        private val filters: List<FilterInterface> = emptyList()
 ) {
+    
+    // Legacy constructor for test compatibility
+    constructor(configuration: ScanConfiguration) : this(
+        configuration = configuration,
+        detectors = emptyList(),
+        filters = emptyList()
+    )
 
     companion object {
         private const val MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024 // 50MB
@@ -167,6 +174,86 @@ class FileScanner(
                     filePath = filePath.toString(),
                     errorMessage = e.message ?: "Unknown error"
             )
+        }
+    }
+
+    /**
+     * Legacy method for test compatibility - scans a file and returns simple results
+     * 
+     * @param file The file to scan
+     * @return List of LegacyScanResult objects (legacy format for tests)
+     */
+    fun scanFile(file: File): List<LegacyScanResult> {
+        // Apply filters first if available
+        if (filters.isNotEmpty()) {
+            val shouldScan = filters.all { filter ->
+                try {
+                    filter.shouldIncludeFile(file, file.path)
+                } catch (e: Exception) {
+                    true // Include on filter error
+                }
+            }
+            if (!shouldScan) {
+                return emptyList()
+            }
+        }
+
+        // Apply detectors if available
+        if (detectors.isNotEmpty()) {
+            try {
+                val content = readFileContent(file) ?: return emptyList()
+                val results = mutableListOf<LegacyScanResult>()
+                
+                detectors.forEach { detector ->
+                    try {
+                        val scanContext = ScanContext(
+                            filePath = file.toPath(),
+                            fileName = file.name,
+                            fileExtension = file.extension,
+                            isTestFile = isTestFile(file.toPath()),
+                            fileSize = file.length(),
+                            configuration = configuration,
+                            relativePath = file.path,
+                            content = content,
+                            lines = content.lines()
+                        )
+                        
+                        val findings = detector.detect(scanContext)
+                        findings.forEach { finding ->
+                            results.add(LegacyScanResult(
+                                file = file,
+                                lineNumber = finding.location.lineNumber,
+                                columnStart = finding.location.columnStart,
+                                columnEnd = finding.location.columnEnd,
+                                content = finding.secretInfo.detectedValue,
+                                ruleId = finding.detectorName,
+                                severity = convertSeverity(finding.severity),
+                                message = finding.description
+                            ))
+                        }
+                    } catch (e: Exception) {
+                        // Log and continue with other detectors
+                        System.err.println("Detector failed: ${e.message}")
+                    }
+                }
+                
+                return results
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Failed to scan file: ${e.message}", e)
+            }
+        }
+        
+        // No detectors configured - return empty list
+        return emptyList()
+    }
+    
+    private fun convertSeverity(severity: Severity): LegacyScanResult.Severity {
+        return when (severity) {
+            Severity.CRITICAL -> LegacyScanResult.Severity.HIGH
+            Severity.HIGH -> LegacyScanResult.Severity.HIGH
+            Severity.MEDIUM -> LegacyScanResult.Severity.MEDIUM
+            Severity.LOW -> LegacyScanResult.Severity.LOW
+            Severity.INFO -> LegacyScanResult.Severity.LOW
         }
     }
 
