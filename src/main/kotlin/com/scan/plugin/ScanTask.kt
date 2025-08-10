@@ -6,6 +6,7 @@ import com.scan.core.ScanResult
 import com.scan.reporting.ConsoleReporter
 import com.scan.reporting.HtmlReporter
 import com.scan.reporting.JsonReporter
+import com.scan.reporting.ReportSummary
 import java.io.File
 import java.time.Duration
 import java.time.Instant
@@ -39,8 +40,34 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
      *
      * We use Gradle's Property API here, which provides lazy evaluation and proper integration with
      * Gradle's configuration cache and task isolation features.
+     * 
+     * Marked as @Internal since we expose individual properties as @Input below.
      */
-    @get:Nested abstract val scanConfiguration: Property<ScanExtension>
+    @get:Internal abstract val scanConfiguration: Property<ScanExtension>
+
+    /**
+     * Individual input properties from the scan configuration for proper Gradle task input tracking.
+     * These properties ensure that Gradle can correctly determine when this task needs to re-run.
+     */
+    @get:Input
+    val taskContextAwareScanning: Boolean
+        get() = scanConfiguration.get().contextAwareScanning.getOrElse(true)
+
+    @get:Input
+    val taskCustomPatterns: Map<String, String>
+        get() = scanConfiguration.get().customPatterns.getOrElse(emptyMap())
+
+    @get:Input
+    val taskEnabled: Boolean
+        get() = scanConfiguration.get().enabled.getOrElse(true)
+
+    @get:Input
+    val taskEntropyThreshold: Double
+        get() = scanConfiguration.get().entropyThreshold.getOrElse(4.5)
+
+    @get:Input
+    val taskExcludePatterns: Set<String>
+        get() = scanConfiguration.get().excludePatterns.getOrElse(emptySet())
 
     /**
      * Lazily computed file tree that represents all files to be scanned. This property is marked as
@@ -429,7 +456,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             val jsonReporter = JsonReporter()
             val jsonFile = outputDir.resolve("scan-report.json")
             runBlocking {
-                jsonReporter.generateReport(scanResults, jsonFile)
+                jsonReporter.generateReport(listOf(scanResults), jsonFile.absolutePath)
             }
             logger.info("Generated JSON report: ${jsonFile.absolutePath}")
         } catch (exception: Exception) {
