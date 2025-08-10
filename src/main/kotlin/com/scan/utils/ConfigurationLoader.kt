@@ -318,24 +318,23 @@ class ConfigurationLoader(private val project: Project) {
         )
     }
 
-    private fun convertPatterns(patterns: Any?): PatternConfiguration {
+    private fun convertPatterns(@Suppress("UNUSED_PARAMETER") patterns: Any?): PatternConfiguration {
         return PatternConfiguration()
     }
-    }
 
-    private fun convertDetectors(detectors: Any?): DetectorConfiguration {
+    private fun convertDetectors(@Suppress("UNUSED_PARAMETER") detectors: Any?): DetectorConfiguration {
         return DetectorConfiguration()
     }
 
-    private fun convertDetectorConfig(config: Any?): DetectorConfiguration {
+    private fun convertDetectorConfig(@Suppress("UNUSED_PARAMETER") config: Any?): DetectorConfiguration {
         return DetectorConfiguration()
     }
 
-    private fun convertReporting(reporting: Any?): ReportingConfiguration {
+    private fun convertReporting(@Suppress("UNUSED_PARAMETER") reporting: Any?): ReportingConfiguration {
         return ReportingConfiguration()
     }
 
-    private fun convertPerformance(performance: Any?): PerformanceConfiguration {
+    private fun convertPerformance(@Suppress("UNUSED_PARAMETER") performance: Any?): PerformanceConfiguration {
         return PerformanceConfiguration()
     }
 
