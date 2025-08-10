@@ -1,15 +1,10 @@
 package com.scan.reporting
 
-import com.scan.core.ScanConfiguration
 import com.scan.core.ScanResult
 import java.io.File
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.gradle.api.logging.Logger
 
 /**
  * JSON reporter that generates structured JSON reports for scan results.
@@ -17,13 +12,7 @@ import org.gradle.api.logging.Logger
  * This reporter creates machine-readable JSON output that can be easily consumed by CI/CD systems,
  * security dashboards, and other tools.
  */
-class JsonReporter(private val logger: Logger, private val configuration: ScanConfiguration) {
-
-    private val json = Json {
-        prettyPrint = true
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
+class JsonReporter {
 
     companion object {
         private const val DEFAULT_OUTPUT_FILE = "scan-results.json"
@@ -34,237 +23,87 @@ class JsonReporter(private val logger: Logger, private val configuration: ScanCo
      * Generates a JSON report from scan results.
      *
      * @param results List of scan results to report
-     * @param outputFile Optional custom output file path
+     * @param outputDir Output directory for the report
      * @return The generated JSON report as a string
      */
-    fun generateReport(results: List<ScanResult>, outputFile: String? = null): String {
-        val reportData = createReportData(results)
-        val jsonReport = json.encodeToString(reportData)
-
-        val targetFile =
-                outputFile
-                        ?: configuration.outputDir?.let {
-                            File(it, DEFAULT_OUTPUT_FILE).absolutePath
-                        }
-                                ?: DEFAULT_OUTPUT_FILE
+    fun generateReport(results: List<ScanResult>, outputDir: String): String {
+        val jsonReport = createJsonReport(results)
+        val targetFile = File(outputDir, DEFAULT_OUTPUT_FILE)
 
         try {
-            writeReportToFile(jsonReport, targetFile)
-            logger.lifecycle("JSON report generated: $targetFile")
+            writeReportToFile(jsonReport, targetFile.absolutePath)
         } catch (e: Exception) {
-            logger.error("Failed to write JSON report to file: ${e.message}")
             throw ReportGenerationException("Failed to generate JSON report", e)
         }
 
         return jsonReport
     }
 
-    /** Creates the structured report data from scan results. */
-    private fun createReportData(results: List<ScanResult>): JsonScanReport {
+    /** Creates the JSON report from scan results. */
+    private fun createJsonReport(results: List<ScanResult>): String {
         val timestamp = Instant.now().atOffset(ZoneOffset.UTC).format(ISO_FORMATTER)
-        val totalFiles = results.map { it.filePath }.distinct().size
-        val totalFindings = results.size
-        val criticalFindings = results.count { it.severity == ScanResult.Severity.CRITICAL }
-        val highFindings = results.count { it.severity == ScanResult.Severity.HIGH }
-        val mediumFindings = results.count { it.severity == ScanResult.Severity.MEDIUM }
-        val lowFindings = results.count { it.severity == ScanResult.Severity.LOW }
-
-        val findingsByType =
-                results.groupBy { it.ruleId }.mapValues { (_, findings) -> findings.size }
-
-        val findingsByFile =
-                results.groupBy { it.filePath }.map { (filePath, findings) ->
-                    JsonFileResult(
-                            filePath = filePath,
-                            findingsCount = findings.size,
-                            findings =
-                                    findings.map { result ->
-                                        JsonFinding(
-                                                ruleId = result.ruleId,
-                                                ruleName = result.ruleName,
-                                                description = result.description,
-                                                severity = result.severity.name.lowercase(),
-                                                confidence = result.confidence.name.lowercase(),
-                                                lineNumber = result.lineNumber,
-                                                columnStart = result.columnStart,
-                                                columnEnd = result.columnEnd,
-                                                matchedText =
-                                                        if (configuration.includeMatchedText)
-                                                                result.matchedText
-                                                        else "[REDACTED]",
-                                                context =
-                                                        result.context?.let { ctx ->
-                                                            JsonContext(
-                                                                    before = ctx.before,
-                                                                    after = ctx.after,
-                                                                    linesBefore = ctx.linesBefore,
-                                                                    linesAfter = ctx.linesAfter
-                                                            )
-                                                        },
-                                                metadata = result.metadata
-                                        )
-                                    }
-                    )
-                }
-
-        return JsonScanReport(
-                metadata =
-                        JsonReportMetadata(
-                                timestamp = timestamp,
-                                version = getPluginVersion(),
-                                scanConfiguration =
-                                        JsonScanConfiguration(
-                                                scanPaths = configuration.scanPaths,
-                                                excludePaths = configuration.excludePaths,
-                                                includePatterns = configuration.includePatterns,
-                                                excludePatterns = configuration.excludePatterns,
-                                                enabledDetectors = configuration.enabledDetectors,
-                                                maxFileSize = configuration.maxFileSize,
-                                                followSymlinks = configuration.followSymlinks,
-                                                scanHiddenFiles = configuration.scanHiddenFiles
-                                        )
-                        ),
-                summary =
-                        JsonSummary(
-                                totalFiles = totalFiles,
-                                totalFindings = totalFindings,
-                                findingsBySeverity =
-                                        JsonSeverityBreakdown(
-                                                critical = criticalFindings,
-                                                high = highFindings,
-                                                medium = mediumFindings,
-                                                low = lowFindings
-                                        ),
-                                findingsByType = findingsByType,
-                                scanDurationMs = results.firstOrNull()?.scanDuration ?: 0L
-                        ),
-                results = findingsByFile
-        )
-    }
-
-    /** Writes the JSON report to the specified file. */
-    private fun writeReportToFile(jsonContent: String, filePath: String) {
-        val file = File(filePath)
-        file.parentFile?.mkdirs()
-        file.writeText(jsonContent)
-    }
-
-    /** Gets the plugin version for metadata. */
-    private fun getPluginVersion(): String {
-        return try {
-            javaClass.`package`.implementationVersion ?: "development"
-        } catch (e: Exception) {
-            "unknown"
+        val allFindings = results.flatMap { it.findings }
+        
+        val sb = StringBuilder()
+        sb.append("{\n")
+        sb.append("  \"scanReport\": {\n")
+        sb.append("    \"metadata\": {\n")
+        sb.append("      \"timestamp\": \"$timestamp\",\n")
+        sb.append("      \"version\": \"1.0.0\",\n")
+        sb.append("      \"tool\": \"SCAN Security Scanner\"\n")
+        sb.append("    },\n")
+        sb.append("    \"summary\": {\n")
+        sb.append("      \"totalFiles\": ${results.size},\n")
+        sb.append("      \"totalFindings\": ${allFindings.size},\n")
+        sb.append("      \"criticalFindings\": ${allFindings.count { it.severity == com.scan.core.Severity.CRITICAL }},\n")
+        sb.append("      \"highFindings\": ${allFindings.count { it.severity == com.scan.core.Severity.HIGH }},\n")
+        sb.append("      \"mediumFindings\": ${allFindings.count { it.severity == com.scan.core.Severity.MEDIUM }},\n")
+        sb.append("      \"lowFindings\": ${allFindings.count { it.severity == com.scan.core.Severity.LOW }}\n")
+        sb.append("    },\n")
+        sb.append("    \"findings\": [\n")
+        
+        allFindings.forEachIndexed { index, finding ->
+            sb.append("      {\n")
+            sb.append("        \"id\": \"${finding.id}\",\n")
+            sb.append("        \"title\": \"${escapeJson(finding.title)}\",\n")
+            sb.append("        \"description\": \"${escapeJson(finding.description)}\",\n")
+            sb.append("        \"severity\": \"${finding.severity.name}\",\n")
+            sb.append("        \"confidence\": \"${finding.confidence.name}\",\n")
+            sb.append("        \"location\": {\n")
+            sb.append("          \"filePath\": \"${escapeJson(finding.location.filePath)}\",\n")
+            sb.append("          \"lineNumber\": ${finding.location.lineNumber},\n")
+            sb.append("          \"columnStart\": ${finding.location.columnStart},\n")
+            sb.append("          \"columnEnd\": ${finding.location.columnEnd}\n")
+            sb.append("        },\n")
+            sb.append("        \"secretInfo\": {\n")
+            sb.append("          \"type\": \"${finding.secretInfo.secretType.name}\",\n")
+            sb.append("          \"patternName\": \"${escapeJson(finding.secretInfo.patternName)}\",\n")
+            sb.append("          \"entropy\": ${finding.secretInfo.entropy}\n")
+            sb.append("        }\n")
+            sb.append("      }")
+            if (index < allFindings.size - 1) sb.append(",")
+            sb.append("\n")
         }
+        
+        sb.append("    ]\n")
+        sb.append("  }\n")
+        sb.append("}")
+        
+        return sb.toString()
     }
 
-    /** Validates that the JSON report can be properly serialized. */
-    fun validateReport(results: List<ScanResult>): Boolean {
-        return try {
-            val reportData = createReportData(results)
-            json.encodeToString(reportData)
-            true
-        } catch (e: Exception) {
-            logger.error("JSON report validation failed: ${e.message}")
-            false
-        }
+    private fun escapeJson(text: String): String {
+        return text.replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
     }
 
-    /** Creates a compact JSON report without pretty printing. */
-    fun generateCompactReport(results: List<ScanResult>): String {
-        val compactJson = Json {
-            prettyPrint = false
-            ignoreUnknownKeys = true
-            encodeDefaults = false
-        }
-
-        val reportData = createReportData(results)
-        return compactJson.encodeToString(reportData)
-    }
-
-    /** Generates a JSON report with only summary information (no detailed findings). */
-    fun generateSummaryReport(results: List<ScanResult>): String {
-        val reportData = createReportData(results)
-        val summaryReport =
-                JsonScanReport(
-                        metadata = reportData.metadata,
-                        summary = reportData.summary,
-                        results = emptyList()
-                )
-
-        return json.encodeToString(summaryReport)
+    private fun writeReportToFile(content: String, filePath: String) {
+        File(filePath).writeText(content)
     }
 }
 
-/** Data classes for JSON serialization */
-@Serializable
-data class JsonScanReport(
-        val metadata: JsonReportMetadata,
-        val summary: JsonSummary,
-        val results: List<JsonFileResult>
-)
-
-@Serializable
-data class JsonReportMetadata(
-        val timestamp: String,
-        val version: String,
-        val scanConfiguration: JsonScanConfiguration
-)
-
-@Serializable
-data class JsonScanConfiguration(
-        val scanPaths: List<String>,
-        val excludePaths: List<String>,
-        val includePatterns: List<String>,
-        val excludePatterns: List<String>,
-        val enabledDetectors: List<String>,
-        val maxFileSize: Long,
-        val followSymlinks: Boolean,
-        val scanHiddenFiles: Boolean
-)
-
-@Serializable
-data class JsonSummary(
-        val totalFiles: Int,
-        val totalFindings: Int,
-        val findingsBySeverity: JsonSeverityBreakdown,
-        val findingsByType: Map<String, Int>,
-        val scanDurationMs: Long
-)
-
-@Serializable
-data class JsonSeverityBreakdown(val critical: Int, val high: Int, val medium: Int, val low: Int)
-
-@Serializable
-data class JsonFileResult(
-        val filePath: String,
-        val findingsCount: Int,
-        val findings: List<JsonFinding>
-)
-
-@Serializable
-data class JsonFinding(
-        val ruleId: String,
-        val ruleName: String,
-        val description: String,
-        val severity: String,
-        val confidence: String,
-        val lineNumber: Int,
-        val columnStart: Int?,
-        val columnEnd: Int?,
-        val matchedText: String,
-        val context: JsonContext?,
-        val metadata: Map<String, String>?
-)
-
-@Serializable
-data class JsonContext(
-        val before: String?,
-        val after: String?,
-        val linesBefore: List<String>?,
-        val linesAfter: List<String>?
-)
-
-/** Custom exception for report generation errors. */
-class ReportGenerationException(message: String, cause: Throwable? = null) :
-        Exception(message, cause)
+/** Exception thrown when report generation fails */
+class ReportGenerationException(message: String, cause: Throwable? = null) : Exception(message, cause)
