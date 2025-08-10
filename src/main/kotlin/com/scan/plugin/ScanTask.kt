@@ -16,6 +16,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.work.DisableCachingByDefault
+import kotlinx.coroutines.runBlocking
 
 /**
  * The main task that performs security scanning for sensitive information.
@@ -218,11 +219,14 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                                 html = if (config.generateHtmlReport.getOrElse(false))
                                     HtmlReportConfiguration()
                                 else HtmlReportConfiguration()
+                        ),
+                        buildIntegration = BuildIntegrationConfiguration(
+                                strictMode = config.strictMode.getOrElse(false)
                         )
                 )
 
         logger.debug(
-                "Created scan engine with configuration: strictMode=${internalConfig.strictMode}"
+                "Created scan engine with configuration: strictMode=${internalConfig.buildIntegration.strictMode}"
         )
 
         return ScanEngine(internalConfig)
@@ -337,15 +341,9 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         }
 
         try {
-            // Delegate the actual scanning to the engine
-            return scanEngine.scanFiles(filesToScan) { scannedCount, totalCount ->
-                // Progress callback for large operations
-                if (shouldReportProgress && scannedCount % progressReportingThreshold == 0) {
-                    val percentage = (scannedCount * 100) / totalCount
-                    logger.lifecycle(
-                            "📊 Scanning progress: $scannedCount/$totalCount files ($percentage%)"
-                    )
-                }
+            // Delegate the actual scanning to the engine - convert to async call
+            return runBlocking {
+                scanEngine.executeScan(filesToScan.first().parent)
             }
         } catch (exception: Exception) {
             throw GradleException("Scanning failed: ${exception.message}", exception)
@@ -396,14 +394,14 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             } else {
                 appendLine("⚠️  Found ${scanResults.findings.size} potential security issues:")
                 scanResults.findings.forEach { finding ->
-                    appendLine("- ${finding.file.name}: ${finding.description}")
+                    appendLine("- ${finding.location.filePath}: ${finding.description}")
                 }
             }
 
             appendLine()
             appendLine("Scan Statistics:")
-            appendLine("- Files scanned: ${scanResults.filesScanned}")
-            appendLine("- Scan duration: ${scanResults.scanDuration}")
+            appendLine("- Files scanned: ${scanResults.summary.totalFilesScanned}")
+            appendLine("- Scan duration: ${scanResults.getFormattedDuration()}")
             appendLine("- Issues found: ${scanResults.findings.size}")
         }
 
@@ -416,7 +414,9 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         try {
             val htmlReporter = HtmlReporter()
             val htmlFile = outputDir.resolve("scan-report.html")
-            htmlReporter.generateReport(scanResults, htmlFile)
+            runBlocking {
+                htmlReporter.generateReport(scanResults, htmlFile)
+            }
             logger.info("Generated HTML report: ${htmlFile.absolutePath}")
         } catch (exception: Exception) {
             logger.warn("Failed to generate HTML report: ${exception.message}")
@@ -428,7 +428,9 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         try {
             val jsonReporter = JsonReporter()
             val jsonFile = outputDir.resolve("scan-report.json")
-            jsonReporter.generateReport(scanResults, jsonFile)
+            runBlocking {
+                jsonReporter.generateReport(scanResults, jsonFile)
+            }
             logger.info("Generated JSON report: ${jsonFile.absolutePath}")
         } catch (exception: Exception) {
             logger.warn("Failed to generate JSON report: ${exception.message}")
@@ -445,14 +447,22 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         // Always show console output using the console reporter
         val consoleReporter = ConsoleReporter()
-        consoleReporter.reportResults(scanResults)
+        // Create a dummy report summary for console reporter compatibility  
+        val dummySummary = com.scan.reporting.ReportSummary(
+            totalFindings = scanResults.findings.size,
+            projectPath = project.projectDir.absolutePath,
+            timestamp = java.time.LocalDateTime.now(),
+            scanDuration = duration.toMillis(),
+            generationTime = 0L
+        )
+        consoleReporter.generateReport(listOf(scanResults), dummySummary)
 
         // Determine the appropriate response based on findings and configuration
         when {
             scanResults.findings.isEmpty() -> {
                 logger.lifecycle("✅ SCAN completed successfully: No sensitive information found")
                 logger.lifecycle(
-                        "📊 Scanned ${scanResults.filesScanned} files in ${duration.toMillis()}ms"
+                        "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
                 )
             }
             config.failOnSecrets.get() -> {
@@ -467,7 +477,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                         "⚠️  SCAN completed with warnings: Found ${scanResults.findings.size} potential security issues"
                 )
                 logger.lifecycle(
-                        "📊 Scanned ${scanResults.filesScanned} files in ${duration.toMillis()}ms"
+                        "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
                 )
                 logger.lifecycle(
                         "💡 Consider reviewing and addressing these findings to improve security"
@@ -476,7 +486,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             else -> {
                 // Silent mode - just complete without fanfare
                 logger.info(
-                        "SCAN completed: ${scanResults.findings.size} findings, ${scanResults.filesScanned} files scanned"
+                        "SCAN completed: ${scanResults.findings.size} findings, ${scanResults.summary.totalFilesScanned} files scanned"
                 )
             }
         }
