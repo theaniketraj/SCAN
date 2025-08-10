@@ -223,17 +223,13 @@ class FileScannerTest {
         @DisplayName("Should work with real pattern detector")
         fun testIntegrationWithPatternDetector() {
             // Arrange
-            val realDetector = PatternDetector(SecretPatterns.getAllPatterns())
-            val realFilter = FileExtensionFilter(listOf(".kt", ".java"))
+            val realDetector = PatternDetector()
+            val realFilter = FileExtensionFilter(setOf("kt", "java"))
             val realConfig =
                     ScanConfiguration(
-                            detectors = listOf(realDetector),
-                            filters = listOf(realFilter),
-                            maxFileSize = 1024 * 1024,
-                            includeHidden = false,
-                            followSymlinks = false,
-                            parallelProcessing = false,
-                            maxThreads = 1
+                            scanPath = tempDir.toString(),
+                            includedExtensions = setOf("kt", "java"),
+                            maxFileSize = 1024 * 1024
                     )
 
             val realFileScanner = FileScanner(realConfig)
@@ -264,16 +260,15 @@ class FileScannerTest {
         @DisplayName("Should work with entropy detector")
         fun testIntegrationWithEntropyDetector() {
             // Arrange
-            val entropyDetector = EntropyDetector(threshold = 4.5)
+            val entropyDetector = EntropyDetector()
             val realConfig =
                     ScanConfiguration(
-                            detectors = listOf(entropyDetector),
-                            filters = emptyList(),
-                            maxFileSize = 1024 * 1024,
-                            includeHidden = false,
-                            followSymlinks = false,
-                            parallelProcessing = false,
-                            maxThreads = 1
+                            scanPath = tempDir.toString(),
+                            entropy = EntropyConfiguration(
+                                enabled = true,
+                                threshold = 4.5
+                            ),
+                            maxFileSize = 1024 * 1024
                     )
 
             val realFileScanner = FileScanner(realConfig)
@@ -301,19 +296,21 @@ class FileScannerTest {
         @DisplayName("Should work with composite detector")
         fun testIntegrationWithCompositeDetector() {
             // Arrange
-            val patternDetector = PatternDetector(SecretPatterns.getAllPatterns())
-            val entropyDetector = EntropyDetector(threshold = 4.0)
-            val compositeDetector = CompositeDetector(listOf(patternDetector, entropyDetector))
+            val patternDetector = PatternDetector()
+            val entropyDetector = EntropyDetector()
+            val compositeDetector = CompositeDetector()
 
             val realConfig =
                     ScanConfiguration(
-                            detectors = listOf(compositeDetector),
-                            filters = emptyList(),
-                            maxFileSize = 1024 * 1024,
-                            includeHidden = false,
-                            followSymlinks = false,
-                            parallelProcessing = false,
-                            maxThreads = 1
+                            scanPath = tempDir.toString(),
+                            detectors = DetectorConfiguration(
+                                enabledDetectors = setOf("pattern", "entropy")
+                            ),
+                            entropy = EntropyConfiguration(
+                                enabled = true,
+                                threshold = 4.0
+                            ),
+                            maxFileSize = 1024 * 1024
                     )
 
             val realFileScanner = FileScanner(realConfig)
@@ -344,20 +341,18 @@ class FileScannerTest {
         @DisplayName("Should work with multiple filters")
         fun testIntegrationWithMultipleFilters() {
             // Arrange
-            val detector = PatternDetector(SecretPatterns.getAllPatterns())
-            val extensionFilter = FileExtensionFilter(listOf(".kt"))
-            val pathFilter = PathFilter(excludePatterns = listOf("**/test/**"))
-            val whitelistFilter = WhitelistFilter(listOf("normalValue"))
-
+            val detector = PatternDetector()
+            val extensionFilter = FileExtensionFilter(includeExtensions = setOf("kt"))
+            
             val realConfig =
                     ScanConfiguration(
-                            detectors = listOf(detector),
-                            filters = listOf(extensionFilter, pathFilter, whitelistFilter),
-                            maxFileSize = 1024 * 1024,
-                            includeHidden = false,
-                            followSymlinks = false,
-                            parallelProcessing = false,
-                            maxThreads = 1
+                            scanPath = tempDir.toString(),
+                            includedExtensions = setOf("kt"),
+                            excludePatterns = listOf("**/test/**"),
+                            whitelist = WhitelistConfiguration(
+                                globalExclusions = listOf("normalValue")
+                            ),
+                            maxFileSize = 1024 * 1024
                     )
 
             val realFileScanner = FileScanner(realConfig)
