@@ -1,12 +1,12 @@
 package com.scan.detectors
 
 import com.scan.patterns.SecretPatterns
+import com.scan.core.ScanContext
+import com.scan.config.ScanConfiguration
+import com.scan.utils.PatternMatcher
 import io.mockk.every
 import io.mockk.mockk
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -14,31 +14,18 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import java.io.File
 
 @DisplayName("ContextAwareDetector Tests")
 class ContextAwareDetectorTest {
 
-    private lateinit var detector: ContextAwareDetector
-    private lateinit var mockSecretPatterns: SecretPatterns
+    private lateinit var detector: ContextAwareDetectorImpl
+    private lateinit var mockPatternMatcher: PatternMatcher
 
     @BeforeEach
     fun setUp() {
-        mockSecretPatterns = mockk()
-        every { mockSecretPatterns.getAllPatterns() } returns
-                mapOf(
-                        "api_key" to
-                                listOf(
-                                        "(?i)api[_-]?key['\"]?\\s*[:=]\\s*['\"]?([a-zA-Z0-9_-]{20,})",
-                                        "(?i)secret[_-]?key['\"]?\\s*[:=]\\s*['\"]?([a-zA-Z0-9_-]{20,})"
-                                ),
-                        "aws_access_key" to listOf("AKIA[0-9A-Z]{16}"),
-                        "database_url" to
-                                listOf(
-                                        "(?i)(jdbc|mysql|postgres)://[^\\s'\"]+:[^\\s'\"]+@[^\\s'\"]+/[^\\s'\"]+",
-                                        "(?i)database[_-]?url['\"]?\\s*[:=]\\s*['\"]?([^\\s'\"]+)"
-                                )
-                )
-        detector = ContextAwareDetector(mockSecretPatterns)
+        mockPatternMatcher = mockk()
+        detector = ContextAwareDetectorImpl(mockPatternMatcher)
     }
 
     @Nested
@@ -58,19 +45,27 @@ class ContextAwareDetectorTest {
                 }
             """.trimIndent()
 
-            val results = detector.detect(content, "DatabaseConfig.kt")
+            val tempFile = File.createTempFile("test", ".kt")
+            tempFile.writeText(content)
+            val scanContext = ScanContext(
+                file = tempFile,
+                content = content,
+                configuration = ScanConfiguration()
+            )
+
+            val results = detector.detect(scanContext)
 
             assertEquals(2, results.size)
             assertTrue(
                     results.any {
-                        it.type == "api_key" &&
-                                it.value.contains("sk_live_abcdef123456789012345678")
+                        it.secretInfo.secretType == "api_key" &&
+                                it.secretInfo.value.contains("sk_live_abcdef123456789012345678")
                     }
             )
             assertTrue(
                     results.any {
-                        it.type == "database_url" &&
-                                it.value.contains(
+                        it.secretInfo.secretType == "database_url" &&
+                                it.secretInfo.value.contains(
                                         "jdbc:mysql://user:password123@localhost:3306/mydb"
                                 )
                     }
