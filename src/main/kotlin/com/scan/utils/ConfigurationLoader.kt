@@ -412,7 +412,6 @@ class ConfigurationLoader(private val project: Project) {
                     "(?i)redis://[^\\s]+",
                     "(?i)postgresql://[^\\s]+"
             )
-}
 
 /** Data classes for YAML configuration parsing */
 data class ConfigurationData(
@@ -459,3 +458,4 @@ data class PerformanceConfig(
         val parallelScanning: Boolean? = null,
         val threadCount: Int? = null
 )
+}
