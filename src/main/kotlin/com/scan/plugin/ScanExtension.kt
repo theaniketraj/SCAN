@@ -14,16 +14,24 @@ abstract class ScanExtension {
     abstract val strictMode: Property<Boolean>
     abstract val failOnSecretsFound: Property<Boolean>
     abstract val failOnSecrets: Property<Boolean>
+    abstract val failOnFound: Property<Boolean>  // Alias for failOnSecrets
     abstract val warnOnSecrets: Property<Boolean>
     abstract val verbose: Property<Boolean>
     abstract val quiet: Property<Boolean>
     abstract val includePatterns: SetProperty<String>
     abstract val excludePatterns: SetProperty<String>
+    abstract val includeFiles: SetProperty<String>  // Alias for includePatterns
+    abstract val excludeFiles: SetProperty<String>   // Alias for excludePatterns
     abstract val maxFileSizeBytes: Property<Long>
     abstract val ignoreTestFiles: Property<Boolean>
+    abstract val scanTests: Property<Boolean>
     abstract val generateHtmlReport: Property<Boolean>
     abstract val generateJsonReport: Property<Boolean>
     abstract val reportOutputDir: DirectoryProperty
+    abstract val reportPath: Property<String>
+    abstract val reportFormats: SetProperty<String>
+    abstract val outputFormat: Property<String>
+    abstract val outputFile: Property<String>
     abstract val parallelScanning: Property<Boolean>
     abstract val entropyThreshold: Property<Double>
     abstract val customPatterns: MapProperty<String, String>
@@ -92,5 +100,16 @@ abstract class ScanExtension {
         var sortByRisk: Boolean = true
         var maskSecrets: Boolean = true
         var maxSecretLength: Int = 50
+    }
+
+    /**
+     * Validates the extension configuration
+     */
+    fun validate() {
+        // Entropy threshold validation
+        val threshold = entropyThreshold.getOrElse(4.5)
+        if (threshold < 0.0 || threshold > 10.0) {
+            throw IllegalArgumentException("entropyThreshold must be between 0.0 and 10.0, got $threshold")
+        }
     }
 }
