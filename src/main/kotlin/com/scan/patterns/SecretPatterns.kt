@@ -556,6 +556,11 @@ object SecretPatterns {
         }
     }
 
+    /** Get all patterns as a map grouped by name */
+    fun getAllPatterns(): Map<String, List<SecretPattern>> {
+        return ALL_PATTERNS.groupBy { it.name }
+    }
+
     /** Create a custom pattern for project-specific secrets */
     fun createCustomPattern(
             name: String,
