@@ -121,9 +121,10 @@ class ConsoleReporter {
 
     /** Print findings for a specific file */
     private fun printFileFindings(scanResult: ScanResult) {
-        logger.lifecycle(colorize("📁 ${scanResult.filePath}", ConsoleColor.BLUE, bold = true))
+        val filePath = scanResult.findings.firstOrNull()?.location?.filePath ?: "Unknown"
+        logger.lifecycle(colorize("📁 $filePath", ConsoleColor.BLUE, bold = true))
         logger.lifecycle(
-                "   ${colorize("─".repeat(scanResult.filePath.length + 2), ConsoleColor.BLUE)}"
+                "   ${colorize("─".repeat(filePath.length + 2), ConsoleColor.BLUE)}"
         )
 
         scanResult.findings.forEachIndexed { index, finding ->
@@ -416,7 +417,7 @@ enum class ConsoleColor(val code: String) {
 /** Represents a security finding for console reporting */
 data class ConsoleFinding(
         val description: String,
-        val severity: FindingSeverity,
+        val severity: com.scan.core.Severity,
         val ruleName: String = "",
         val lineNumber: Int? = null,
         val columnStart: Int? = null,
