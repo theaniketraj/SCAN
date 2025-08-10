@@ -526,6 +526,11 @@ object DatabasePatterns {
                     )
             )
 
+    /** Get all patterns as a map grouped by name */
+    fun getAllPatterns(): Map<String, List<DatabasePattern>> {
+        return ALL_PATTERNS.groupBy { it.name }
+    }
+
     /** Get patterns by database type */
     fun getPatternsByType(type: String): List<DatabasePattern> {
         return when (type.lowercase()) {
