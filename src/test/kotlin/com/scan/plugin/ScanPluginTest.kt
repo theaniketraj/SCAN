@@ -2,16 +2,21 @@ package com.scan.plugin
 
 import java.io.File
 import java.nio.file.Path
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+
+// Helper function for assertFailsWith since it's not in JUnit 5
+inline fun <reified T : Throwable> assertFailsWith(block: () -> Unit): T {
+    return assertThrows(T::class.java) { block() }
+}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScanPluginTest {
