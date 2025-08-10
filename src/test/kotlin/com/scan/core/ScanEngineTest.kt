@@ -7,8 +7,6 @@ import com.scan.utils.*
 import io.mockk.*
 import java.io.File
 import java.nio.file.Path
-import kotlin.test.assertContains
-import kotlin.test.assertTrue
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.io.TempDir
