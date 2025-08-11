@@ -133,13 +133,13 @@ class ScanEngineTest {
 
         val findings1 =
                 listOf(
-                        ScanResult.Finding(
+                        createTestFinding(
                                 file = file1.absolutePath,
                                 line = 1,
                                 column = 13,
                                 pattern = "Password Pattern",
                                 match = "password123",
-                                severity = ScanResult.Severity.MEDIUM,
+                                severity = Severity.MEDIUM,
                                 confidence = 0.8,
                                 context = "val secret = \"password123\""
                         )
@@ -147,13 +147,13 @@ class ScanEngineTest {
 
         val findings2 =
                 listOf(
-                        ScanResult.Finding(
+                        createTestFinding(
                                 file = file2.absolutePath,
                                 line = 1,
                                 column = 15,
                                 pattern = "GitHub Token Pattern",
                                 match = "ghp_1234567890abcdef",
-                                severity = ScanResult.Severity.HIGH,
+                                severity = Severity.HIGH,
                                 confidence = 0.95,
                                 context = "String token = \"ghp_1234567890abcdef\";"
                         )
@@ -249,25 +249,25 @@ class ScanEngineTest {
         val file2 = createTestFile("File2.kt", "content2")
 
         val highSeverityFinding =
-                ScanResult.Finding(
+                createTestFinding(
                         file = file1.absolutePath,
                         line = 1,
                         column = 1,
                         pattern = "High Pattern",
                         match = "high",
-                        severity = ScanResult.Severity.HIGH,
+                        severity = Severity.HIGH,
                         confidence = 0.9,
                         context = "context"
                 )
 
         val mediumSeverityFinding =
-                ScanResult.Finding(
+                createTestFinding(
                         file = file2.absolutePath,
                         line = 1,
                         column = 1,
                         pattern = "Medium Pattern",
                         match = "medium",
-                        severity = ScanResult.Severity.MEDIUM,
+                        severity = Severity.MEDIUM,
                         confidence = 0.8,
                         context = "context"
                 )
@@ -283,9 +283,9 @@ class ScanEngineTest {
         assertEquals(2, result.summary.totalFindingsCount)
 
         val summary = result.summary
-        assertEquals(1, summary.findingsBySeverity[ScanResult.Severity.HIGH])
-        assertEquals(1, summary.findingsBySeverity[ScanResult.Severity.MEDIUM])
-        assertEquals(0, summary.findingsBySeverity[ScanResult.Severity.LOW])
+        assertEquals(1, summary.findingsBySeverity[Severity.HIGH])
+        assertEquals(1, summary.findingsBySeverity[Severity.MEDIUM])
+        assertEquals(0, summary.findingsBySeverity[Severity.LOW])
     }
 
     @Test
@@ -403,23 +403,23 @@ class ScanEngineTest {
 
         val findings =
                 listOf(
-                        ScanResult.Finding(
+                        createTestFinding(
                                 file = testFile.absolutePath,
                                 line = 1,
                                 column = 1,
                                 pattern = "Pattern1",
                                 match = "secret1",
-                                severity = ScanResult.Severity.HIGH,
+                                severity = Severity.HIGH,
                                 confidence = 0.9,
                                 context = "context1"
                         ),
-                        ScanResult.Finding(
+                        createTestFinding(
                                 file = testFile.absolutePath,
                                 line = 1,
                                 column = 10,
                                 pattern = "Pattern2",
                                 match = "secret2",
-                                severity = ScanResult.Severity.MEDIUM,
+                                severity = Severity.MEDIUM,
                                 confidence = 0.8,
                                 context = "context2"
                         )
@@ -500,13 +500,13 @@ class ScanEngineTest {
             val testFile = createTestFile("Test.kt", "content")
             val manyFindings =
                     (1..1000).map { i ->
-                        ScanResult.Finding(
+                        createTestFinding(
                                 file = testFile.absolutePath,
                                 line = i,
                                 column = 1,
                                 pattern = "Pattern$i",
                                 match = "match$i",
-                                severity = ScanResult.Severity.LOW,
+                                severity = Severity.LOW,
                                 confidence = 0.5,
                                 context = "context$i"
                         )
