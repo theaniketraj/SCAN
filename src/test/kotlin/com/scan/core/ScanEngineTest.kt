@@ -10,6 +10,7 @@ import java.nio.file.Path
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.io.TempDir
+import kotlinx.coroutines.runBlocking
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScanEngineTest {
@@ -104,8 +105,8 @@ class ScanEngineTest {
                                     isInString = true
                                 ),
                                 remediation = RemediationInfo(
-                                    description = "Remove or secure this API key",
-                                    suggestedActions = listOf("Use environment variables"),
+                                    recommendation = "Remove or secure this API key",
+                                    actionItems = listOf("Use environment variables"),
                                     references = emptyList()
                                 )
                         )
@@ -114,14 +115,14 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(any()) } returns expectedFindings
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
         assertNotNull(result)
-        assertEquals(1, result.totalFilesScanned)
-        assertEquals(1, result.totalFindings)
+        assertEquals(1, result.summary.totalFilesScanned)
+        assertEquals(1, result.summary.totalFindingsCount)
         assertEquals(expectedFindings, result.findings)
-        assertTrue(result.scanDuration > 0)
+        assertTrue(result.getScanDurationMs() > 0)
     }
 
     @Test
@@ -162,11 +163,11 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(file2) } returns findings2
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(2, result.totalFilesScanned)
-        assertEquals(2, result.totalFindings)
+        assertEquals(2, result.summary.totalFilesScanned)
+        assertEquals(2, result.summary.totalFindingsCount)
         assertTrue(result.findings.containsAll(findings1 + findings2))
     }
 
@@ -180,10 +181,10 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(ktFile) } returns emptyList()
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(1, result.totalFilesScanned) // Only .kt file should be scanned
+        assertEquals(1, result.summary.totalFilesScanned) // Only .kt file should be scanned
         verify(exactly = 1) { mockFileScanner.scanFile(ktFile) }
         verify(exactly = 0) { mockFileScanner.scanFile(txtFile) }
     }
@@ -200,7 +201,7 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(mainFile) } returns emptyList()
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
         verify(exactly = 1) { mockFileScanner.scanFile(mainFile) }
@@ -218,7 +219,7 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(smallFile) } returns emptyList()
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
         verify(exactly = 1) { mockFileScanner.scanFile(smallFile) }
@@ -233,12 +234,12 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(testFile) } throws RuntimeException("Scan failed")
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(0, result.totalFilesScanned)
+        assertEquals(0, result.summary.totalFilesScanned)
         assertEquals(1, result.errors.size)
-        assertContains(result.errors.first(), "Scan failed")
+        assertTrue(result.errors.first().message.contains("Scan failed"))
     }
 
     @Test
@@ -275,11 +276,11 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(file2) } returns listOf(mediumSeverityFinding)
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(2, result.totalFilesScanned)
-        assertEquals(2, result.totalFindings)
+        assertEquals(2, result.summary.totalFilesScanned)
+        assertEquals(2, result.summary.totalFindingsCount)
 
         val summary = result.summary
         assertEquals(1, summary.findingsBySeverity[ScanResult.Severity.HIGH])
@@ -294,11 +295,11 @@ class ScanEngineTest {
         emptyDir.mkdirs()
 
         // When
-        val result = scanEngine.scan(emptyDir)
+        val result = runBlocking { scanEngine.executeScan(emptyDir.toString()) }
 
         // Then
-        assertEquals(0, result.totalFilesScanned)
-        assertEquals(0, result.totalFindings)
+        assertEquals(0, result.summary.totalFilesScanned)
+        assertEquals(0, result.summary.totalFindingsCount)
         assertTrue(result.findings.isEmpty())
         assertTrue(result.errors.isEmpty())
     }
@@ -339,7 +340,7 @@ class ScanEngineTest {
             ),
             remediation = RemediationInfo(
                 description = "Remove or secure this secret",
-                suggestedActions = listOf("Use environment variables"),
+                actionItems = listOf("Use environment variables"),
                 references = emptyList()
             )
         )
@@ -347,10 +348,10 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(testFile) } returns listOf(patternFinding)
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(1, result.totalFindings)
+        assertEquals(1, result.summary.totalFindingsCount)
         assertEquals("Pattern Detection", result.findings.first().pattern)
     }
 
@@ -362,12 +363,12 @@ class ScanEngineTest {
 
         // When
         val startTime = System.currentTimeMillis()
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
         val endTime = System.currentTimeMillis()
 
         // Then
-        assertTrue(result.scanDuration > 0)
-        assertTrue(result.scanDuration <= (endTime - startTime))
+        assertTrue(result.getScanDurationMs() > 0)
+        assertTrue(result.getScanDurationMs() <= (endTime - startTime))
         assertNotNull(result.timestamp)
     }
 
@@ -377,7 +378,7 @@ class ScanEngineTest {
         val nonExistentPath = File("/non/existent/path")
 
         // When & Then
-        assertThrows<IllegalArgumentException> { scanEngine.scan(nonExistentPath) }
+        assertThrows<IllegalArgumentException> { runBlocking { scanEngine.executeScan(nonExistentPath.toString()) } }
     }
 
     @Test
@@ -388,10 +389,10 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(any()) } returns emptyList()
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(10, result.totalFilesScanned)
+        assertEquals(10, result.summary.totalFilesScanned)
         files.forEach { file -> verify(exactly = 1) { mockFileScanner.scanFile(file) } }
     }
 
@@ -427,11 +428,11 @@ class ScanEngineTest {
         every { mockFileScanner.scanFile(testFile) } returns findings
 
         // When
-        val result = scanEngine.scan(tempDir.toFile())
+        val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertEquals(1, result.totalFilesScanned)
-        assertEquals(2, result.totalFindings)
+        assertEquals(1, result.summary.totalFilesScanned)
+        assertEquals(2, result.summary.totalFindingsCount)
 
         val fileFindings = result.findings.groupBy { it.file }
         assertEquals(1, fileFindings.keys.size)
@@ -485,12 +486,12 @@ class ScanEngineTest {
 
             // When
             val startTime = System.currentTimeMillis()
-            val result = scanEngine.scan(tempDir.toFile())
+            val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
             val duration = System.currentTimeMillis() - startTime
 
             // Then
             assertTrue(duration < 5000) // Should complete within 5 seconds
-            assertEquals(50, result.totalFilesScanned)
+            assertEquals(50, result.summary.totalFilesScanned)
         }
 
         @Test
@@ -514,10 +515,10 @@ class ScanEngineTest {
             every { mockFileScanner.scanFile(testFile) } returns manyFindings
 
             // When
-            val result = scanEngine.scan(tempDir.toFile())
+            val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
             // Then
-            assertEquals(1000, result.totalFindings)
+            assertEquals(1000, result.summary.totalFindingsCount)
             assertEquals(1000, result.findings.size)
         }
     }
