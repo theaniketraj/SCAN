@@ -49,7 +49,7 @@ object EntropyCalculator {
     private val BASE64_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
     private val HEX_CHARSET = "0123456789ABCDEFabcdef"
     private val ALPHANUMERIC_CHARSET =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
     /**
      * Calculates the Shannon entropy of a given string.
@@ -125,13 +125,13 @@ object EntropyCalculator {
     fun analyzeEntropy(input: String): EntropyAnalysis {
         if (input.isEmpty()) {
             return EntropyAnalysis(
-                    entropy = 0.0,
-                    normalizedEntropy = 0.0,
-                    charsetType = CharsetType.UNKNOWN,
-                    isHighEntropy = false,
-                    threshold = 0.0,
-                    characterCount = 0,
-                    uniqueCharacters = 0
+                entropy = 0.0,
+                normalizedEntropy = 0.0,
+                charsetType = CharsetType.UNKNOWN,
+                isHighEntropy = false,
+                threshold = 0.0,
+                characterCount = 0,
+                uniqueCharacters = 0
             )
         }
 
@@ -140,18 +140,18 @@ object EntropyCalculator {
         val charsetType = detectCharsetType(input)
         val threshold = determineThreshold(input)
         val isHighEntropy =
-                entropy >= threshold &&
-                        input.length >= DEFAULT_MIN_LENGTH &&
-                        input.length <= DEFAULT_MAX_LENGTH
+            entropy >= threshold &&
+                input.length >= DEFAULT_MIN_LENGTH &&
+                input.length <= DEFAULT_MAX_LENGTH
 
         return EntropyAnalysis(
-                entropy = entropy,
-                normalizedEntropy = normalizedEntropy,
-                charsetType = charsetType,
-                isHighEntropy = isHighEntropy,
-                threshold = threshold,
-                characterCount = input.length,
-                uniqueCharacters = input.toSet().size
+            entropy = entropy,
+            normalizedEntropy = normalizedEntropy,
+            charsetType = charsetType,
+            isHighEntropy = isHighEntropy,
+            threshold = threshold,
+            characterCount = input.length,
+            uniqueCharacters = input.toSet().size
         )
     }
 
@@ -166,9 +166,9 @@ object EntropyCalculator {
      * @return List of high-entropy substrings found
      */
     fun findHighEntropySubstrings(
-            input: String,
-            windowSizes: List<Int> = listOf(16, 24, 32, 40),
-            minEntropy: Double = GENERAL_ENTROPY_THRESHOLD
+        input: String,
+        windowSizes: List<Int> = listOf(16, 24, 32, 40),
+        minEntropy: Double = GENERAL_ENTROPY_THRESHOLD
     ): List<EntropySubstring> {
         val results = mutableListOf<EntropySubstring>()
 
@@ -180,14 +180,14 @@ object EntropyCalculator {
 
                     if (analysis.entropy >= minEntropy) {
                         results.add(
-                                EntropySubstring(
-                                        text = substring,
-                                        startIndex = i,
-                                        endIndex = i + windowSize - 1,
-                                        entropy = analysis.entropy,
-                                        normalizedEntropy = analysis.normalizedEntropy,
-                                        charsetType = analysis.charsetType
-                                )
+                            EntropySubstring(
+                                text = substring,
+                                startIndex = i,
+                                endIndex = i + windowSize - 1,
+                                entropy = analysis.entropy,
+                                normalizedEntropy = analysis.normalizedEntropy,
+                                charsetType = analysis.charsetType
+                            )
                         )
                     }
                 }
@@ -215,10 +215,10 @@ object EntropyCalculator {
 
         return when {
             chars.all { it in BASE64_CHARSET } &&
-                    chars.intersect(BASE64_CHARSET.toSet()).size >= 10 -> CharsetType.BASE64
+                chars.intersect(BASE64_CHARSET.toSet()).size >= 10 -> CharsetType.BASE64
             chars.all { it in HEX_CHARSET } &&
-                    chars.intersect("0123456789".toSet()).isNotEmpty() &&
-                    chars.intersect("ABCDEFabcdef".toSet()).isNotEmpty() -> CharsetType.HEXADECIMAL
+                chars.intersect("0123456789".toSet()).isNotEmpty() &&
+                chars.intersect("ABCDEFabcdef".toSet()).isNotEmpty() -> CharsetType.HEXADECIMAL
             chars.all { it in ALPHANUMERIC_CHARSET } -> CharsetType.ALPHANUMERIC
             chars.any { !it.isLetterOrDigit() && it !in "+/=" } -> CharsetType.MIXED
             else -> CharsetType.UNKNOWN
@@ -227,7 +227,7 @@ object EntropyCalculator {
 
     /** Removes overlapping substrings, keeping the ones with highest entropy. */
     private fun deduplicateOverlappingSubstrings(
-            substrings: List<EntropySubstring>
+        substrings: List<EntropySubstring>
     ): List<EntropySubstring> {
         if (substrings.isEmpty()) return emptyList()
 
@@ -236,10 +236,10 @@ object EntropyCalculator {
 
         sorted.forEach { candidate ->
             val hasOverlap =
-                    result.any { existing ->
-                        candidate.startIndex < existing.endIndex &&
-                                existing.startIndex < candidate.endIndex
-                    }
+                result.any { existing ->
+                    candidate.startIndex < existing.endIndex &&
+                        existing.startIndex < candidate.endIndex
+                }
 
             if (!hasOverlap) {
                 result.add(candidate)
@@ -271,29 +271,29 @@ enum class CharsetType {
  * @property uniqueCharacters Number of unique characters
  */
 data class EntropyAnalysis(
-        val entropy: Double,
-        val normalizedEntropy: Double,
-        val charsetType: CharsetType,
-        val isHighEntropy: Boolean,
-        val threshold: Double,
-        val characterCount: Int,
-        val uniqueCharacters: Int
+    val entropy: Double,
+    val normalizedEntropy: Double,
+    val charsetType: CharsetType,
+    val isHighEntropy: Boolean,
+    val threshold: Double,
+    val characterCount: Int,
+    val uniqueCharacters: Int
 ) {
     /** Returns a human-readable description of the entropy analysis. */
     fun getDescription(): String {
         val entropyLevel =
-                when {
-                    entropy < 2.0 -> "Very Low"
-                    entropy < 3.0 -> "Low"
-                    entropy < 4.0 -> "Medium"
-                    entropy < 5.0 -> "High"
-                    else -> "Very High"
-                }
+            when {
+                entropy < 2.0 -> "Very Low"
+                entropy < 3.0 -> "Low"
+                entropy < 4.0 -> "Medium"
+                entropy < 5.0 -> "High"
+                else -> "Very High"
+            }
 
         return "Entropy: ${"%.2f".format(entropy)} ($entropyLevel), " +
-                "Normalized: ${"%.2f".format(normalizedEntropy)}, " +
-                "Charset: ${charsetType.name.lowercase()}, " +
-                "High Entropy: $isHighEntropy"
+            "Normalized: ${"%.2f".format(normalizedEntropy)}, " +
+            "Charset: ${charsetType.name.lowercase()}, " +
+            "High Entropy: $isHighEntropy"
     }
 }
 
@@ -308,12 +308,12 @@ data class EntropyAnalysis(
  * @property charsetType Detected character set type
  */
 data class EntropySubstring(
-        val text: String,
-        val startIndex: Int,
-        val endIndex: Int,
-        val entropy: Double,
-        val normalizedEntropy: Double,
-        val charsetType: CharsetType
+    val text: String,
+    val startIndex: Int,
+    val endIndex: Int,
+    val entropy: Double,
+    val normalizedEntropy: Double,
+    val charsetType: CharsetType
 ) {
     /** Returns the length of the substring. */
     val length: Int
@@ -322,8 +322,8 @@ data class EntropySubstring(
     /** Returns a human-readable description of the high-entropy substring. */
     fun getDescription(): String {
         return "High-entropy substring at positions $startIndex-$endIndex: " +
-                "entropy=${"%.2f".format(entropy)}, " +
-                "charset=${charsetType.name.lowercase()}, " +
-                "length=$length"
+            "entropy=${"%.2f".format(entropy)}, " +
+            "charset=${charsetType.name.lowercase()}, " +
+            "length=$length"
     }
 }
