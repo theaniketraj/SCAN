@@ -4,13 +4,12 @@ import com.scan.detectors.*
 import com.scan.filters.*
 import com.scan.reporting.*
 import com.scan.utils.*
+import kotlinx.coroutines.*
 import java.io.File
 import java.nio.file.*
-import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
-import kotlinx.coroutines.*
 
 /**
  * Core scanning engine that orchestrates the entire security scanning process
@@ -74,11 +73,11 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
                 // Execute scanning with parallel processing
                 val scanResults =
-                        if (configuration.performance.maxConcurrency > 1) {
-                            scanFilesParallel(filesToScan)
-                        } else {
-                            scanFilesSequential(filesToScan)
-                        }
+                    if (configuration.performance.maxConcurrency > 1) {
+                        scanFilesParallel(filesToScan)
+                    } else {
+                        scanFilesSequential(filesToScan)
+                    }
 
                 // Process and aggregate results
                 val aggregatedResults = aggregateResults(scanResults)
@@ -92,7 +91,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                         } else {
                             aggregatedResults
                         }
-                */
+                 */
 
                 // Save cache if enabled
                 if (configuration.performance.enableCaching) {
@@ -167,28 +166,28 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         withContext(dispatcher) {
             files
-                    .map { file ->
-                        async {
-                            try {
-                                val result = scanSingleFile(file)
-                                results[file.absolutePath] = result
+                .map { file ->
+                    async {
+                        try {
+                            val result = scanSingleFile(file)
+                            results[file.absolutePath] = result
 
-                                val processed = processedCount.incrementAndGet()
-                                if (processed % 100 == 0 || processed == totalFiles) {
-                                    logger.info("Scanned $processed/$totalFiles files")
-                                }
-
-                                result
-                            } catch (e: Exception) {
-                                logger.warn("Failed to scan file: ${file.absolutePath}", e)
-                                FileScanResult.error(
-                                        file.absolutePath,
-                                        e.message ?: "Unknown error"
-                                )
+                            val processed = processedCount.incrementAndGet()
+                            if (processed % 100 == 0 || processed == totalFiles) {
+                                logger.info("Scanned $processed/$totalFiles files")
                             }
+
+                            result
+                        } catch (e: Exception) {
+                            logger.warn("Failed to scan file: ${file.absolutePath}", e)
+                            FileScanResult.error(
+                                file.absolutePath,
+                                e.message ?: "Unknown error"
+                            )
                         }
                     }
-                    .awaitAll()
+                }
+                .awaitAll()
         }
 
         return results.values.toList()
@@ -238,13 +237,13 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // Read file content
         val content =
-                try {
-                    file.readText(Charsets.UTF_8)
-                } catch (e: Exception) {
-                    logger.debug("Failed to read file as UTF-8: $filePath - ${e.message}")
-                    stats.errorFiles++
-                    return FileScanResult.error(filePath, "Failed to read file: ${e.message}")
-                }
+            try {
+                file.readText(Charsets.UTF_8)
+            } catch (e: Exception) {
+                logger.debug("Failed to read file as UTF-8: $filePath - ${e.message}")
+                stats.errorFiles++
+                return FileScanResult.error(filePath, "Failed to read file: ${e.message}")
+            }
 
         // Skip empty files
         if (content.isBlank()) {
@@ -278,9 +277,9 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // Sort by severity and file path
         return allFindings.sortedWith(
-                compareByDescending<Finding> { it.severity }
-                        .thenBy { it.location.filePath }
-                        .thenBy { it.location.lineNumber }
+            compareByDescending<Finding> { it.severity }
+                .thenBy { it.location.filePath }
+                .thenBy { it.location.lineNumber }
         )
     }
 
@@ -302,69 +301,73 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // Create scan summary
         val summary =
-                ScanSummary(
-                        totalFilesScanned = stats.scannedFiles,
-                        totalFindingsCount = findings.size,
-                        findingsBySeverity =
-                                mapOf(
-                                        Severity.CRITICAL to stats.criticalIssues,
-                                        Severity.HIGH to stats.highIssues,
-                                        Severity.MEDIUM to stats.mediumIssues,
-                                        Severity.LOW to stats.lowIssues,
-                                        Severity.INFO to
-                                                findings.count { it.severity == Severity.INFO }
-                                ),
-                        findingsByDetector =
-                                findings.groupBy { it.detectorType }.mapValues { it.value.size },
-                        totalLinesScanned = 0L, // TODO: Track lines scanned in statistics
-                        skippedFiles = stats.skippedFiles,
-                        skippedReason = emptyMap() // TODO: Implement skip reason tracking
-                )
+            ScanSummary(
+                totalFilesScanned = stats.scannedFiles,
+                totalFindingsCount = findings.size,
+                findingsBySeverity =
+                mapOf(
+                    Severity.CRITICAL to stats.criticalIssues,
+                    Severity.HIGH to stats.highIssues,
+                    Severity.MEDIUM to stats.mediumIssues,
+                    Severity.LOW to stats.lowIssues,
+                    Severity.INFO to
+                        findings.count { it.severity == Severity.INFO }
+                ),
+                findingsByDetector =
+                findings.groupBy { it.detectorType }.mapValues { it.value.size },
+                totalLinesScanned = 0L, // TODO: Track lines scanned in statistics
+                skippedFiles = stats.skippedFiles,
+                skippedReason = emptyMap() // TODO: Implement skip reason tracking
+            )
 
         // Create scan result configuration
         val scanConfig =
-                ScanResultConfiguration(
-                        configurationSource = configuration.configSource,
-                        enabledDetectors = configuration.detectors.enabledDetectors.toList(),
-                        excludedPaths = configuration.excludePatterns,
-                        includedExtensions = configuration.includedExtensions.toList(),
-                        severityThreshold = configuration.buildIntegration.failureThreshold,
-                        maxFileSize = configuration.maxFileSize,
-                        customPatterns = 0 // TODO: Count custom patterns
-                )
+            ScanResultConfiguration(
+                configurationSource = configuration.configSource,
+                enabledDetectors = configuration.detectors.enabledDetectors.toList(),
+                excludedPaths = configuration.excludePatterns,
+                includedExtensions = configuration.includedExtensions.toList(),
+                severityThreshold = configuration.buildIntegration.failureThreshold,
+                maxFileSize = configuration.maxFileSize,
+                customPatterns = 0 // TODO: Count custom patterns
+            )
 
         // Create performance metrics
         val perfMetrics =
-                PerformanceMetrics(
-                        totalDurationMs = stats.endTime - stats.startTime,
-                        fileProcessingTimeMs = 0L, // TODO: Track individual timing
-                        patternMatchingTimeMs = 0L,
-                        entropyCalculationTimeMs = 0L,
-                        reportGenerationTimeMs = 0L,
-                        memoryUsageBytes =
-                                Runtime.getRuntime().totalMemory() -
-                                        Runtime.getRuntime().freeMemory(),
-                        peakMemoryUsageBytes = Runtime.getRuntime().maxMemory(),
-                        filesPerSecond =
-                                if (stats.endTime > stats.startTime)
-                                        stats.scannedFiles.toDouble() * 1000 /
-                                                (stats.endTime - stats.startTime)
-                                else 0.0,
-                        averageFileProcessingTimeMs =
-                                if (stats.scannedFiles > 0)
-                                        (stats.endTime - stats.startTime).toDouble() /
-                                                stats.scannedFiles
-                                else 0.0
-                )
+            PerformanceMetrics(
+                totalDurationMs = stats.endTime - stats.startTime,
+                fileProcessingTimeMs = 0L, // TODO: Track individual timing
+                patternMatchingTimeMs = 0L,
+                entropyCalculationTimeMs = 0L,
+                reportGenerationTimeMs = 0L,
+                memoryUsageBytes =
+                Runtime.getRuntime().totalMemory() -
+                    Runtime.getRuntime().freeMemory(),
+                peakMemoryUsageBytes = Runtime.getRuntime().maxMemory(),
+                filesPerSecond =
+                if (stats.endTime > stats.startTime) {
+                    stats.scannedFiles.toDouble() * 1000 /
+                        (stats.endTime - stats.startTime)
+                } else {
+                    0.0
+                },
+                averageFileProcessingTimeMs =
+                if (stats.scannedFiles > 0) {
+                    (stats.endTime - stats.startTime).toDouble() /
+                        stats.scannedFiles
+                } else {
+                    0.0
+                }
+            )
 
         return ScanResult(
-                scanId = "scan-${System.currentTimeMillis()}",
-                timestamp = java.time.LocalDateTime.now(),
-                configuration = scanConfig,
-                summary = summary,
-                findings = findings,
-                errors = emptyList(), // TODO: Collect actual errors during scan
-                performance = perfMetrics
+            scanId = "scan-${System.currentTimeMillis()}",
+            timestamp = java.time.LocalDateTime.now(),
+            configuration = scanConfig,
+            summary = summary,
+            findings = findings,
+            errors = emptyList(), // TODO: Collect actual errors during scan
+            performance = perfMetrics
         )
     }
 
@@ -389,17 +392,17 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         if (configuration.detectors.enabledDetectors.contains("pattern")) {
             detectorConfigs.add(
-                    com.scan.detectors.CompositeDetector.DetectorConfig(patternDetector)
+                com.scan.detectors.CompositeDetector.DetectorConfig(patternDetector)
             )
         }
         if (configuration.detectors.enabledDetectors.contains("entropy")) {
             detectorConfigs.add(
-                    com.scan.detectors.CompositeDetector.DetectorConfig(entropyDetector)
+                com.scan.detectors.CompositeDetector.DetectorConfig(entropyDetector)
             )
         }
         if (configuration.detectors.enabledDetectors.contains("context")) {
             detectorConfigs.add(
-                    com.scan.detectors.CompositeDetector.DetectorConfig(contextAwareDetector)
+                com.scan.detectors.CompositeDetector.DetectorConfig(contextAwareDetector)
             )
         }
 
@@ -427,18 +430,18 @@ class ScanEngine(private val configuration: ScanConfiguration) {
 
         // File extension filter
         filters.add(
-                FileExtensionFilter(
-                        includeExtensions = configuration.includedExtensions,
-                        excludeExtensions = configuration.excludedExtensions
-                )
+            FileExtensionFilter(
+                includeExtensions = configuration.includedExtensions,
+                excludeExtensions = configuration.excludedExtensions
+            )
         )
 
         // Path filter
         filters.add(
-                PathFilter(
-                        includeGlobs = configuration.includePatterns.toSet(),
-                        excludeGlobs = configuration.excludePatterns.toSet()
-                )
+            PathFilter(
+                includeGlobs = configuration.includePatterns.toSet(),
+                excludeGlobs = configuration.excludePatterns.toSet()
+            )
         )
 
         // Test file filter - only add if test filter is enabled
@@ -532,20 +535,20 @@ private data class CachedScanResult(val fileHash: String, val result: FileScanRe
 
 /** Statistics tracking for scan execution */
 data class ScanStatistics(
-        var startTime: Long = 0L,
-        var endTime: Long = 0L,
-        var totalFilesDiscovered: Int = 0,
-        var scannedFiles: Int = 0,
-        var skippedFiles: Int = 0,
-        var errorFiles: Int = 0,
-        var emptyFiles: Int = 0,
-        var filesWithSecrets: Int = 0,
-        var totalFindings: Int = 0,
-        var criticalIssues: Int = 0,
-        var highIssues: Int = 0,
-        var mediumIssues: Int = 0,
-        var lowIssues: Int = 0,
-        var cacheHits: Int = 0
+    var startTime: Long = 0L,
+    var endTime: Long = 0L,
+    var totalFilesDiscovered: Int = 0,
+    var scannedFiles: Int = 0,
+    var skippedFiles: Int = 0,
+    var errorFiles: Int = 0,
+    var emptyFiles: Int = 0,
+    var filesWithSecrets: Int = 0,
+    var totalFindings: Int = 0,
+    var criticalIssues: Int = 0,
+    var highIssues: Int = 0,
+    var mediumIssues: Int = 0,
+    var lowIssues: Int = 0,
+    var cacheHits: Int = 0
 ) {
     val scanDurationMs: Long
         get() = endTime - startTime
@@ -574,7 +577,7 @@ private class ConsoleLogger(private val name: String) : Logger {
     override fun debug(message: String) = println("[DEBUG] $name: $message")
     override fun info(message: String) = println("[INFO] $name: $message")
     override fun warn(message: String, throwable: Throwable?) =
-            println("[WARN] $name: $message ${throwable?.message ?: ""}")
+        println("[WARN] $name: $message ${throwable?.message ?: ""}")
     override fun error(message: String, throwable: Throwable?) =
-            println("[ERROR] $name: $message ${throwable?.message ?: ""}")
+        println("[ERROR] $name: $message ${throwable?.message ?: ""}")
 }
