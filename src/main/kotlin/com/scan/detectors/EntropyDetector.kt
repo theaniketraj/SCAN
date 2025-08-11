@@ -1,7 +1,6 @@
 package com.scan.detectors
 
 import com.scan.core.*
-import java.io.File
 import kotlin.math.log2
 import kotlin.math.max
 import kotlin.math.min
@@ -27,10 +26,10 @@ class EntropyDetector : AbstractDetector() {
 
         // Character sets for different encoding types
         private val BASE64_CHARS =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toSet()
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toSet()
         private val HEX_CHARS = "0123456789ABCDEFabcdef".toSet()
         private val ALPHANUMERIC_CHARS =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toSet()
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toSet()
     }
 
     private var minLength: Int = DEFAULT_MIN_LENGTH
@@ -45,46 +44,46 @@ class EntropyDetector : AbstractDetector() {
 
     // Common words and patterns to exclude (reduce false positives)
     private val commonWords =
-            setOf(
-                    "password",
-                    "username",
-                    "email",
-                    "name",
-                    "title",
-                    "description",
-                    "example",
-                    "test",
-                    "demo",
-                    "sample",
-                    "placeholder",
-                    "default",
-                    "admin",
-                    "user",
-                    "guest",
-                    "anonymous",
-                    "public",
-                    "private"
-            )
+        setOf(
+            "password",
+            "username",
+            "email",
+            "name",
+            "title",
+            "description",
+            "example",
+            "test",
+            "demo",
+            "sample",
+            "placeholder",
+            "default",
+            "admin",
+            "user",
+            "guest",
+            "anonymous",
+            "public",
+            "private"
+        )
 
     // Common placeholder patterns
     private val placeholderPatterns =
-            listOf(
-                    Regex("^[x]{4,}$", RegexOption.IGNORE_CASE),
-                    Regex("^[0]{4,}$"),
-                    Regex("^[1]{4,}$"),
-                    Regex("^(abc|xyz|test|demo){2,}$", RegexOption.IGNORE_CASE),
-                    Regex("^[a-z]*(123|456|789)+[a-z]*$", RegexOption.IGNORE_CASE)
-            )
+        listOf(
+            Regex("^[x]{4,}$", RegexOption.IGNORE_CASE),
+            Regex("^[0]{4,}$"),
+            Regex("^[1]{4,}$"),
+            Regex("^(abc|xyz|test|demo){2,}$", RegexOption.IGNORE_CASE),
+            Regex("^[a-z]*(123|456|789)+[a-z]*$", RegexOption.IGNORE_CASE)
+        )
 
     /** Data class representing an entropy analysis result */
     data class EntropyAnalysis(
-            val text: String,
-            val entropy: Double,
-            val length: Int,
-            val charsetType: CharsetType,
-            val normalizedEntropy: Double,
-            val confidence: Double,
-            val isLikelySecret: Boolean
+        val text: String,
+        val entropy: Double,
+        val length: Int,
+        val charsetType: CharsetType,
+        val normalizedEntropy: Double,
+        val confidence: Double,
+        val isLikelySecret: Boolean
     )
 
     /** Enum representing different character set types */
@@ -98,13 +97,13 @@ class EntropyDetector : AbstractDetector() {
 
     /** Data class for entropy match results */
     data class EntropyMatch(
-            val text: String,
-            val startIndex: Int,
-            val endIndex: Int,
-            val lineNumber: Int,
-            val columnNumber: Int,
-            val analysis: EntropyAnalysis,
-            val context: String
+        val text: String,
+        val startIndex: Int,
+        val endIndex: Int,
+        val lineNumber: Int,
+        val columnNumber: Int,
+        val analysis: EntropyAnalysis,
+        val context: String
     )
 
     override fun performDetection(context: ScanContext): List<Finding> {
@@ -122,24 +121,24 @@ class EntropyDetector : AbstractDetector() {
                 val contextLines = getContext(lines, lineNumber - 1, 2)
 
                 val match =
-                        EntropyMatch(
-                                text = candidate.text,
-                                startIndex = candidate.startIndex,
-                                endIndex = candidate.endIndex,
-                                lineNumber = lineNumber,
-                                columnNumber = columnNumber,
-                                analysis = analysis,
-                                context = contextLines
-                        )
+                    EntropyMatch(
+                        text = candidate.text,
+                        startIndex = candidate.startIndex,
+                        endIndex = candidate.endIndex,
+                        lineNumber = lineNumber,
+                        columnNumber = columnNumber,
+                        analysis = analysis,
+                        context = contextLines
+                    )
 
                 findings.add(createFinding(context, match))
             }
         }
 
         return findings.sortedWith(
-                compareByDescending<Finding> { it.confidence }
-                        .thenBy { it.location.lineNumber }
-                        .thenBy { it.location.columnStart }
+            compareByDescending<Finding> { it.confidence }
+                .thenBy { it.location.lineNumber }
+                .thenBy { it.location.columnStart }
         )
     }
 
@@ -149,13 +148,13 @@ class EntropyDetector : AbstractDetector() {
     fun analyzeEntropy(text: String): EntropyAnalysis {
         if (text.length < minLength) {
             return EntropyAnalysis(
-                    text = text,
-                    entropy = 0.0,
-                    length = text.length,
-                    charsetType = CharsetType.UNKNOWN,
-                    normalizedEntropy = 0.0,
-                    confidence = 0.0,
-                    isLikelySecret = false
+                text = text,
+                entropy = 0.0,
+                length = text.length,
+                charsetType = CharsetType.UNKNOWN,
+                normalizedEntropy = 0.0,
+                confidence = 0.0,
+                isLikelySecret = false
             )
         }
 
@@ -176,13 +175,13 @@ class EntropyDetector : AbstractDetector() {
         val confidence = calculateConfidence(text, entropy, charsetType, normalizedEntropy)
 
         return EntropyAnalysis(
-                text = text,
-                entropy = entropy,
-                length = text.length,
-                charsetType = charsetType,
-                normalizedEntropy = normalizedEntropy,
-                confidence = confidence,
-                isLikelySecret = isLikelySecret
+            text = text,
+            entropy = entropy,
+            length = text.length,
+            charsetType = charsetType,
+            normalizedEntropy = normalizedEntropy,
+            confidence = confidence,
+            isLikelySecret = isLikelySecret
         )
     }
 
@@ -206,7 +205,7 @@ class EntropyDetector : AbstractDetector() {
 
         return when {
             chars.all { it in BASE64_CHARS } && text.contains(Regex("[A-Za-z0-9+/]")) ->
-                    CharsetType.BASE64
+                CharsetType.BASE64
             chars.all { it in HEX_CHARS } && text.length >= 8 -> CharsetType.HEX
             chars.all { it in ALPHANUMERIC_CHARS } -> CharsetType.ALPHANUMERIC
             chars.all { it.code <= 255 } -> CharsetType.EXTENDED_ASCII
@@ -229,30 +228,30 @@ class EntropyDetector : AbstractDetector() {
 
     /** Calculate confidence score for a potential secret */
     private fun calculateConfidence(
-            text: String,
-            entropy: Double,
-            charsetType: CharsetType,
-            normalizedEntropy: Double
+        text: String,
+        entropy: Double,
+        charsetType: CharsetType,
+        normalizedEntropy: Double
     ): Double {
         var confidence = normalizedEntropy * confidenceMultiplier
 
         // Length-based adjustments
         confidence *=
-                when {
-                    text.length >= 32 -> 1.2 // Longer strings are more likely to be secrets
-                    text.length >= 16 -> 1.1
-                    text.length < 8 -> 0.7 // Very short strings are less reliable
-                    else -> 1.0
-                }
+            when {
+                text.length >= 32 -> 1.2 // Longer strings are more likely to be secrets
+                text.length >= 16 -> 1.1
+                text.length < 8 -> 0.7 // Very short strings are less reliable
+                else -> 1.0
+            }
 
         // Character set specific adjustments
         confidence *=
-                when (charsetType) {
-                    CharsetType.BASE64 -> 1.3 // Base64 is common for encoded secrets
-                    CharsetType.HEX -> 1.1 // Hex is common for keys
-                    CharsetType.ALPHANUMERIC -> 1.0
-                    else -> 0.9
-                }
+            when (charsetType) {
+                CharsetType.BASE64 -> 1.3 // Base64 is common for encoded secrets
+                CharsetType.HEX -> 1.1 // Hex is common for keys
+                CharsetType.ALPHANUMERIC -> 1.0
+                else -> 0.9
+            }
 
         // Pattern-based adjustments
         if (hasRepeatingPatterns(text)) {
@@ -299,12 +298,12 @@ class EntropyDetector : AbstractDetector() {
             val quotedText = match.groupValues[1]
             if (quotedText.length in minLength..maxLength) {
                 candidates.add(
-                        StringCandidate(
-                                text = quotedText,
-                                startIndex = match.range.first + 1, // Skip opening quote
-                                endIndex = match.range.last, // Skip closing quote
-                                context = "quoted_string"
-                        )
+                    StringCandidate(
+                        text = quotedText,
+                        startIndex = match.range.first + 1, // Skip opening quote
+                        endIndex = match.range.last, // Skip closing quote
+                        context = "quoted_string"
+                    )
                 )
             }
         }
@@ -316,24 +315,24 @@ class EntropyDetector : AbstractDetector() {
     private fun extractAssignmentValues(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
         val assignmentRegex =
-                Regex(
-                        """(?i)(api[_-]?key|token|secret|password|auth)\s*[=:]\s*["']?([a-zA-Z0-9+/=_-]{$minLength,$maxLength})["']?"""
-                )
+            Regex(
+                """(?i)(api[_-]?key|token|secret|password|auth)\s*[=:]\s*["']?([a-zA-Z0-9+/=_-]{$minLength,$maxLength})["']?"""
+            )
 
         assignmentRegex.findAll(content).forEach { match ->
             val value = match.groupValues[2]
             if (value.length in minLength..maxLength) {
                 candidates.add(
-                        StringCandidate(
-                                text = value,
-                                startIndex =
-                                        match.range.first + match.groupValues[0].indexOf(value),
-                                endIndex =
-                                        match.range.first +
-                                                match.groupValues[0].indexOf(value) +
-                                                value.length - 1,
-                                context = "assignment_value"
-                        )
+                    StringCandidate(
+                        text = value,
+                        startIndex =
+                        match.range.first + match.groupValues[0].indexOf(value),
+                        endIndex =
+                        match.range.first +
+                            match.groupValues[0].indexOf(value) +
+                            value.length - 1,
+                        context = "assignment_value"
+                    )
                 )
             }
         }
@@ -345,22 +344,22 @@ class EntropyDetector : AbstractDetector() {
     private fun extractUrlParameters(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
         val urlParamRegex =
-                Regex("""[?&](token|key|auth|secret)=([a-zA-Z0-9+/=_-]{$minLength,$maxLength})""")
+            Regex("""[?&](token|key|auth|secret)=([a-zA-Z0-9+/=_-]{$minLength,$maxLength})""")
 
         urlParamRegex.findAll(content).forEach { match ->
             val value = match.groupValues[2]
             if (value.length in minLength..maxLength) {
                 candidates.add(
-                        StringCandidate(
-                                text = value,
-                                startIndex =
-                                        match.range.first + match.groupValues[0].indexOf(value),
-                                endIndex =
-                                        match.range.first +
-                                                match.groupValues[0].indexOf(value) +
-                                                value.length - 1,
-                                context = "url_parameter"
-                        )
+                    StringCandidate(
+                        text = value,
+                        startIndex =
+                        match.range.first + match.groupValues[0].indexOf(value),
+                        endIndex =
+                        match.range.first +
+                            match.groupValues[0].indexOf(value) +
+                            value.length - 1,
+                        context = "url_parameter"
+                    )
                 )
             }
         }
@@ -372,24 +371,24 @@ class EntropyDetector : AbstractDetector() {
     private fun extractJsonValues(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
         val jsonValueRegex =
-                Regex(
-                        """"(token|key|auth|secret|password)"\s*:\s*"([^"]{$minLength,$maxLength})""""
-                )
+            Regex(
+                """"(token|key|auth|secret|password)"\s*:\s*"([^"]{$minLength,$maxLength})""""
+            )
 
         jsonValueRegex.findAll(content).forEach { match ->
             val value = match.groupValues[2]
             if (value.length in minLength..maxLength) {
                 candidates.add(
-                        StringCandidate(
-                                text = value,
-                                startIndex =
-                                        match.range.first + match.groupValues[0].indexOf(value),
-                                endIndex =
-                                        match.range.first +
-                                                match.groupValues[0].indexOf(value) +
-                                                value.length - 1,
-                                context = "json_value"
-                        )
+                    StringCandidate(
+                        text = value,
+                        startIndex =
+                        match.range.first + match.groupValues[0].indexOf(value),
+                        endIndex =
+                        match.range.first +
+                            match.groupValues[0].indexOf(value) +
+                            value.length - 1,
+                        context = "json_value"
+                    )
                 )
             }
         }
@@ -406,12 +405,12 @@ class EntropyDetector : AbstractDetector() {
             val text = match.value
             if (text.length in minLength..maxLength && hasGoodEntropyIndicators(text)) {
                 candidates.add(
-                        StringCandidate(
-                                text = text,
-                                startIndex = match.range.first,
-                                endIndex = match.range.last,
-                                context = "alphanumeric_sequence"
-                        )
+                    StringCandidate(
+                        text = text,
+                        startIndex = match.range.first,
+                        endIndex = match.range.last,
+                        context = "alphanumeric_sequence"
+                    )
                 )
             }
         }
@@ -534,9 +533,9 @@ class EntropyDetector : AbstractDetector() {
 
     /** Data class for string candidates */
     private data class StringCandidate(
-            val text: String,
-            val startIndex: Int,
-            val endIndex: Int,
-            val context: String
+        val text: String,
+        val startIndex: Int,
+        val endIndex: Int,
+        val context: String
     )
 }
