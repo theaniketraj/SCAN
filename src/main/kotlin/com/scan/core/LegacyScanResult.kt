@@ -17,6 +17,8 @@ data class LegacyScanResult(
     val message: String
 ) {
     enum class Severity {
-        HIGH, MEDIUM, LOW
+        HIGH,
+        MEDIUM,
+        LOW
     }
 }
