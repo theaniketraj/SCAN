@@ -20,19 +20,19 @@ data class ScanContext(
 ) {
     /** Get the normalized file extension (lowercase, without dot) */
     fun getNormalizedExtension(): String = fileExtension.lowercase().removePrefix(".")
-    
+
     /** Check if this is a binary file based on content */
     fun isBinaryFile(): Boolean {
         if (content.isEmpty()) return false
         val nonPrintableCount = content.count { it.code < 32 && it !in "\t\n\r" }
         return nonPrintableCount.toDouble() / content.length > 0.3
     }
-    
+
     /** Get line at specific index (1-based) */
     fun getLine(lineNumber: Int): String? {
         return lines.getOrNull(lineNumber - 1)
     }
-    
+
     /** Get context around a specific line */
     fun getContextLines(lineNumber: Int, contextSize: Int = 2): List<String> {
         val startLine = maxOf(0, lineNumber - 1 - contextSize)
