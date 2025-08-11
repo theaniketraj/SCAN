@@ -428,8 +428,8 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         // File extension filter
         filters.add(
                 FileExtensionFilter(
-                        includeExtensions = configuration.includePatterns.toSet(),
-                        excludeExtensions = configuration.excludePatterns.toSet()
+                        includeExtensions = configuration.includedExtensions,
+                        excludeExtensions = configuration.excludedExtensions
                 )
         )
 
