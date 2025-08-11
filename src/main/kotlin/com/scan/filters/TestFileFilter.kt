@@ -1,7 +1,6 @@
 package com.scan.filters
 
 import com.scan.core.Finding
-import com.scan.core.ScanResult
 import java.io.File
 import java.util.regex.Pattern
 
@@ -14,17 +13,17 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
 
     /** Configuration for test file handling policies */
     data class TestFileConfig(
-            val policy: TestFilePolicy = TestFilePolicy.EXCLUDE_ALL,
-            val allowRealSecrets: Boolean = false,
-            val strictnessLevel: StrictnessLevel = StrictnessLevel.BALANCED,
-            val customTestPatterns: Set<Pattern> = emptySet(),
-            val customTestDirectories: Set<String> = emptySet(),
-            val customTestFileExtensions: Set<String> = emptySet(),
-            val excludeTestDataFiles: Boolean = true,
-            val excludeMockFiles: Boolean = true,
-            val excludeFixtureFiles: Boolean = true,
-            val treatIntegrationTestsAsProduction: Boolean = false,
-            val caseSensitive: Boolean = false
+        val policy: TestFilePolicy = TestFilePolicy.EXCLUDE_ALL,
+        val allowRealSecrets: Boolean = false,
+        val strictnessLevel: StrictnessLevel = StrictnessLevel.BALANCED,
+        val customTestPatterns: Set<Pattern> = emptySet(),
+        val customTestDirectories: Set<String> = emptySet(),
+        val customTestFileExtensions: Set<String> = emptySet(),
+        val excludeTestDataFiles: Boolean = true,
+        val excludeMockFiles: Boolean = true,
+        val excludeFixtureFiles: Boolean = true,
+        val treatIntegrationTestsAsProduction: Boolean = false,
+        val caseSensitive: Boolean = false
     ) {
         companion object {
             fun builder() = TestFileConfigBuilder()
@@ -85,19 +84,19 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         }
 
         fun build() =
-                TestFileConfig(
-                        policy = policy,
-                        allowRealSecrets = allowRealSecrets,
-                        strictnessLevel = strictnessLevel,
-                        customTestPatterns = customTestPatterns.toSet(),
-                        customTestDirectories = customTestDirectories.toSet(),
-                        customTestFileExtensions = customTestFileExtensions.toSet(),
-                        excludeTestDataFiles = excludeTestDataFiles,
-                        excludeMockFiles = excludeMockFiles,
-                        excludeFixtureFiles = excludeFixtureFiles,
-                        treatIntegrationTestsAsProduction = treatIntegrationTestsAsProduction,
-                        caseSensitive = caseSensitive
-                )
+            TestFileConfig(
+                policy = policy,
+                allowRealSecrets = allowRealSecrets,
+                strictnessLevel = strictnessLevel,
+                customTestPatterns = customTestPatterns.toSet(),
+                customTestDirectories = customTestDirectories.toSet(),
+                customTestFileExtensions = customTestFileExtensions.toSet(),
+                excludeTestDataFiles = excludeTestDataFiles,
+                excludeMockFiles = excludeMockFiles,
+                excludeFixtureFiles = excludeFixtureFiles,
+                treatIntegrationTestsAsProduction = treatIntegrationTestsAsProduction,
+                caseSensitive = caseSensitive
+            )
     }
 
     override fun shouldIncludeFile(file: File, relativePath: String): Boolean {
@@ -166,11 +165,11 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
     private fun isTestFile(file: File): Boolean {
         val fileName = if (config.caseSensitive) file.name else file.name.lowercase()
         val filePath =
-                if (config.caseSensitive) {
-                    file.absolutePath.replace("\\", "/")
-                } else {
-                    file.absolutePath.replace("\\", "/").lowercase()
-                }
+            if (config.caseSensitive) {
+                file.absolutePath.replace("\\", "/")
+            } else {
+                file.absolutePath.replace("\\", "/").lowercase()
+            }
 
         // Check custom patterns first
         if (matchesCustomTestPatterns(filePath)) {
@@ -191,32 +190,32 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
     private fun isTestFileStrict(fileName: String, filePath: String): Boolean {
         val testDirs = setOf("test", "tests") + config.customTestDirectories
         val testExtensions =
-                setOf("test.kt", "test.java", "spec.kt", "spec.java") +
-                        config.customTestFileExtensions.map { "$it.test" }.toSet() +
-                        config.customTestFileExtensions.map { "$it.spec" }.toSet()
+            setOf("test.kt", "test.java", "spec.kt", "spec.java") +
+                config.customTestFileExtensions.map { "$it.test" }.toSet() +
+                config.customTestFileExtensions.map { "$it.spec" }.toSet()
 
         return testDirs.any { dir -> filePath.contains("/$dir/") } ||
-                testExtensions.any { ext -> fileName.endsWith(ext) } ||
-                fileName.matches(Regex(".*Test\\.(kt|java|js|ts|py|rb|go|rs|scala)$")) ||
-                fileName.matches(Regex(".*Spec\\.(kt|java|js|ts|py|rb|go|rs|scala)$"))
+            testExtensions.any { ext -> fileName.endsWith(ext) } ||
+            fileName.matches(Regex(".*Test\\.(kt|java|js|ts|py|rb|go|rs|scala)$")) ||
+            fileName.matches(Regex(".*Spec\\.(kt|java|js|ts|py|rb|go|rs|scala)$"))
     }
 
     private fun isTestFileBalanced(fileName: String, filePath: String): Boolean {
         if (isTestFileStrict(fileName, filePath)) return true
 
         val testDirs =
-                setOf(
-                        "test",
-                        "tests",
-                        "spec",
-                        "specs",
-                        "__tests__",
-                        "__test__",
-                        "testing",
-                        "unittest",
-                        "unit-test",
-                        "integration-test"
-                ) + config.customTestDirectories
+            setOf(
+                "test",
+                "tests",
+                "spec",
+                "specs",
+                "__tests__",
+                "__test__",
+                "testing",
+                "unittest",
+                "unit-test",
+                "integration-test"
+            ) + config.customTestDirectories
 
         val testPatterns = listOf("test", "spec", "mock", "fixture", "stub", "fake")
 
@@ -227,27 +226,27 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
 
         // Check file name patterns
         if (testPatterns.any { pattern ->
-                    fileName.contains(pattern) ||
-                            fileName.startsWith("${pattern}_") ||
-                            fileName.endsWith("_$pattern")
-                }
+                fileName.contains(pattern) ||
+                    fileName.startsWith("${pattern}_") ||
+                    fileName.endsWith("_$pattern")
+            }
         ) {
             return true
         }
 
         // Check for test-specific file extensions
         val testExtensions =
-                config.customTestFileExtensions +
-                        setOf(
-                                "test.js",
-                                "test.ts",
-                                "spec.js",
-                                "spec.ts",
-                                "test.py",
-                                "spec.py",
-                                "test.rb",
-                                "spec.rb"
-                        )
+            config.customTestFileExtensions +
+                setOf(
+                    "test.js",
+                    "test.ts",
+                    "spec.js",
+                    "spec.ts",
+                    "test.py",
+                    "spec.py",
+                    "test.rb",
+                    "spec.rb"
+                )
 
         return testExtensions.any { ext -> fileName.endsWith(ext) }
     }
@@ -256,18 +255,18 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         if (isTestFileBalanced(fileName, filePath)) return true
 
         val loosePatterns =
-                listOf(
-                        "example",
-                        "sample",
-                        "demo",
-                        "playground",
-                        "sandbox",
-                        "dummy",
-                        "temp",
-                        "tmp",
-                        "dev",
-                        "debug"
-                )
+            listOf(
+                "example",
+                "sample",
+                "demo",
+                "playground",
+                "sandbox",
+                "dummy",
+                "temp",
+                "tmp",
+                "dev",
+                "debug"
+            )
 
         return loosePatterns.any { pattern ->
             fileName.contains(pattern) || filePath.contains("/$pattern/")
@@ -276,101 +275,101 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
 
     private fun isIntegrationTest(file: File): Boolean {
         val filePath =
-                if (config.caseSensitive) {
-                    file.absolutePath.replace("\\", "/")
-                } else {
-                    file.absolutePath.replace("\\", "/").lowercase()
-                }
+            if (config.caseSensitive) {
+                file.absolutePath.replace("\\", "/")
+            } else {
+                file.absolutePath.replace("\\", "/").lowercase()
+            }
 
         val integrationPatterns =
-                listOf(
-                        "integration",
-                        "integration-test",
-                        "integrationtest",
-                        "e2e",
-                        "end-to-end",
-                        "endtoend",
-                        "system-test",
-                        "systemtest"
-                )
+            listOf(
+                "integration",
+                "integration-test",
+                "integrationtest",
+                "e2e",
+                "end-to-end",
+                "endtoend",
+                "system-test",
+                "systemtest"
+            )
 
         return integrationPatterns.any { pattern ->
             filePath.contains("/$pattern/") ||
-                    file.name.contains(pattern, ignoreCase = !config.caseSensitive)
+                file.name.contains(pattern, ignoreCase = !config.caseSensitive)
         }
     }
 
     private fun isTestDataFile(file: File): Boolean {
         val fileName = if (config.caseSensitive) file.name else file.name.lowercase()
         val filePath =
-                if (config.caseSensitive) {
-                    file.absolutePath.replace("\\", "/")
-                } else {
-                    file.absolutePath.replace("\\", "/").lowercase()
-                }
+            if (config.caseSensitive) {
+                file.absolutePath.replace("\\", "/")
+            } else {
+                file.absolutePath.replace("\\", "/").lowercase()
+            }
 
         val testDataPatterns =
-                listOf("testdata", "test-data", "test_data", "data", "resources", "assets")
+            listOf("testdata", "test-data", "test_data", "data", "resources", "assets")
 
         return testDataPatterns.any { pattern ->
             fileName.contains(pattern) || filePath.contains("/$pattern/")
         } ||
-                file.extension.let { ext ->
-                    listOf("json", "xml", "yaml", "yml", "csv", "txt", "properties")
-                            .contains(if (config.caseSensitive) ext else ext.lowercase())
-                }
+            file.extension.let { ext ->
+                listOf("json", "xml", "yaml", "yml", "csv", "txt", "properties")
+                    .contains(if (config.caseSensitive) ext else ext.lowercase())
+            }
     }
 
     private fun isMockFile(file: File): Boolean {
         val fileName = if (config.caseSensitive) file.name else file.name.lowercase()
         val filePath =
-                if (config.caseSensitive) {
-                    file.absolutePath.replace("\\", "/")
-                } else {
-                    file.absolutePath.replace("\\", "/").lowercase()
-                }
+            if (config.caseSensitive) {
+                file.absolutePath.replace("\\", "/")
+            } else {
+                file.absolutePath.replace("\\", "/").lowercase()
+            }
 
         val mockPatterns =
-                listOf(
-                        "mock",
-                        "mocks",
-                        "__mocks__",
-                        "stub",
-                        "stubs",
-                        "fake",
-                        "fakes",
-                        "double",
-                        "doubles"
-                )
+            listOf(
+                "mock",
+                "mocks",
+                "__mocks__",
+                "stub",
+                "stubs",
+                "fake",
+                "fakes",
+                "double",
+                "doubles"
+            )
 
         return mockPatterns.any { pattern ->
             fileName.contains(pattern) ||
-                    filePath.contains("/$pattern/") ||
-                    fileName.startsWith("${pattern}_") ||
-                    fileName.endsWith("_$pattern")
+                filePath.contains("/$pattern/") ||
+                fileName.startsWith("${pattern}_") ||
+                fileName.endsWith("_$pattern")
         }
     }
 
     private fun isFixtureFile(file: File): Boolean {
         val fileName = if (config.caseSensitive) file.name else file.name.lowercase()
         val filePath =
-                if (config.caseSensitive) {
-                    file.absolutePath.replace("\\", "/")
-                } else {
-                    file.absolutePath.replace("\\", "/").lowercase()
-                }
+            if (config.caseSensitive) {
+                file.absolutePath.replace("\\", "/")
+            } else {
+                file.absolutePath.replace("\\", "/").lowercase()
+            }
 
         val fixturePatterns =
-                listOf(
-                        "fixture",
-                        "fixtures",
-                        "factory",
-                        "factories",
-                        "builder",
-                        "builders",
-                        "generator",
-                        "generators"
-                )
+            listOf(
+                "fixture",
+                "fixtures",
+                "factory",
+                "factories",
+                "builder",
+                "builders",
+                "generator",
+                "generators"
+            )
 
         return fixturePatterns.any { pattern ->
             fileName.contains(pattern) || filePath.contains("/$pattern/")
@@ -385,8 +384,8 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         val productionIndicators = listOf("prod", "production", "live", "staging", "stage")
 
         if (productionIndicators.any { indicator ->
-                    lineContent.contains(indicator, ignoreCase = true)
-                }
+                lineContent.contains(indicator, ignoreCase = true)
+            }
         ) {
             return true
         }
@@ -403,32 +402,32 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
 
     private fun isObviousTestSecret(finding: Finding): Boolean {
         val secretValue =
-                if (config.caseSensitive) finding.secretInfo.detectedValue else finding.secretInfo.detectedValue.lowercase()
+            if (config.caseSensitive) finding.secretInfo.detectedValue else finding.secretInfo.detectedValue.lowercase()
         val lineContent =
-                if (config.caseSensitive) finding.location.lineContent else finding.location.lineContent.lowercase()
+            if (config.caseSensitive) finding.location.lineContent else finding.location.lineContent.lowercase()
 
         val testIndicators =
-                listOf(
-                        "test",
-                        "example",
-                        "sample",
-                        "demo",
-                        "mock",
-                        "fake",
-                        "dummy",
-                        "placeholder",
-                        "xxx",
-                        "yyy",
-                        "zzz",
-                        "abc",
-                        "123",
-                        "password",
-                        "secret",
-                        "key",
-                        "token",
-                        "lorem",
-                        "ipsum"
-                )
+            listOf(
+                "test",
+                "example",
+                "sample",
+                "demo",
+                "mock",
+                "fake",
+                "dummy",
+                "placeholder",
+                "xxx",
+                "yyy",
+                "zzz",
+                "abc",
+                "123",
+                "password",
+                "secret",
+                "key",
+                "token",
+                "lorem",
+                "ipsum"
+            )
 
         return testIndicators.any { indicator ->
             secretValue.contains(indicator) || lineContent.contains(indicator)
@@ -440,27 +439,27 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
 
         // Common test data patterns
         val testPatterns =
-                listOf(
-                        "test",
-                        "example",
-                        "sample",
-                        "demo",
-                        "mock",
-                        "fake",
-                        "dummy",
-                        "abc",
-                        "xyz",
-                        "foo",
-                        "bar",
-                        "baz",
-                        "qux",
-                        "lorem",
-                        "ipsum"
-                )
+            listOf(
+                "test",
+                "example",
+                "sample",
+                "demo",
+                "mock",
+                "fake",
+                "dummy",
+                "abc",
+                "xyz",
+                "foo",
+                "bar",
+                "baz",
+                "qux",
+                "lorem",
+                "ipsum"
+            )
 
         return testPatterns.any { pattern -> lowerValue.contains(pattern) } ||
-                isRepeatingPattern(value) ||
-                isSequentialPattern(value)
+            isRepeatingPattern(value) ||
+            isSequentialPattern(value)
     }
 
     private fun hasRealSecretCharacteristics(value: String): Boolean {
@@ -485,10 +484,10 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
     private fun isSimpleTestPattern(value: String): Boolean {
         // Patterns like "123456", "abcdef", "password123", etc.
         return value.matches(Regex("^[0-9]+$")) ||
-                value.matches(Regex("^[a-zA-Z]+$")) ||
-                value.matches(Regex("^[a-zA-Z]+[0-9]+$")) ||
-                value.matches(Regex("^[0-9]+[a-zA-Z]+$")) ||
-                value.length < 6
+            value.matches(Regex("^[a-zA-Z]+$")) ||
+            value.matches(Regex("^[a-zA-Z]+[0-9]+$")) ||
+            value.matches(Regex("^[0-9]+[a-zA-Z]+$")) ||
+            value.length < 6
     }
 
     private fun isRepeatingPattern(value: String): Boolean {
@@ -533,47 +532,47 @@ class TestFileFilter(private val config: TestFileConfig = TestFileConfig()) : Fi
         /** Create filter that excludes all test files */
         fun createExcludeAll(): TestFileFilter {
             return TestFileFilter(
-                    TestFileConfig.builder()
-                            .policy(TestFilePolicy.EXCLUDE_ALL)
-                            .strictnessLevel(StrictnessLevel.BALANCED)
-                            .build()
+                TestFileConfig.builder()
+                    .policy(TestFilePolicy.EXCLUDE_ALL)
+                    .strictnessLevel(StrictnessLevel.BALANCED)
+                    .build()
             )
         }
 
         /** Create filter for development environments with relaxed test scanning */
         fun createDevelopment(): TestFileFilter {
             return TestFileFilter(
-                    TestFileConfig.builder()
-                            .policy(TestFilePolicy.RELAXED_SCANNING)
-                            .allowRealSecrets(false)
-                            .strictnessLevel(StrictnessLevel.BALANCED)
-                            .excludeTestDataFiles(true)
-                            .excludeMockFiles(true)
-                            .excludeFixtureFiles(true)
-                            .build()
+                TestFileConfig.builder()
+                    .policy(TestFilePolicy.RELAXED_SCANNING)
+                    .allowRealSecrets(false)
+                    .strictnessLevel(StrictnessLevel.BALANCED)
+                    .excludeTestDataFiles(true)
+                    .excludeMockFiles(true)
+                    .excludeFixtureFiles(true)
+                    .build()
             )
         }
 
         /** Create filter for CI/CD environments */
         fun createCICD(): TestFileFilter {
             return TestFileFilter(
-                    TestFileConfig.builder()
-                            .policy(TestFilePolicy.INTEGRATION_ONLY)
-                            .allowRealSecrets(true)
-                            .strictnessLevel(StrictnessLevel.STRICT)
-                            .treatIntegrationTestsAsProduction(true)
-                            .build()
+                TestFileConfig.builder()
+                    .policy(TestFilePolicy.INTEGRATION_ONLY)
+                    .allowRealSecrets(true)
+                    .strictnessLevel(StrictnessLevel.STRICT)
+                    .treatIntegrationTestsAsProduction(true)
+                    .build()
             )
         }
 
         /** Create permissive filter that scans all files */
         fun createPermissive(): TestFileFilter {
             return TestFileFilter(
-                    TestFileConfig.builder()
-                            .policy(TestFilePolicy.INCLUDE_ALL)
-                            .allowRealSecrets(true)
-                            .strictnessLevel(StrictnessLevel.LOOSE)
-                            .build()
+                TestFileConfig.builder()
+                    .policy(TestFilePolicy.INCLUDE_ALL)
+                    .allowRealSecrets(true)
+                    .strictnessLevel(StrictnessLevel.LOOSE)
+                    .build()
             )
         }
     }
