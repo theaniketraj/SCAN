@@ -38,9 +38,9 @@ data class Finding(
         return when {
             secret.length <= 4 -> "*".repeat(secret.length)
             secret.length <= 8 ->
-                    "${secret.take(2)}${"*".repeat(secret.length - 4)}${secret.takeLast(2)}"
+                "${secret.take(2)}${"*".repeat(secret.length - 4)}${secret.takeLast(2)}"
             else ->
-                    "${secret.take(3)}${"*".repeat(secret.length - 6)}${secret.takeLast(3)}"
+                "${secret.take(3)}${"*".repeat(secret.length - 6)}${secret.takeLast(3)}"
         }
     }
 
@@ -50,14 +50,14 @@ data class Finding(
         Confidence.MEDIUM -> 65
         Confidence.LOW -> 40
     }
-    
+
     /** Check if this finding is the same as another (for baseline comparison) */
     fun isSameAs(other: Finding): Boolean {
         return this.location.filePath == other.location.filePath &&
-               this.location.lineNumber == other.location.lineNumber &&
-               this.location.columnStart == other.location.columnStart &&
-               this.secretInfo.detectedValue == other.secretInfo.detectedValue &&
-               this.detectorType == other.detectorType
+            this.location.lineNumber == other.location.lineNumber &&
+            this.location.columnStart == other.location.columnStart &&
+            this.secretInfo.detectedValue == other.secretInfo.detectedValue &&
+            this.detectorType == other.detectorType
     }
 }
 
@@ -74,13 +74,13 @@ data class FindingLocation(
 ) {
     /** Get position as a readable string */
     fun getPositionString(): String = "$filePath:$lineNumber:$columnStart"
-    
+
     /** Check if this location contains another location */
     fun contains(other: FindingLocation): Boolean {
         return filePath == other.filePath &&
-               lineNumber == other.lineNumber &&
-               columnStart <= other.columnStart &&
-               columnEnd >= other.columnEnd
+            lineNumber == other.lineNumber &&
+            columnStart <= other.columnStart &&
+            columnEnd >= other.columnEnd
     }
 }
 
@@ -97,7 +97,7 @@ data class SecretInfo(
 ) {
     /** Check if secret appears to be valid/active */
     fun isLikelyValid(): Boolean = validationStatus == ValidationStatus.VALID
-    
+
     /** Get entropy category */
     fun getEntropyCategory(): String = when {
         entropy >= 4.5 -> "High"
