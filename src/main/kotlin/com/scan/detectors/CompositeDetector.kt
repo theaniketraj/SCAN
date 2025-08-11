@@ -1,10 +1,10 @@
 package com.scan.detectors
 
 import com.scan.core.*
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
-import kotlinx.coroutines.*
 
 /**
  * Composite detector that combines multiple detection strategies to provide comprehensive secret
@@ -19,14 +19,14 @@ import kotlinx.coroutines.*
  * - Detailed reporting of detection sources
  */
 class CompositeDetector(
-        private val detectors: List<DetectorConfig> = emptyList(),
-        private val executionMode: ExecutionMode = ExecutionMode.PARALLEL,
-        private val mergingStrategy: MergingStrategy = MergingStrategy.WEIGHTED_AVERAGE,
-        private val deduplicationStrategy: DeduplicationStrategy =
-                DeduplicationStrategy.POSITION_AND_CONTENT,
-        private val enableCaching: Boolean = true,
-        private val maxCacheSize: Int = 1000,
-        private val timeoutMillis: Long = 30000
+    private val detectors: List<DetectorConfig> = emptyList(),
+    private val executionMode: ExecutionMode = ExecutionMode.PARALLEL,
+    private val mergingStrategy: MergingStrategy = MergingStrategy.WEIGHTED_AVERAGE,
+    private val deduplicationStrategy: DeduplicationStrategy =
+        DeduplicationStrategy.POSITION_AND_CONTENT,
+    private val enableCaching: Boolean = true,
+    private val maxCacheSize: Int = 1000,
+    private val timeoutMillis: Long = 30000
 ) : AbstractDetector() {
 
     override val detectorId: String = "composite"
@@ -35,91 +35,91 @@ class CompositeDetector(
     override val supportedFileTypes: Set<String> = emptySet() // supports all file types
 
     private val resultCache =
-            if (enableCaching) ConcurrentHashMap<String, List<Finding>>() else null
+        if (enableCaching) ConcurrentHashMap<String, List<Finding>>() else null
     private val detectorInstances = detectors.map { it.detector }
 
     companion object {
         /** Creates a default composite detector with commonly used detection strategies */
         fun createDefault(
-                patternDetector: PatternDetector,
-                entropyDetector: EntropyDetector,
-                contextAwareDetector: ContextAwareDetector
+            patternDetector: PatternDetector,
+            entropyDetector: EntropyDetector,
+            contextAwareDetector: ContextAwareDetector
         ): CompositeDetector {
             return CompositeDetector(
-                    detectors =
-                            listOf(
-                                    DetectorConfig(
-                                            patternDetector,
-                                            weight = 1.0,
-                                            priority = DetectorPriority.HIGH
-                                    ),
-                                    DetectorConfig(
-                                            entropyDetector,
-                                            weight = 0.8,
-                                            priority = DetectorPriority.MEDIUM
-                                    ),
-                                    DetectorConfig(
-                                            contextAwareDetector,
-                                            weight = 1.2,
-                                            priority = DetectorPriority.HIGH
-                                    )
-                            ),
-                    mergingStrategy = MergingStrategy.WEIGHTED_AVERAGE,
-                    deduplicationStrategy = DeduplicationStrategy.SMART_MERGE
+                detectors =
+                listOf(
+                    DetectorConfig(
+                        patternDetector,
+                        weight = 1.0,
+                        priority = DetectorPriority.HIGH
+                    ),
+                    DetectorConfig(
+                        entropyDetector,
+                        weight = 0.8,
+                        priority = DetectorPriority.MEDIUM
+                    ),
+                    DetectorConfig(
+                        contextAwareDetector,
+                        weight = 1.2,
+                        priority = DetectorPriority.HIGH
+                    )
+                ),
+                mergingStrategy = MergingStrategy.WEIGHTED_AVERAGE,
+                deduplicationStrategy = DeduplicationStrategy.SMART_MERGE
             )
         }
 
         /** Creates a high-precision composite detector focused on reducing false positives */
         fun createHighPrecision(
-                contextAwareDetector: ContextAwareDetector,
-                patternDetector: PatternDetector
+            contextAwareDetector: ContextAwareDetector,
+            patternDetector: PatternDetector
         ): CompositeDetector {
             return CompositeDetector(
-                    detectors =
-                            listOf(
-                                    DetectorConfig(
-                                            contextAwareDetector,
-                                            weight = 1.5,
-                                            priority = DetectorPriority.HIGH
-                                    ),
-                                    DetectorConfig(
-                                            patternDetector,
-                                            weight = 1.0,
-                                            priority = DetectorPriority.MEDIUM
-                                    )
-                            ),
-                    mergingStrategy = MergingStrategy.CONSERVATIVE,
-                    deduplicationStrategy = DeduplicationStrategy.SMART_MERGE
+                detectors =
+                listOf(
+                    DetectorConfig(
+                        contextAwareDetector,
+                        weight = 1.5,
+                        priority = DetectorPriority.HIGH
+                    ),
+                    DetectorConfig(
+                        patternDetector,
+                        weight = 1.0,
+                        priority = DetectorPriority.MEDIUM
+                    )
+                ),
+                mergingStrategy = MergingStrategy.CONSERVATIVE,
+                deduplicationStrategy = DeduplicationStrategy.SMART_MERGE
             )
         }
 
         /** Creates a high-recall composite detector focused on finding all potential secrets */
         fun createHighRecall(
-                patternDetector: PatternDetector,
-                entropyDetector: EntropyDetector,
-                contextAwareDetector: ContextAwareDetector
+            patternDetector: PatternDetector,
+            entropyDetector: EntropyDetector,
+            contextAwareDetector: ContextAwareDetector
         ): CompositeDetector {
             return CompositeDetector(
-                    detectors =
-                            listOf(
-                                    DetectorConfig(
-                                            patternDetector,
-                                            weight = 1.0,
-                                            priority = DetectorPriority.HIGH
-                                    ),
-                                    DetectorConfig(
-                                            entropyDetector,
-                                            weight = 1.0,
-                                            priority = DetectorPriority.HIGH
-                                    ),
-                                    DetectorConfig(
-                                            contextAwareDetector,
-                                            weight = 0.8,
-                                            priority = DetectorPriority.MEDIUM
-                                    )
-                            ),
-                    mergingStrategy = MergingStrategy.OPTIMISTIC,
-                    deduplicationStrategy = DeduplicationStrategy.POSITION_BASED
+                detectors =
+                listOf(
+                    DetectorConfig(
+                        patternDetector,
+                        weight = 1.0,
+                        priority = DetectorPriority.HIGH
+                    ),
+                    DetectorConfig(
+                        entropyDetector,
+                        weight = 1.0,
+                        priority = DetectorPriority.HIGH
+                    ),
+                    DetectorConfig(
+                        contextAwareDetector,
+                        weight = 0.8,
+                        priority = DetectorPriority.MEDIUM
+                    )
+                ),
+                mergingStrategy = MergingStrategy.OPTIMISTIC,
+                deduplicationStrategy = DeduplicationStrategy.POSITION_BASED
             )
         }
     }
@@ -136,12 +136,12 @@ class CompositeDetector(
         }
 
         val results =
-                when (executionMode) {
-                    ExecutionMode.SEQUENTIAL -> executeSequential(context)
-                    ExecutionMode.PARALLEL -> executeParallel(context)
-                    ExecutionMode.FAIL_FAST -> executeFailFast(context)
-                    ExecutionMode.PRIORITY_BASED -> executePriorityBased(context)
-                }
+            when (executionMode) {
+                ExecutionMode.SEQUENTIAL -> executeSequential(context)
+                ExecutionMode.PARALLEL -> executeParallel(context)
+                ExecutionMode.FAIL_FAST -> executeFailFast(context)
+                ExecutionMode.PRIORITY_BASED -> executePriorityBased(context)
+            }
 
         val mergedResults = mergeResults(results, context.filePath.toFile())
         val deduplicatedResults = deduplicateResults(mergedResults)
@@ -178,26 +178,26 @@ class CompositeDetector(
     private fun executeParallel(context: ScanContext): List<DetectorResult> {
         return runBlocking {
             val deferredResults =
-                    detectors.map { config ->
-                        async(Dispatchers.Default) {
-                            try {
-                                withTimeout(timeoutMillis) {
-                                    val findings = config.detector.detect(context)
-                                    DetectorResult(config, findings, null)
-                                }
-                            } catch (e: TimeoutCancellationException) {
-                                DetectorResult(
-                                        config,
-                                        emptyList(),
-                                        Exception(
-                                                "Detector timed out: ${config.detector::class.simpleName}"
-                                        )
-                                )
-                            } catch (e: Exception) {
-                                DetectorResult(config, emptyList(), e)
+                detectors.map { config ->
+                    async(Dispatchers.Default) {
+                        try {
+                            withTimeout(timeoutMillis) {
+                                val findings = config.detector.detect(context)
+                                DetectorResult(config, findings, null)
                             }
+                        } catch (e: TimeoutCancellationException) {
+                            DetectorResult(
+                                config,
+                                emptyList(),
+                                Exception(
+                                    "Detector timed out: ${config.detector::class.simpleName}"
+                                )
+                            )
+                        } catch (e: Exception) {
+                            DetectorResult(config, emptyList(), e)
                         }
                     }
+                }
 
             deferredResults.awaitAll()
         }
@@ -236,26 +236,26 @@ class CompositeDetector(
             detectorsByPriority[priority]?.let { priorityDetectors ->
                 val priorityResults = runBlocking {
                     priorityDetectors
-                            .map { config ->
-                                async(Dispatchers.Default) {
-                                    try {
-                                        val findings = config.detector.detect(context)
-                                        DetectorResult(config, findings, null)
-                                    } catch (e: Exception) {
-                                        DetectorResult(config, emptyList(), e)
-                                    }
+                        .map { config ->
+                            async(Dispatchers.Default) {
+                                try {
+                                    val findings = config.detector.detect(context)
+                                    DetectorResult(config, findings, null)
+                                } catch (e: Exception) {
+                                    DetectorResult(config, emptyList(), e)
                                 }
                             }
-                            .awaitAll()
+                        }
+                        .awaitAll()
                 }
                 results.addAll(priorityResults)
 
                 // If high priority detectors found significant results, we might skip lower
                 // priority ones
                 if (priority == DetectorPriority.HIGH &&
-                                priorityResults.any {
-                                    it.findings.any { finding -> finding.confidence.value > 0.7 }
-                                }
+                    priorityResults.any {
+                        it.findings.any { finding -> finding.confidence.value > 0.7 }
+                    }
                 ) {
                     // Continue with lower priority but with reduced timeout
                     // This is a simple heuristic - can be made more sophisticated
@@ -283,17 +283,17 @@ class CompositeDetector(
 
     private fun mergeWithWeightedAverage(results: List<DetectorResult>): List<Finding> {
         val findingGroups =
-                groupSimilarFindings(
-                        results.flatMap { result ->
-                            result.findings.map { finding ->
-                                WeightedFinding(
-                                        finding,
-                                        result.config.weight,
-                                        result.config.detector::class.simpleName ?: "Unknown"
-                                )
-                            }
-                        }
-                )
+            groupSimilarFindings(
+                results.flatMap { result ->
+                    result.findings.map { finding ->
+                        WeightedFinding(
+                            finding,
+                            result.config.weight,
+                            result.config.detector::class.simpleName ?: "Unknown"
+                        )
+                    }
+                }
+            )
 
         return findingGroups.map { group ->
             val baseFinding = group.first().finding
@@ -302,9 +302,9 @@ class CompositeDetector(
             val detectorSources = group.map { it.detectorName }.distinct()
 
             baseFinding.copy(
-                    confidence = Confidence.fromValue(weightedConfidence),
-                    context = buildMergedContext(baseFinding.context, detectorSources),
-                    description = enhanceMessageWithSources(baseFinding.description, detectorSources)
+                confidence = Confidence.fromValue(weightedConfidence),
+                context = buildMergedContext(baseFinding.context, detectorSources),
+                description = enhanceMessageWithSources(baseFinding.description, detectorSources)
             )
         }
     }
@@ -321,9 +321,9 @@ class CompositeDetector(
                     // Multiple detectors found this - increase confidence
                     val avgConfidence = group.map { it.finding.confidence.value }.average()
                     baseFinding.copy(
-                            confidence = Confidence.fromValue(min(1.0, avgConfidence * 1.2)),
-                            description =
-                                    "${baseFinding.description} (confirmed by ${group.size} detectors)"
+                        confidence = Confidence.fromValue(min(1.0, avgConfidence * 1.2)),
+                        description =
+                        "${baseFinding.description} (confirmed by ${group.size} detectors)"
                     )
                 }
                 baseFinding.confidence.value > 0.8 -> baseFinding
@@ -341,10 +341,10 @@ class CompositeDetector(
             val maxConfidence = group.maxOf { it.finding.confidence }
 
             baseFinding.copy(
-                    confidence = maxConfidence,
-                    severity = group.maxOf { it.finding.severity },
-                    description =
-                            "${baseFinding.description} (detected by ${group.size} detector${if (group.size > 1) "s" else ""})"
+                confidence = maxConfidence,
+                severity = group.maxOf { it.finding.severity },
+                description =
+                "${baseFinding.description} (detected by ${group.size} detector${if (group.size > 1) "s" else ""})"
             )
         }
     }
@@ -360,38 +360,38 @@ class CompositeDetector(
     }
 
     private fun deduplicateExactMatches(
-            findings: List<Finding>
+        findings: List<Finding>
     ): List<Finding> {
         return findings.distinctBy { Triple(it.location.filePath, it.location.lineNumber, it.description) }
     }
 
     private fun deduplicateByPosition(
-            findings: List<Finding>
+        findings: List<Finding>
     ): List<Finding> {
         return findings
-                .groupBy { Triple(it.location.filePath, it.location.lineNumber, it.location.columnStart) }
-                .map { (_, group) ->
-                    // Keep the finding with highest confidence
-                    group.maxByOrNull { it.confidence } ?: group.first()
-                }
+            .groupBy { Triple(it.location.filePath, it.location.lineNumber, it.location.columnStart) }
+            .map { (_, group) ->
+                // Keep the finding with highest confidence
+                group.maxByOrNull { it.confidence } ?: group.first()
+            }
     }
 
     private fun deduplicateByPositionAndContent(
-            findings: List<Finding>
+        findings: List<Finding>
     ): List<Finding> {
         return findings
-                .groupBy { finding ->
-                    QuadTuple(
-                            finding.location.filePath,
-                            finding.location.lineNumber,
-                            finding.location.columnStart,
-                            extractSecretValue(finding)
-                    )
-                }
-                .map { (_, group) ->
-                    // Merge findings for the same secret
-                    mergeIdenticalFindings(group)
-                }
+            .groupBy { finding ->
+                QuadTuple(
+                    finding.location.filePath,
+                    finding.location.lineNumber,
+                    finding.location.columnStart,
+                    extractSecretValue(finding)
+                )
+            }
+            .map { (_, group) ->
+                // Merge findings for the same secret
+                mergeIdenticalFindings(group)
+            }
     }
 
     private fun smartMergeFindings(findings: List<Finding>): List<Finding> {
@@ -399,9 +399,9 @@ class CompositeDetector(
 
         findings.forEach { finding ->
             val existingGroup =
-                    groups.find { group ->
-                        group.any { existing -> areSimilarFindings(existing, finding) }
-                    }
+                groups.find { group ->
+                    group.any { existing -> areSimilarFindings(existing, finding) }
+                }
 
             if (existingGroup != null) {
                 existingGroup.add(finding)
@@ -420,17 +420,17 @@ class CompositeDetector(
     }
 
     private fun groupSimilarFindings(
-            weightedFindings: List<WeightedFinding>
+        weightedFindings: List<WeightedFinding>
     ): List<List<WeightedFinding>> {
         val groups = mutableListOf<MutableList<WeightedFinding>>()
 
         weightedFindings.forEach { weightedFinding ->
             val existingGroup =
-                    groups.find { group ->
-                        group.any { existing ->
-                            areSimilarFindings(existing.finding, weightedFinding.finding)
-                        }
+                groups.find { group ->
+                    group.any { existing ->
+                        areSimilarFindings(existing.finding, weightedFinding.finding)
                     }
+                }
 
             if (existingGroup != null) {
                 existingGroup.add(weightedFinding)
@@ -443,20 +443,19 @@ class CompositeDetector(
     }
 
     private fun areSimilarFindings(
-            finding1: Finding,
-            finding2: Finding
+        finding1: Finding,
+        finding2: Finding
     ): Boolean {
         // Same file and line
         if (finding1.location.filePath == finding2.location.filePath &&
-                        finding1.location.lineNumber == finding2.location.lineNumber
+            finding1.location.lineNumber == finding2.location.lineNumber
         ) {
-
             // Check if positions overlap or are very close
             val pos1Range = finding1.location.columnStart..finding1.location.columnEnd
             val pos2Range = finding2.location.columnStart..finding2.location.columnEnd
 
             return pos1Range.intersect(pos2Range).isNotEmpty() ||
-                    kotlin.math.abs(finding1.location.columnStart - finding2.location.columnStart) <= 3
+                kotlin.math.abs(finding1.location.columnStart - finding2.location.columnStart) <= 3
         }
 
         return false
@@ -471,48 +470,48 @@ class CompositeDetector(
         val allRuleIds = findings.map { it.detectorType }.distinct()
 
         return baseFinding.copy(
-                confidence = maxConfidence,
-                severity = maxSeverity,
-                description = "${baseFinding.description} (merged from ${findings.size} detections)"
+            confidence = maxConfidence,
+            severity = maxSeverity,
+            description = "${baseFinding.description} (merged from ${findings.size} detections)"
         )
     }
 
     private fun postProcessResults(
-            findings: List<Finding>,
-            file: File,
-            content: String
+        findings: List<Finding>,
+        file: File,
+        content: String
     ): List<Finding> {
         return findings
-                .filter { it.confidence.value > 0.1 } // Remove very low confidence findings
-                .sortedWith(
-                        compareByDescending<Finding> { it.severity }
-                                .thenByDescending { it.confidence }
-                                .thenBy { it.location.lineNumber }
-                )
-                .map { enhanceFindingWithMetadata(it, file, content) }
+            .filter { it.confidence.value > 0.1 } // Remove very low confidence findings
+            .sortedWith(
+                compareByDescending<Finding> { it.severity }
+                    .thenByDescending { it.confidence }
+                    .thenBy { it.location.lineNumber }
+            )
+            .map { enhanceFindingWithMetadata(it, file, content) }
     }
 
     private fun enhanceFindingWithMetadata(
-            finding: Finding,
-            file: File,
-            content: String
+        finding: Finding,
+        file: File,
+        content: String
     ): Finding {
         val lines = content.lines()
         val lineContent =
-                if (finding.location.lineNumber <= lines.size) {
-                    lines[finding.location.lineNumber - 1]
-                } else {
-                    ""
-                }
+            if (finding.location.lineNumber <= lines.size) {
+                lines[finding.location.lineNumber - 1]
+            } else {
+                ""
+            }
 
         return finding.copy(
-                context = finding.context.copy(
-                        lineContent = if (finding.context.lineContent.isBlank()) {
-                            "Line: ${lineContent.trim()}"
-                        } else {
-                            "${finding.context.lineContent} | Line: ${lineContent.trim()}"
-                        }
-                )
+            context = finding.context.copy(
+                lineContent = if (finding.context.lineContent.isBlank()) {
+                    "Line: ${lineContent.trim()}"
+                } else {
+                    "${finding.context.lineContent} | Line: ${lineContent.trim()}"
+                }
+            )
         )
     }
 
@@ -535,15 +534,15 @@ class CompositeDetector(
         } else {
             originalContext.getContextDescription()
         }
-        
+
         // Return the original context (since we can't easily merge the metadata)
         // The enhanced information will be in the message instead
         return originalContext
     }
 
     private fun enhanceMessageWithSources(
-            originalMessage: String,
-            detectorSources: List<String>
+        originalMessage: String,
+        detectorSources: List<String>
     ): String {
         return if (detectorSources.size > 1) {
             "$originalMessage (confirmed by ${detectorSources.size} detectors)"
@@ -554,30 +553,30 @@ class CompositeDetector(
 
     // Configuration and result classes
     data class DetectorConfig(
-            val detector: DetectorInterface,
-            val weight: Double = 1.0,
-            val priority: DetectorPriority = DetectorPriority.MEDIUM,
-            val enabled: Boolean = true,
-            val timeoutMillis: Long = 10000
+        val detector: DetectorInterface,
+        val weight: Double = 1.0,
+        val priority: DetectorPriority = DetectorPriority.MEDIUM,
+        val enabled: Boolean = true,
+        val timeoutMillis: Long = 10000
     )
 
     private data class DetectorResult(
-            val config: DetectorConfig,
-            val findings: List<Finding>,
-            val error: Exception?
+        val config: DetectorConfig,
+        val findings: List<Finding>,
+        val error: Exception?
     )
 
     private data class WeightedFinding(
-            val finding: Finding,
-            val weight: Double,
-            val detectorName: String
+        val finding: Finding,
+        val weight: Double,
+        val detectorName: String
     )
 
     private data class QuadTuple<T1, T2, T3, T4>(
-            val first: T1,
-            val second: T2,
-            val third: T3,
-            val fourth: T4
+        val first: T1,
+        val second: T2,
+        val third: T3,
+        val fourth: T4
     )
 
     enum class ExecutionMode {
@@ -619,9 +618,9 @@ class CompositeDetector(
         private var timeoutMillis = 30000L
 
         fun addDetector(
-                detector: DetectorInterface,
-                weight: Double = 1.0,
-                priority: DetectorPriority = DetectorPriority.MEDIUM
+            detector: DetectorInterface,
+            weight: Double = 1.0,
+            priority: DetectorPriority = DetectorPriority.MEDIUM
         ): Builder {
             detectors.add(DetectorConfig(detector, weight, priority))
             return this
@@ -659,13 +658,13 @@ class CompositeDetector(
 
         fun build(): CompositeDetector {
             return CompositeDetector(
-                    detectors = detectors.toList(),
-                    executionMode = executionMode,
-                    mergingStrategy = mergingStrategy,
-                    deduplicationStrategy = deduplicationStrategy,
-                    enableCaching = enableCaching,
-                    maxCacheSize = maxCacheSize,
-                    timeoutMillis = timeoutMillis
+                detectors = detectors.toList(),
+                executionMode = executionMode,
+                mergingStrategy = mergingStrategy,
+                deduplicationStrategy = deduplicationStrategy,
+                enableCaching = enableCaching,
+                maxCacheSize = maxCacheSize,
+                timeoutMillis = timeoutMillis
             )
         }
     }
