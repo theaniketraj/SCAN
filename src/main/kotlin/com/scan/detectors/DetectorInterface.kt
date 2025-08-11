@@ -1,8 +1,8 @@
 package com.scan.detectors
 
 import com.scan.core.*
-import java.util.regex.Pattern
 import java.util.UUID
+import java.util.regex.Pattern
 
 /**
  * Common interface for all secret detection strategies.
@@ -88,8 +88,8 @@ interface DetectorInterface {
 
         // Check file extension support
         if (supportedFileTypes.isNotEmpty() &&
-                        context.fileExtension.lowercase() !in
-                                supportedFileTypes.map { it.lowercase() }
+            context.fileExtension.lowercase() !in
+            supportedFileTypes.map { it.lowercase() }
         ) {
             return false
         }
@@ -128,7 +128,7 @@ abstract class AbstractDetector : DetectorInterface {
 
             findings
         } catch (e: Exception) {
-            throw DetectorException("Detection failed in ${detectorId}: ${e.message}", e)
+            throw DetectorException("Detection failed in $detectorId: ${e.message}", e)
         } finally {
             totalScanTime += System.currentTimeMillis() - startTime
         }
@@ -142,11 +142,11 @@ abstract class AbstractDetector : DetectorInterface {
 
     override fun getStatistics(): DetectorStatistics {
         return DetectorStatistics(
-                detectorId = detectorId,
-                scanCount = scanCount,
-                findingCount = findingCount,
-                averageScanTime = if (scanCount > 0) totalScanTime.toDouble() / scanCount else 0.0,
-                findingsByType = findingsByType.toMap()
+            detectorId = detectorId,
+            scanCount = scanCount,
+            findingCount = findingCount,
+            averageScanTime = if (scanCount > 0) totalScanTime.toDouble() / scanCount else 0.0,
+            findingsByType = findingsByType.toMap()
         )
     }
 
@@ -159,23 +159,23 @@ abstract class AbstractDetector : DetectorInterface {
 
     /** Helper method to create findings with consistent metadata. */
     protected fun createFinding(
-            type: String,
-            value: String,
-            lineNumber: Int,
-            columnStart: Int,
-            columnEnd: Int,
-            confidence: Double,
-            rule: String,
-            context: ScanContext,
-            severity: Severity = Severity.MEDIUM,
-            contextText: String = ""
+        type: String,
+        value: String,
+        lineNumber: Int,
+        columnStart: Int,
+        columnEnd: Int,
+        confidence: Double,
+        rule: String,
+        context: ScanContext,
+        severity: Severity = Severity.MEDIUM,
+        contextText: String = ""
     ): Finding {
         val confidenceEnum = when {
             confidence >= 0.8 -> Confidence.HIGH
             confidence >= 0.5 -> Confidence.MEDIUM
             else -> Confidence.LOW
         }
-        
+
         val location = FindingLocation(
             filePath = context.filePath.toString(),
             relativePath = context.relativePath ?: context.fileName,
@@ -184,23 +184,23 @@ abstract class AbstractDetector : DetectorInterface {
             columnEnd = columnEnd,
             lineContent = context.getLine(lineNumber) ?: ""
         )
-        
+
         val secretInfo = SecretInfo(
             detectedValue = value,
             patternName = rule,
             patternDescription = "Detected by $detectorName",
             secretType = SecretType.fromString(type) ?: SecretType.UNKNOWN
         )
-        
+
         val findingContext = FindingContext(
             lineContent = context.getLine(lineNumber) ?: "",
             surroundingLines = context.getContextLines(lineNumber, 2),
             isInComment = false, // TODO: Implement comment detection
-            isInString = false,  // TODO: Implement string detection  
+            isInString = false, // TODO: Implement string detection
             isInTestFile = context.isTestFile,
             isInConfigFile = context.fileExtension.lowercase() in setOf("yml", "yaml", "json", "xml", "properties", "conf", "config")
         )
-        
+
         val remediation = RemediationInfo(
             recommendation = "Remove or secure this sensitive information",
             actionItems = listOf(
@@ -209,7 +209,7 @@ abstract class AbstractDetector : DetectorInterface {
                 "Rotate the secret if it has been committed"
             )
         )
-        
+
         return Finding(
             id = UUID.randomUUID().toString(),
             title = "Potential ${type.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }} detected",
@@ -227,11 +227,11 @@ abstract class AbstractDetector : DetectorInterface {
 
     /** Extracts surrounding context for a finding. */
     protected fun extractContext(
-            scanContext: ScanContext,
-            lineNumber: Int,
-            columnStart: Int,
-            columnEnd: Int,
-            contextLines: Int = 1
+        scanContext: ScanContext,
+        lineNumber: Int,
+        columnStart: Int,
+        columnEnd: Int,
+        contextLines: Int = 1
     ): String {
         if (lineNumber <= 0 || lineNumber > scanContext.lines.size) {
             return ""
@@ -241,14 +241,16 @@ abstract class AbstractDetector : DetectorInterface {
         val endLine = minOf(scanContext.lines.size, lineNumber + contextLines)
 
         return (startLine..endLine)
-                .mapNotNull { lineNum ->
-                    val line = scanContext.lines.getOrNull(lineNum - 1)
-                    if (line != null) {
-                        val marker = if (lineNum == lineNumber) ">>> " else "    "
-                        "${marker}${lineNum}: ${line}"
-                    } else null
+            .mapNotNull { lineNum ->
+                val line = scanContext.lines.getOrNull(lineNum - 1)
+                if (line != null) {
+                    val marker = if (lineNum == lineNumber) ">>> " else "    "
+                    "${marker}$lineNum: $line"
+                } else {
+                    null
                 }
-                .joinToString("\n")
+            }
+            .joinToString("\n")
     }
 
     /** Validates that a potential secret value meets minimum criteria. */
@@ -260,32 +262,32 @@ abstract class AbstractDetector : DetectorInterface {
     protected fun isCommonPlaceholder(value: String): Boolean {
         val normalized = value.lowercase()
         val placeholders =
-                setOf(
-                        "example",
-                        "test",
-                        "demo",
-                        "sample",
-                        "placeholder",
-                        "dummy",
-                        "fake",
-                        "mock",
-                        "your_key",
-                        "your_secret",
-                        "insert_here",
-                        "put_your_key_here",
-                        "xxxxxxxx",
-                        "12345678",
-                        "abcdefgh",
-                        "password",
-                        "secret",
-                        "token",
-                        "key"
-                )
+            setOf(
+                "example",
+                "test",
+                "demo",
+                "sample",
+                "placeholder",
+                "dummy",
+                "fake",
+                "mock",
+                "your_key",
+                "your_secret",
+                "insert_here",
+                "put_your_key_here",
+                "xxxxxxxx",
+                "12345678",
+                "abcdefgh",
+                "password",
+                "secret",
+                "token",
+                "key"
+            )
 
         return placeholders.any { normalized.contains(it) } ||
-                normalized.matches(Regex("^[x]+$")) ||
-                normalized.matches(Regex("^[0-9]+$")) ||
-                normalized.matches(Regex("^[a-z]+$"))
+            normalized.matches(Regex("^[x]+$")) ||
+            normalized.matches(Regex("^[0-9]+$")) ||
+            normalized.matches(Regex("^[a-z]+$"))
     }
 }
 
@@ -342,17 +344,17 @@ interface ContextAwareDetector : DetectorInterface {
 
 /** Represents a detection pattern with metadata. */
 data class DetectionPattern(
-        val id: String,
-        val name: String,
-        val pattern: Pattern,
-        val secretType: String,
-        val confidence: Double,
-        val severity: Severity = Severity.MEDIUM,
-        val description: String = "",
-        val examples: List<String> = emptyList(),
-        val falsePositives: List<String> = emptyList(),
-        val tags: Set<String> = emptySet(),
-        val enabled: Boolean = true
+    val id: String,
+    val name: String,
+    val pattern: Pattern,
+    val secretType: String,
+    val confidence: Double,
+    val severity: Severity = Severity.MEDIUM,
+    val description: String = "",
+    val examples: List<String> = emptyList(),
+    val falsePositives: List<String> = emptyList(),
+    val tags: Set<String> = emptySet(),
+    val enabled: Boolean = true
 ) {
     /** Tests if the pattern matches the given text. */
     fun matches(text: String): Boolean = pattern.matcher(text).find()
@@ -364,12 +366,12 @@ data class DetectionPattern(
 
         while (matcher.find()) {
             matches.add(
-                    PatternMatch(
-                            value = matcher.group(),
-                            start = matcher.start(),
-                            end = matcher.end(),
-                            groups = (1..matcher.groupCount()).map { matcher.group(it) }
-                    )
+                PatternMatch(
+                    value = matcher.group(),
+                    start = matcher.start(),
+                    end = matcher.end(),
+                    groups = (1..matcher.groupCount()).map { matcher.group(it) }
+                )
             )
         }
 
@@ -379,29 +381,29 @@ data class DetectionPattern(
 
 /** Represents a pattern match result. */
 data class PatternMatch(
-        val value: String,
-        val start: Int,
-        val end: Int,
-        val groups: List<String> = emptyList()
+    val value: String,
+    val start: Int,
+    val end: Int,
+    val groups: List<String> = emptyList()
 )
 
 /** Result of context analysis for a potential finding. */
 data class ContextAnalysis(
-        val isInComment: Boolean = false,
-        val isInString: Boolean = false,
-        val isInTestCode: Boolean = false,
-        val isInDocumentation: Boolean = false,
-        val isVariableAssignment: Boolean = false,
-        val variableName: String? = null,
-        val functionContext: String? = null,
-        val confidence: Double = 1.0
+    val isInComment: Boolean = false,
+    val isInString: Boolean = false,
+    val isInTestCode: Boolean = false,
+    val isInDocumentation: Boolean = false,
+    val isVariableAssignment: Boolean = false,
+    val variableName: String? = null,
+    val functionContext: String? = null,
+    val confidence: Double = 1.0
 )
 
 /** Validation result for detector configuration. */
 data class ValidationResult(
-        val isValid: Boolean,
-        val errors: List<String> = emptyList(),
-        val warnings: List<String> = emptyList()
+    val isValid: Boolean,
+    val errors: List<String> = emptyList(),
+    val warnings: List<String> = emptyList()
 ) {
     companion object {
         fun success() = ValidationResult(true)
@@ -412,8 +414,8 @@ data class ValidationResult(
 
 /** Configuration schema for a detector. */
 data class DetectorConfigSchema(
-        val properties: Map<String, PropertySchema> = emptyMap(),
-        val required: Set<String> = emptySet()
+    val properties: Map<String, PropertySchema> = emptyMap(),
+    val required: Set<String> = emptySet()
 ) {
     companion object {
         fun empty() = DetectorConfigSchema()
@@ -422,12 +424,12 @@ data class DetectorConfigSchema(
 
 /** Schema for a configuration property. */
 data class PropertySchema(
-        val type: PropertyType,
-        val description: String,
-        val defaultValue: Any? = null,
-        val allowedValues: List<Any>? = null,
-        val minValue: Number? = null,
-        val maxValue: Number? = null
+    val type: PropertyType,
+    val description: String,
+    val defaultValue: Any? = null,
+    val allowedValues: List<Any>? = null,
+    val minValue: Number? = null,
+    val maxValue: Number? = null
 )
 
 /** Types of configuration properties. */
@@ -442,13 +444,13 @@ enum class PropertyType {
 
 /** Statistics about detector performance. */
 data class DetectorStatistics(
-        val detectorId: String = "",
-        val scanCount: Int = 0,
-        val findingCount: Int = 0,
-        val averageScanTime: Double = 0.0,
-        val findingsByType: Map<String, Int> = emptyMap(),
-        val falsePositiveRate: Double = 0.0,
-        val performanceMetrics: Map<String, Any> = emptyMap()
+    val detectorId: String = "",
+    val scanCount: Int = 0,
+    val findingCount: Int = 0,
+    val averageScanTime: Double = 0.0,
+    val findingsByType: Map<String, Int> = emptyMap(),
+    val falsePositiveRate: Double = 0.0,
+    val performanceMetrics: Map<String, Any> = emptyMap()
 )
 
 /** Exception thrown when detector encounters a critical error. */
