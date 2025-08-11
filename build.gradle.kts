@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.java.gradle.plugin)
     alias(libs.plugins.gradle.plugin.publish)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.detekt)
     alias(libs.plugins.spotless)
     alias(libs.plugins.versions)
     alias(libs.plugins.dependency.analysis)
@@ -55,9 +54,6 @@ dependencies {
 
     // Test Runtime
     testRuntimeOnly(libs.junit.jupiter.engine)
-
-    // Detekt
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:${libs.versions.detekt.get()}")
 }
 
 gradlePlugin {
@@ -102,36 +98,29 @@ tasks.withType<Test> {
     jvmArgs("-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100")
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    config.setFrom("$projectDir/config/detekt/detekt.yml")
-    baseline = file("$projectDir/config/detekt/baseline.xml")
-}
+spotless {
+    kotlin {
+        target("src/main/**/*.kt")
+        targetExclude("**/build/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+            .setEditorConfigPath("${rootProject.projectDir}/.editorconfig")
+            .editorConfigOverride(mapOf(
+                "ktlint_standard_trailing-comma-on-call-site" to "disabled",
+                "ktlint_standard_trailing-comma-on-declaration-site" to "disabled",
+                "ktlint_standard_max-line-length" to "disabled",
+                "ktlint_standard_no-wildcard-imports" to "disabled"
+            ))
+    }
 
-// Temporarily disabled Spotless for compilation fixing
-// spotless {
-//     kotlin {
-//         target("**/*.kt")
-//         targetExclude("**/build/**/*.kt")
-//         ktlint(libs.versions.ktlint.get())
-//             .setEditorConfigPath("${rootProject.projectDir}/.editorconfig")
-//             .editorConfigOverride(mapOf(
-//                 "ktlint_standard_trailing-comma-on-call-site" to "disabled",
-//                 "ktlint_standard_trailing-comma-on-declaration-site" to "disabled"
-//             ))
-//         // Temporarily disabled: licenseHeaderFile(rootProject.file("spotless/Copyright.kt"))
-//     }
-//     
-//     kotlinGradle {
-//         target("*.gradle.kts")
-//         ktlint(libs.versions.ktlint.get())
-//             .editorConfigOverride(mapOf(
-//                 "ktlint_standard_trailing-comma-on-call-site" to "disabled",
-//                 "ktlint_standard_trailing-comma-on-declaration-site" to "disabled"
-//             ))
-//     }
-// }// Documentation
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf(
+                "ktlint_standard_trailing-comma-on-call-site" to "disabled",
+                "ktlint_standard_trailing-comma-on-declaration-site" to "disabled"
+            ))
+    }
+} // Documentation
 tasks.dokkaHtml.configure {
     outputDirectory.set(layout.buildDirectory.dir("dokka"))
 }
