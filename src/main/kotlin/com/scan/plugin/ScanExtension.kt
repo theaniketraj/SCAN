@@ -1,10 +1,9 @@
 package com.scan.plugin
 
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.file.DirectoryProperty
 
 /**
  * Extension class for configuring the SCAN security scanning plugin
@@ -14,14 +13,14 @@ abstract class ScanExtension {
     abstract val strictMode: Property<Boolean>
     abstract val failOnSecretsFound: Property<Boolean>
     abstract val failOnSecrets: Property<Boolean>
-    abstract val failOnFound: Property<Boolean>  // Alias for failOnSecrets
+    abstract val failOnFound: Property<Boolean> // Alias for failOnSecrets
     abstract val warnOnSecrets: Property<Boolean>
     abstract val verbose: Property<Boolean>
     abstract val quiet: Property<Boolean>
     abstract val includePatterns: SetProperty<String>
     abstract val excludePatterns: SetProperty<String>
-    abstract val includeFiles: SetProperty<String>  // Alias for includePatterns
-    abstract val excludeFiles: SetProperty<String>   // Alias for excludePatterns
+    abstract val includeFiles: SetProperty<String> // Alias for includePatterns
+    abstract val excludeFiles: SetProperty<String> // Alias for excludePatterns
     abstract val maxFileSizeBytes: Property<Long>
     abstract val ignoreTestFiles: Property<Boolean>
     abstract val scanTests: Property<Boolean>
@@ -36,22 +35,22 @@ abstract class ScanExtension {
     abstract val entropyThreshold: Property<Double>
     abstract val customPatterns: MapProperty<String, String>
     abstract val contextAwareScanning: Property<Boolean>
-    
+
     fun patterns(action: PatternConfig.() -> Unit) {
         val config = PatternConfig()
         action(config)
     }
-    
+
     fun entropy(action: EntropyConfig.() -> Unit) {
         val config = EntropyConfig()
         action(config)
     }
-    
+
     fun filter(action: FilterConfig.() -> Unit) {
         val config = FilterConfig()
         action(config)
     }
-    
+
     fun reporting(action: ReportingConfig.() -> Unit) {
         val config = ReportingConfig()
         action(config)
