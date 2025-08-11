@@ -5,8 +5,8 @@ import java.io.File
 
 /**
  * HTML reporter that generates comprehensive HTML reports for scan results.
- * 
- * This reporter creates HTML output with detailed finding information, 
+ *
+ * This reporter creates HTML output with detailed finding information,
  * severity analysis, and interactive features for easy review.
  */
 class HtmlReporter {
@@ -19,7 +19,7 @@ class HtmlReporter {
      */
     suspend fun generateReport(scanResult: ScanResult, outputFile: File) {
         val htmlContent = createHtmlReport(scanResult)
-        
+
         try {
             outputFile.parentFile?.mkdirs()
             outputFile.writeText(htmlContent)
@@ -36,7 +36,7 @@ class HtmlReporter {
      */
     fun generateReportSync(scanResult: ScanResult, outputFile: File) {
         val htmlContent = createHtmlReport(scanResult)
-        
+
         try {
             outputFile.parentFile?.mkdirs()
             outputFile.writeText(htmlContent)
@@ -48,7 +48,7 @@ class HtmlReporter {
     private fun createHtmlReport(scanResult: ScanResult): String {
         val findings = scanResult.findings
         val timestamp = java.time.LocalDateTime.now()
-        
+
         return buildString {
             appendLine("<!DOCTYPE html>")
             appendLine("<html lang=\"en\">")
@@ -64,10 +64,10 @@ class HtmlReporter {
             appendLine("    <div class=\"container\">")
             appendLine("        <header>")
             appendLine("            <h1>🔍 SCAN Security Report</h1>")
-            appendLine("            <p>Generated on ${timestamp}</p>")
+            appendLine("            <p>Generated on $timestamp</p>")
             appendLine("        </header>")
             appendLine()
-            
+
             // Summary section
             appendLine("        <section class=\"summary\">")
             appendLine("            <h2>Summary</h2>")
@@ -83,12 +83,12 @@ class HtmlReporter {
             appendLine("            </div>")
             appendLine("        </section>")
             appendLine()
-            
+
             // Findings section
             if (findings.isNotEmpty()) {
                 appendLine("        <section class=\"findings\">")
                 appendLine("            <h2>Findings Details</h2>")
-                
+
                 findings.forEachIndexed { index, finding ->
                     val severityClass = finding.severity.name.lowercase()
                     appendLine("            <div class=\"finding finding-$severityClass\">")
@@ -110,7 +110,7 @@ class HtmlReporter {
                     appendLine("                </div>")
                     appendLine("            </div>")
                 }
-                
+
                 appendLine("        </section>")
             } else {
                 appendLine("        <section class=\"no-findings\">")
@@ -118,7 +118,7 @@ class HtmlReporter {
                 appendLine("            <p>Your codebase appears to be free of detectable security issues.</p>")
                 appendLine("        </section>")
             }
-            
+
             appendLine("    </div>")
             appendLine("</body>")
             appendLine("</html>")
@@ -306,9 +306,9 @@ class HtmlReporter {
 
     private fun escapeHtml(text: String): String {
         return text.replace("&", "&amp;")
-                  .replace("<", "&lt;")
-                  .replace(">", "&gt;")
-                  .replace("\"", "&quot;")
-                  .replace("'", "&#39;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;")
     }
 }
