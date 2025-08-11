@@ -43,7 +43,7 @@ class JsonReporter {
     private fun createJsonReport(results: List<ScanResult>): String {
         val timestamp = Instant.now().atOffset(ZoneOffset.UTC).format(ISO_FORMATTER)
         val allFindings = results.flatMap { it.findings }
-        
+
         val sb = StringBuilder()
         sb.append("{\n")
         sb.append("  \"scanReport\": {\n")
@@ -61,7 +61,7 @@ class JsonReporter {
         sb.append("      \"lowFindings\": ${allFindings.count { it.severity == com.scan.core.Severity.LOW }}\n")
         sb.append("    },\n")
         sb.append("    \"findings\": [\n")
-        
+
         allFindings.forEachIndexed { index, finding ->
             sb.append("      {\n")
             sb.append("        \"id\": \"${finding.id}\",\n")
@@ -84,11 +84,11 @@ class JsonReporter {
             if (index < allFindings.size - 1) sb.append(",")
             sb.append("\n")
         }
-        
+
         sb.append("    ]\n")
         sb.append("  }\n")
         sb.append("}")
-        
+
         return sb.toString()
     }
 
