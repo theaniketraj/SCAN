@@ -19,174 +19,174 @@ object FileUtils {
 
     // Common text file extensions that should be scanned
     private val DEFAULT_TEXT_EXTENSIONS =
-            setOf(
-                    "txt",
-                    "md",
-                    "java",
-                    "kt",
-                    "scala",
-                    "groovy",
-                    "js",
-                    "ts",
-                    "jsx",
-                    "tsx",
-                    "py",
-                    "rb",
-                    "php",
-                    "go",
-                    "rs",
-                    "cpp",
-                    "c",
-                    "h",
-                    "hpp",
-                    "cs",
-                    "vb",
-                    "sql",
-                    "xml",
-                    "html",
-                    "htm",
-                    "css",
-                    "scss",
-                    "sass",
-                    "less",
-                    "json",
-                    "yaml",
-                    "yml",
-                    "toml",
-                    "ini",
-                    "cfg",
-                    "conf",
-                    "config",
-                    "properties",
-                    "sh",
-                    "bash",
-                    "zsh",
-                    "fish",
-                    "bat",
-                    "cmd",
-                    "ps1",
-                    "dockerfile",
-                    "gradle",
-                    "maven",
-                    "pom",
-                    "build",
-                    "make",
-                    "makefile",
-                    "cmake",
-                    "proto",
-                    "thrift",
-                    "avro",
-                    "graphql",
-                    "gql",
-                    "vue",
-                    "svelte",
-                    "r",
-                    "matlab",
-                    "swift",
-                    "dart",
-                    "elm",
-                    "clj",
-                    "cljs",
-                    "hs",
-                    "ml"
-            )
+        setOf(
+            "txt",
+            "md",
+            "java",
+            "kt",
+            "scala",
+            "groovy",
+            "js",
+            "ts",
+            "jsx",
+            "tsx",
+            "py",
+            "rb",
+            "php",
+            "go",
+            "rs",
+            "cpp",
+            "c",
+            "h",
+            "hpp",
+            "cs",
+            "vb",
+            "sql",
+            "xml",
+            "html",
+            "htm",
+            "css",
+            "scss",
+            "sass",
+            "less",
+            "json",
+            "yaml",
+            "yml",
+            "toml",
+            "ini",
+            "cfg",
+            "conf",
+            "config",
+            "properties",
+            "sh",
+            "bash",
+            "zsh",
+            "fish",
+            "bat",
+            "cmd",
+            "ps1",
+            "dockerfile",
+            "gradle",
+            "maven",
+            "pom",
+            "build",
+            "make",
+            "makefile",
+            "cmake",
+            "proto",
+            "thrift",
+            "avro",
+            "graphql",
+            "gql",
+            "vue",
+            "svelte",
+            "r",
+            "matlab",
+            "swift",
+            "dart",
+            "elm",
+            "clj",
+            "cljs",
+            "hs",
+            "ml"
+        )
 
     // Binary file extensions that should typically be skipped
     private val BINARY_EXTENSIONS =
-            setOf(
-                    "jpg",
-                    "jpeg",
-                    "png",
-                    "gif",
-                    "bmp",
-                    "tiff",
-                    "webp",
-                    "ico",
-                    "svg",
-                    "mp3",
-                    "mp4",
-                    "avi",
-                    "mov",
-                    "wmv",
-                    "flv",
-                    "webm",
-                    "ogg",
-                    "wav",
-                    "pdf",
-                    "doc",
-                    "docx",
-                    "xls",
-                    "xlsx",
-                    "ppt",
-                    "pptx",
-                    "zip",
-                    "rar",
-                    "7z",
-                    "tar",
-                    "gz",
-                    "bz2",
-                    "xz",
-                    "jar",
-                    "war",
-                    "ear",
-                    "class",
-                    "exe",
-                    "dll",
-                    "so",
-                    "dylib",
-                    "bin",
-                    "deb",
-                    "rpm",
-                    "msi",
-                    "dmg",
-                    "iso",
-                    "img",
-                    "vdi",
-                    "vmdk",
-                    "ova",
-                    "ovf",
-                    "db",
-                    "sqlite",
-                    "mdb"
-            )
+        setOf(
+            "jpg",
+            "jpeg",
+            "png",
+            "gif",
+            "bmp",
+            "tiff",
+            "webp",
+            "ico",
+            "svg",
+            "mp3",
+            "mp4",
+            "avi",
+            "mov",
+            "wmv",
+            "flv",
+            "webm",
+            "ogg",
+            "wav",
+            "pdf",
+            "doc",
+            "docx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "zip",
+            "rar",
+            "7z",
+            "tar",
+            "gz",
+            "bz2",
+            "xz",
+            "jar",
+            "war",
+            "ear",
+            "class",
+            "exe",
+            "dll",
+            "so",
+            "dylib",
+            "bin",
+            "deb",
+            "rpm",
+            "msi",
+            "dmg",
+            "iso",
+            "img",
+            "vdi",
+            "vmdk",
+            "ova",
+            "ovf",
+            "db",
+            "sqlite",
+            "mdb"
+        )
 
     // Large directories that are typically safe to skip
     private val SKIP_DIRECTORIES =
-            setOf(
-                    ".git",
-                    ".svn",
-                    ".hg",
-                    ".bzr",
-                    "node_modules",
-                    "bower_components",
-                    "vendor",
-                    "target",
-                    "build",
-                    "dist",
-                    "out",
-                    ".gradle",
-                    ".idea",
-                    "build-cache",
-                    ".npm",
-                    ".yarn",
-                    ".pnpm",
-                    "__pycache__",
-                    ".pytest_cache",
-                    ".mypy_cache",
-                    ".tox",
-                    "venv",
-                    "env",
-                    ".env",
-                    "virtualenv",
-                    ".venv",
-                    ".DS_Store",
-                    "Thumbs.db",
-                    ".tmp",
-                    "tmp",
-                    "temp",
-                    ".cache",
-                    "cache"
-            )
+        setOf(
+            ".git",
+            ".svn",
+            ".hg",
+            ".bzr",
+            "node_modules",
+            "bower_components",
+            "vendor",
+            "target",
+            "build",
+            "dist",
+            "out",
+            ".gradle",
+            ".idea",
+            "build-cache",
+            ".npm",
+            ".yarn",
+            ".pnpm",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".tox",
+            "venv",
+            "env",
+            ".env",
+            "virtualenv",
+            ".venv",
+            ".DS_Store",
+            "Thumbs.db",
+            ".tmp",
+            "tmp",
+            "temp",
+            ".cache",
+            "cache"
+        )
 
     // File size limits for safety (configurable)
     private const val DEFAULT_MAX_FILE_SIZE = 50L * 1024 * 1024 // 50MB
@@ -197,31 +197,31 @@ object FileUtils {
 
     /** Configuration class for file traversal options */
     data class TraversalOptions(
-            val maxDepth: Int = Int.MAX_VALUE,
-            val followSymlinks: Boolean = false,
-            val includeHidden: Boolean = false,
-            val maxFileSize: Long = DEFAULT_MAX_FILE_SIZE,
-            val customExtensions: Set<String>? = null,
-            val excludePatterns: Set<Regex> = emptySet(),
-            val includePatterns: Set<Regex> = emptySet(),
-            val skipDirectories: Set<String> = SKIP_DIRECTORIES,
-            val parallelProcessing: Boolean = true
+        val maxDepth: Int = Int.MAX_VALUE,
+        val followSymlinks: Boolean = false,
+        val includeHidden: Boolean = false,
+        val maxFileSize: Long = DEFAULT_MAX_FILE_SIZE,
+        val customExtensions: Set<String>? = null,
+        val excludePatterns: Set<Regex> = emptySet(),
+        val includePatterns: Set<Regex> = emptySet(),
+        val skipDirectories: Set<String> = SKIP_DIRECTORIES,
+        val parallelProcessing: Boolean = true
     )
 
     /** Represents file metadata for scanning decisions */
     data class FileMetadata(
-            val path: Path,
-            val size: Long,
-            val isText: Boolean,
-            val encoding: Charset?,
-            val lineCount: Int?,
-            val hash: String?
+        val path: Path,
+        val size: Long,
+        val isText: Boolean,
+        val encoding: Charset?,
+        val lineCount: Int?,
+        val hash: String?
     )
 
     /** Find all scannable files in the given directory with specified options */
     fun findScannableFiles(
-            rootPath: Path,
-            options: TraversalOptions = TraversalOptions()
+        rootPath: Path,
+        options: TraversalOptions = TraversalOptions()
     ): List<Path> {
         if (!Files.exists(rootPath)) {
             throw IllegalArgumentException("Path does not exist: $rootPath")
@@ -235,55 +235,55 @@ object FileUtils {
 
         try {
             Files.walkFileTree(
-                    rootPath,
-                    EnumSet.of(FileVisitOption.FOLLOW_LINKS.takeIf { options.followSymlinks }),
-                    options.maxDepth,
-                    object : SimpleFileVisitor<Path>() {
+                rootPath,
+                EnumSet.of(FileVisitOption.FOLLOW_LINKS.takeIf { options.followSymlinks }),
+                options.maxDepth,
+                object : SimpleFileVisitor<Path>() {
 
-                        override fun preVisitDirectory(
-                                dir: Path,
-                                attrs: BasicFileAttributes
-                        ): FileVisitResult {
-                            val dirName = dir.name
+                    override fun preVisitDirectory(
+                        dir: Path,
+                        attrs: BasicFileAttributes
+                    ): FileVisitResult {
+                        val dirName = dir.name
 
-                            // Skip hidden directories unless explicitly included
-                            if (!options.includeHidden && dirName.startsWith(".") && dir != rootPath
-                            ) {
-                                return FileVisitResult.SKIP_SUBTREE
-                            }
-
-                            // Skip common build/cache directories
-                            if (options.skipDirectories.contains(dirName)) {
-                                return FileVisitResult.SKIP_SUBTREE
-                            }
-
-                            return FileVisitResult.CONTINUE
+                        // Skip hidden directories unless explicitly included
+                        if (!options.includeHidden && dirName.startsWith(".") && dir != rootPath
+                        ) {
+                            return FileVisitResult.SKIP_SUBTREE
                         }
 
-                        override fun visitFile(
-                                file: Path,
-                                attrs: BasicFileAttributes
-                        ): FileVisitResult {
-                            try {
-                                if (shouldScanFile(file, attrs, options)) {
-                                    result.add(file)
-                                }
-                            } catch (e: Exception) {
-                                // Log error but continue processing other files
-                                System.err.println("Error processing file $file: ${e.message}")
-                            }
-
-                            return FileVisitResult.CONTINUE
+                        // Skip common build/cache directories
+                        if (options.skipDirectories.contains(dirName)) {
+                            return FileVisitResult.SKIP_SUBTREE
                         }
 
-                        override fun visitFileFailed(
-                                file: Path,
-                                exc: IOException
-                        ): FileVisitResult {
-                            System.err.println("Failed to access file $file: ${exc.message}")
-                            return FileVisitResult.CONTINUE
-                        }
+                        return FileVisitResult.CONTINUE
                     }
+
+                    override fun visitFile(
+                        file: Path,
+                        attrs: BasicFileAttributes
+                    ): FileVisitResult {
+                        try {
+                            if (shouldScanFile(file, attrs, options)) {
+                                result.add(file)
+                            }
+                        } catch (e: Exception) {
+                            // Log error but continue processing other files
+                            System.err.println("Error processing file $file: ${e.message}")
+                        }
+
+                        return FileVisitResult.CONTINUE
+                    }
+
+                    override fun visitFileFailed(
+                        file: Path,
+                        exc: IOException
+                    ): FileVisitResult {
+                        System.err.println("Failed to access file $file: ${exc.message}")
+                        return FileVisitResult.CONTINUE
+                    }
+                }
             )
         } catch (e: IOException) {
             throw RuntimeException("Failed to traverse directory: $rootPath", e)
@@ -294,9 +294,9 @@ object FileUtils {
 
     /** Determine if a file should be scanned based on various criteria */
     private fun shouldScanFile(
-            file: Path,
-            attrs: BasicFileAttributes,
-            options: TraversalOptions
+        file: Path,
+        attrs: BasicFileAttributes,
+        options: TraversalOptions
     ): Boolean {
         // Skip if not a regular file
         if (!attrs.isRegularFile) return false
@@ -310,14 +310,14 @@ object FileUtils {
         // Check include patterns first (if any)
         if (options.includePatterns.isNotEmpty()) {
             val matches =
-                    options.includePatterns.any { pattern -> pattern.matches(file.toString()) }
+                options.includePatterns.any { pattern -> pattern.matches(file.toString()) }
             if (!matches) return false
         }
 
         // Check exclude patterns
         if (options.excludePatterns.isNotEmpty()) {
             val matches =
-                    options.excludePatterns.any { pattern -> pattern.matches(file.toString()) }
+                options.excludePatterns.any { pattern -> pattern.matches(file.toString()) }
             if (matches) return false
         }
 
@@ -373,12 +373,12 @@ object FileUtils {
 
             // Check for high percentage of printable characters
             val printableCount =
-                    bytes.count { byte ->
-                        val char = byte.toInt() and 0xFF
-                        char in 32..126 ||
-                                char in 9..13 ||
-                                char > 127 // ASCII printable + whitespace + UTF-8
-                    }
+                bytes.count { byte ->
+                    val char = byte.toInt() and 0xFF
+                    char in 32..126 ||
+                        char in 9..13 ||
+                        char > 127 // ASCII printable + whitespace + UTF-8
+                }
 
             val printableRatio = printableCount.toDouble() / bytes.size
             return printableRatio > 0.7 // At least 70% printable characters
@@ -397,11 +397,11 @@ object FileUtils {
         }
 
         val detectedEncoding =
-                try {
-                    detectEncodingInternal(file)
-                } catch (e: Exception) {
-                    StandardCharsets.UTF_8 // Fallback to UTF-8
-                }
+            try {
+                detectEncodingInternal(file)
+            } catch (e: Exception) {
+                StandardCharsets.UTF_8 // Fallback to UTF-8
+            }
 
         // Cache the result
         encodingCache[filePath] = detectedEncoding
@@ -421,13 +421,13 @@ object FileUtils {
         // Check for BOM (Byte Order Mark)
         when {
             bytes.size >= 3 &&
-                    bytes[0] == 0xEF.toByte() &&
-                    bytes[1] == 0xBB.toByte() &&
-                    bytes[2] == 0xBF.toByte() -> return StandardCharsets.UTF_8
+                bytes[0] == 0xEF.toByte() &&
+                bytes[1] == 0xBB.toByte() &&
+                bytes[2] == 0xBF.toByte() -> return StandardCharsets.UTF_8
             bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte() ->
-                    return StandardCharsets.UTF_16LE
+                return StandardCharsets.UTF_16LE
             bytes.size >= 2 && bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte() ->
-                    return StandardCharsets.UTF_16BE
+                return StandardCharsets.UTF_16BE
         }
 
         // Try to decode as UTF-8 first
@@ -472,9 +472,9 @@ object FileUtils {
 
     /** Read file content in chunks for large files */
     fun readFileContentChunked(
-            file: Path,
-            chunkSize: Int = 8192,
-            processor: (String, Int) -> Unit
+        file: Path,
+        chunkSize: Int = 8192,
+        processor: (String, Int) -> Unit
     ) {
         if (!Files.exists(file) || !Files.isReadable(file)) return
 
@@ -516,12 +516,12 @@ object FileUtils {
         }
 
         return FileMetadata(
-                path = file,
-                size = attrs.size(),
-                isText = isText,
-                encoding = encoding,
-                lineCount = lineCount,
-                hash = hash
+            path = file,
+            size = attrs.size(),
+            isText = isText,
+            encoding = encoding,
+            lineCount = lineCount,
+            hash = hash
         )
     }
 
@@ -568,17 +568,17 @@ object FileUtils {
         } catch (e: Exception) {
             // Fallback to system temp directory
             val tempDir = System.getProperty("java.io.tmpdir")
-            val fileName = "${prefix}_${System.currentTimeMillis()}${suffix}"
+            val fileName = "${prefix}_${System.currentTimeMillis()}$suffix"
             Paths.get(tempDir, fileName)
         }
     }
 
     /** Safe file copy with progress tracking */
     fun copyFile(
-            source: Path,
-            target: Path,
-            replaceExisting: Boolean = false,
-            progressCallback: ((Long, Long) -> Unit)? = null
+        source: Path,
+        target: Path,
+        replaceExisting: Boolean = false,
+        progressCallback: ((Long, Long) -> Unit)? = null
     ) {
         if (!Files.exists(source)) {
             throw IllegalArgumentException("Source file does not exist: $source")
