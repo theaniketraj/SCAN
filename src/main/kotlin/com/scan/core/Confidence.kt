@@ -12,7 +12,7 @@ enum class Confidence(val displayName: String, val description: String, val valu
         fun fromString(value: String): Confidence? {
             return values().find { it.name.equals(value, ignoreCase = true) }
         }
-        
+
         fun fromValue(value: Double): Confidence {
             return when {
                 value >= 0.7 -> HIGH
