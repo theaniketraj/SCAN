@@ -659,7 +659,7 @@ class PatternDetectorTest {
         @DisplayName("Should work with SecretPatterns")
         fun testWithSecretPatterns() {
             // Arrange
-            val realDetector = PatternDetector())
+            val realDetector = PatternDetector()
             val content =
                     """
                 class RealSecrets {
