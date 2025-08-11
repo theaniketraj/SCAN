@@ -73,7 +73,11 @@ class ContextAwareDetectorImpl(
 
         // Test file indicators
         private val TEST_FILE_INDICATORS = listOf(
-            "test", "spec", "mock", "fixture", "sample"
+            "test",
+            "spec",
+            "mock",
+            "fixture",
+            "sample"
         )
 
         // High-confidence secret patterns that should always be flagged
@@ -90,32 +94,32 @@ class ContextAwareDetectorImpl(
         val fileExtension = context.fileExtension.lowercase()
         val fileName = context.fileName.lowercase()
         val isTestFile = isTestFile(context.filePath.toFile(), fileName)
-        
+
         // Parse file content into structured data
         val fileContext = parseFileContext(context.content, fileExtension)
-        
+
         // Analyze each line with context
         context.content.lines().forEachIndexed { lineIndex, line ->
             val lineNumber = lineIndex + 1
             val lineContext = determineLineContext(line, lineIndex, fileContext, fileExtension)
-            
+
             // Skip analysis for certain contexts unless high confidence
             if (shouldSkipLine(lineContext, isTestFile)) {
                 return@forEachIndexed
             }
-            
+
             // Extract potential secrets from the line
             val potentialSecrets = extractPotentialSecrets(line, lineContext)
-            
+
             potentialSecrets.forEach { secretCandidate ->
                 val confidence = calculateConfidence(
-                    secretCandidate, 
-                    lineContext, 
-                    fileContext, 
+                    secretCandidate,
+                    lineContext,
+                    fileContext,
                     isTestFile,
                     context.filePath.toFile()
                 )
-                
+
                 if (confidence > 0.3) { // Only report findings with reasonable confidence
                     findings.add(createFinding(
                         type = secretCandidate.type.toString(),
@@ -130,7 +134,7 @@ class ContextAwareDetectorImpl(
                 }
             }
         }
-        
+
         return findings
     }
 
@@ -139,7 +143,7 @@ class ContextAwareDetectorImpl(
         val functions = extractFunctions(content, fileExtension)
         val classes = extractClasses(content, fileExtension)
         val variables = extractVariables(content, fileExtension)
-        
+
         return FileContext(
             extension = fileExtension,
             imports = imports,
@@ -151,28 +155,28 @@ class ContextAwareDetectorImpl(
     }
 
     private fun determineLineContext(
-        line: String, 
-        lineIndex: Int, 
-        fileContext: FileContext, 
+        line: String,
+        lineIndex: Int,
+        fileContext: FileContext,
         fileExtension: String
     ): LineContext {
         val trimmedLine = line.trim()
-        
+
         // Check if line is a comment
         val isComment = isComment(trimmedLine, fileExtension)
-        
+
         // Check if line is in a string literal
         val isInString = isInStringLiteral(trimmedLine, fileExtension)
-        
+
         // Check for variable assignment
         val assignment = extractAssignment(trimmedLine)
-        
+
         // Check if line is in a function
         val functionContext = findContainingFunction(lineIndex, fileContext)
-        
+
         // Check if line is in a class
         val classContext = findContainingClass(lineIndex, fileContext)
-        
+
         return LineContext(
             lineNumber = lineIndex + 1,
             content = line,
@@ -187,7 +191,7 @@ class ContextAwareDetectorImpl(
 
     private fun extractPotentialSecrets(line: String, context: LineContext): List<SecretCandidate> {
         val candidates = mutableListOf<SecretCandidate>()
-        
+
         // Extract from string literals
         extractFromStrings(line).forEach { (value, start, end) ->
             if (value.length >= minimumSecretLength) {
@@ -197,7 +201,7 @@ class ContextAwareDetectorImpl(
                 }
             }
         }
-        
+
         // Extract from assignments
         context.assignment?.let { assignment ->
             val value = assignment.value
@@ -208,7 +212,7 @@ class ContextAwareDetectorImpl(
                 }
             }
         }
-        
+
         return candidates
     }
 
@@ -220,7 +224,7 @@ class ContextAwareDetectorImpl(
         file: File
     ): Double {
         var confidence = 0.0
-        
+
         // Base confidence from secret type
         confidence += when (candidate.type) {
             SecretType.API_KEY -> 0.7
@@ -232,41 +236,41 @@ class ContextAwareDetectorImpl(
             SecretType.HIGH_ENTROPY -> calculateEntropy(candidate.value) / 8.0 // Normalize entropy
             SecretType.UNKNOWN -> 0.3
         }
-        
+
         // Adjust based on context
         if (lineContext.isComment) {
             confidence *= 0.3 // Comments are less likely to contain real secrets
         }
-        
+
         if (isTestFile) {
             confidence *= 0.4 // Test files often contain dummy data
         }
-        
+
         // Check for false positive patterns
         if (containsFalsePositivePattern(candidate.value)) {
             confidence *= 0.1
         }
-        
+
         // Check variable name context
         lineContext.assignment?.let { assignment ->
             val variableName = assignment.variableName.lowercase()
             when {
-                variableName.contains("secret") || variableName.contains("key") || 
-                variableName.contains("token") || variableName.contains("password") -> {
+                variableName.contains("secret") || variableName.contains("key") ||
+                    variableName.contains("token") || variableName.contains("password") -> {
                     confidence *= 1.5
                 }
-                variableName.contains("test") || variableName.contains("mock") || 
-                variableName.contains("example") -> {
+                variableName.contains("test") || variableName.contains("mock") ||
+                    variableName.contains("example") -> {
                     confidence *= 0.3
                 }
             }
         }
-        
+
         // Check for high-confidence patterns
         if (matchesHighConfidencePattern(candidate.value)) {
             confidence *= 1.3
         }
-        
+
         // File path context
         val filePath = file.path.lowercase()
         when {
@@ -274,7 +278,7 @@ class ContextAwareDetectorImpl(
             filePath.contains("test") || filePath.contains("mock") -> confidence *= 0.5
             filePath.contains("example") || filePath.contains("sample") -> confidence *= 0.3
         }
-        
+
         return minOf(1.0, maxOf(0.0, confidence))
     }
 
@@ -283,12 +287,12 @@ class ContextAwareDetectorImpl(
         if (context.isComment && !containsHighConfidencePattern(context.content)) {
             return true
         }
-        
+
         // Skip empty lines
         if (context.content.trim().isEmpty()) {
             return true
         }
-        
+
         return false
     }
 
@@ -330,14 +334,14 @@ class ContextAwareDetectorImpl(
         val results = mutableListOf<Triple<String, Int, Int>>()
         val stringPattern = Pattern.compile("([\"'])([^\"'\\\\]|\\\\.)*\\1")
         val matcher = stringPattern.matcher(line)
-        
+
         while (matcher.find()) {
             val value = matcher.group().removeSurrounding("\"", "'")
             if (value.isNotBlank()) {
                 results.add(Triple(value, matcher.start(), matcher.end()))
             }
         }
-        
+
         return results
     }
 
@@ -356,10 +360,10 @@ class ContextAwareDetectorImpl(
 
     private fun calculateEntropy(text: String): Double {
         if (text.isEmpty()) return 0.0
-        
+
         val frequencies = text.groupingBy { it }.eachCount()
         val length = text.length.toDouble()
-        
+
         return frequencies.values.sumOf { count ->
             val probability = count / length
             -probability * kotlin.math.log2(probability)
@@ -395,14 +399,14 @@ class ContextAwareDetectorImpl(
             SecretType.HIGH_ENTROPY -> "High-entropy string detected (potential secret)"
             SecretType.UNKNOWN -> "Potential secret detected"
         }
-        
+
         val contextInfo = when {
             context.isComment -> " in comment"
             context.assignment != null -> " in variable assignment '${context.assignment.variableName}'"
             context.isInString -> " in string literal"
             else -> ""
         }
-        
+
         return "$baseMessage$contextInfo"
     }
 
@@ -415,7 +419,7 @@ class ContextAwareDetectorImpl(
             "python" -> listOf("from\\s+([\\w.]+)\\s+import", "import\\s+([\\w.]+)")
             else -> emptyList()
         }
-        
+
         patterns.forEach { pattern ->
             Pattern.compile(pattern).matcher(content).let { matcher ->
                 while (matcher.find()) {
@@ -423,7 +427,7 @@ class ContextAwareDetectorImpl(
                 }
             }
         }
-        
+
         return imports
     }
 
@@ -435,12 +439,12 @@ class ContextAwareDetectorImpl(
             "java" -> "(?:public|private|protected)?\\s*(?:static)?\\s*\\w+\\s+(\\w+)\\s*\\("
             else -> return functions
         }
-        
+
         val matcher = Pattern.compile(pattern).matcher(content)
         while (matcher.find()) {
             functions.add(FunctionInfo(matcher.group(1), matcher.start()))
         }
-        
+
         return functions
     }
 
@@ -451,12 +455,12 @@ class ContextAwareDetectorImpl(
             "java" -> "(?:public|private|protected)?\\s*class\\s+(\\w+)"
             else -> return classes
         }
-        
+
         val matcher = Pattern.compile(pattern).matcher(content)
         while (matcher.find()) {
             classes.add(ClassInfo(matcher.group(1), matcher.start()))
         }
-        
+
         return classes
     }
 
@@ -467,14 +471,14 @@ class ContextAwareDetectorImpl(
             "java" -> listOf("(?:private|public|protected)?\\s*(?:static)?\\s*\\w+\\s+(\\w+)")
             else -> return variables
         }
-        
+
         patterns.forEach { pattern ->
             val matcher = Pattern.compile(pattern).matcher(content)
             while (matcher.find()) {
                 variables.add(VariableInfo(matcher.group(1), matcher.start()))
             }
         }
-        
+
         return variables
     }
 
