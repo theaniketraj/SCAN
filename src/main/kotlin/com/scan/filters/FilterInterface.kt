@@ -81,11 +81,11 @@ interface FilterInterface {
      * @return A map containing filter metadata (name, version, configuration summary, etc.)
      */
     fun getMetadata(): Map<String, Any> =
-            mapOf(
-                    "name" to this::class.simpleName.orEmpty(),
-                    "priority" to getPriority(),
-                    "description" to getDescription()
-            )
+        mapOf(
+            "name" to this::class.simpleName.orEmpty(),
+            "priority" to getPriority(),
+            "description" to getDescription()
+        )
 }
 
 /**
@@ -96,7 +96,7 @@ interface FilterInterface {
  * @param filterName The name of the filter that caused the error
  */
 class FilterException(message: String, cause: Throwable? = null, val filterName: String? = null) :
-        Exception(buildMessage(message, filterName), cause) {
+    Exception(buildMessage(message, filterName), cause) {
 
     companion object {
         private fun buildMessage(message: String, filterName: String?): String {
@@ -118,9 +118,9 @@ class FilterException(message: String, cause: Throwable? = null, val filterName:
  * @param filteringStats Statistics about the filtering process
  */
 data class FilterResult(
-        val includedFiles: List<File>,
-        val excludedFiles: Map<File, String>,
-        val filteringStats: FilteringStats
+    val includedFiles: List<File>,
+    val excludedFiles: Map<File, String>,
+    val filteringStats: FilteringStats
 )
 
 /**
@@ -133,11 +133,11 @@ data class FilterResult(
  * @param filterCounts Map of filter names to how many times they were applied
  */
 data class FilteringStats(
-        val totalFilesEvaluated: Int,
-        val filesIncluded: Int,
-        val filesExcluded: Int,
-        val filterExecutionTime: Long,
-        val filterCounts: Map<String, Int>
+    val totalFilesEvaluated: Int,
+    val filesIncluded: Int,
+    val filesExcluded: Int,
+    val filterExecutionTime: Long,
+    val filterCounts: Map<String, Int>
 )
 
 /**
@@ -155,10 +155,13 @@ interface CompositeFilterInterface : FilterInterface {
     enum class FilterOperation {
         /** All filters must return true (AND operation) */
         ALL,
+
         /** At least one filter must return true (OR operation) */
         ANY,
+
         /** Exactly one filter must return true (XOR operation) */
         EXCLUSIVE,
+
         /** No filters should return true (NOT operation) */
         NONE
     }
