@@ -1,18 +1,17 @@
 package com.scan.core
 
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 /** Complete scan result containing all findings and metadata */
 data class ScanResult(
-        val scanId: String,
-        val timestamp: LocalDateTime,
-        val configuration: ScanResultConfiguration,
-        val summary: ScanSummary,
-        val findings: List<Finding>,
-        val errors: List<ScanError>,
-        val performance: PerformanceMetrics
+    val scanId: String,
+    val timestamp: LocalDateTime,
+    val configuration: ScanResultConfiguration,
+    val summary: ScanSummary,
+    val findings: List<Finding>,
+    val errors: List<ScanError>,
+    val performance: PerformanceMetrics
 ) {
     /** Check if scan found any security issues */
     fun hasFindings(): Boolean = findings.isNotEmpty()
@@ -61,13 +60,13 @@ data class ScanResult(
 
 /** Summary statistics for the scan */
 data class ScanSummary(
-        val totalFilesScanned: Int,
-        val totalFindingsCount: Int,
-        val findingsBySeverity: Map<Severity, Int>,
-        val findingsByDetector: Map<String, Int>,
-        val totalLinesScanned: Long,
-        val skippedFiles: Int,
-        val skippedReason: Map<String, Int>
+    val totalFilesScanned: Int,
+    val totalFindingsCount: Int,
+    val findingsBySeverity: Map<Severity, Int>,
+    val findingsByDetector: Map<String, Int>,
+    val totalLinesScanned: Long,
+    val skippedFiles: Int,
+    val skippedReason: Map<String, Int>
 ) {
     fun getCriticalCount(): Int = findingsBySeverity[Severity.CRITICAL] ?: 0
     fun getHighCount(): Int = findingsBySeverity[Severity.HIGH] ?: 0
@@ -80,23 +79,23 @@ data class ScanSummary(
 
 /** Configuration snapshot for the scan */
 data class ScanResultConfiguration(
-        val configurationSource: String,
-        val enabledDetectors: List<String>,
-        val excludedPaths: List<String>,
-        val includedExtensions: List<String>,
-        val severityThreshold: Severity,
-        val maxFileSize: Long,
-        val customPatterns: Int
+    val configurationSource: String,
+    val enabledDetectors: List<String>,
+    val excludedPaths: List<String>,
+    val includedExtensions: List<String>,
+    val severityThreshold: Severity,
+    val maxFileSize: Long,
+    val customPatterns: Int
 )
 
 /** Scan error information */
 data class ScanError(
-        val errorType: ErrorType,
-        val message: String,
-        val filePath: String? = null,
-        val lineNumber: Int? = null,
-        val exception: String? = null,
-        val timestamp: LocalDateTime = LocalDateTime.now()
+    val errorType: ErrorType,
+    val message: String,
+    val filePath: String? = null,
+    val lineNumber: Int? = null,
+    val exception: String? = null,
+    val timestamp: LocalDateTime = LocalDateTime.now()
 ) {
     fun getFormattedMessage(): String {
         return buildString {
@@ -110,27 +109,27 @@ data class ScanError(
 
 /** Performance metrics for the scan */
 data class PerformanceMetrics(
-        val totalDurationMs: Long,
-        val fileProcessingTimeMs: Long,
-        val patternMatchingTimeMs: Long,
-        val entropyCalculationTimeMs: Long,
-        val reportGenerationTimeMs: Long,
-        val memoryUsageBytes: Long,
-        val peakMemoryUsageBytes: Long,
-        val filesPerSecond: Double,
-        val averageFileProcessingTimeMs: Double
+    val totalDurationMs: Long,
+    val fileProcessingTimeMs: Long,
+    val patternMatchingTimeMs: Long,
+    val entropyCalculationTimeMs: Long,
+    val reportGenerationTimeMs: Long,
+    val memoryUsageBytes: Long,
+    val peakMemoryUsageBytes: Long,
+    val filesPerSecond: Double,
+    val averageFileProcessingTimeMs: Double
 ) {
     fun getFormattedMetrics(): Map<String, String> {
         return mapOf(
-                "Total Duration" to "${totalDurationMs}ms",
-                "File Processing" to "${fileProcessingTimeMs}ms",
-                "Pattern Matching" to "${patternMatchingTimeMs}ms",
-                "Entropy Calculation" to "${entropyCalculationTimeMs}ms",
-                "Report Generation" to "${reportGenerationTimeMs}ms",
-                "Memory Usage" to "${memoryUsageBytes / 1024 / 1024}MB",
-                "Peak Memory" to "${peakMemoryUsageBytes / 1024 / 1024}MB",
-                "Files/Second" to "%.2f".format(filesPerSecond),
-                "Avg File Time" to "%.2fms".format(averageFileProcessingTimeMs)
+            "Total Duration" to "${totalDurationMs}ms",
+            "File Processing" to "${fileProcessingTimeMs}ms",
+            "Pattern Matching" to "${patternMatchingTimeMs}ms",
+            "Entropy Calculation" to "${entropyCalculationTimeMs}ms",
+            "Report Generation" to "${reportGenerationTimeMs}ms",
+            "Memory Usage" to "${memoryUsageBytes / 1024 / 1024}MB",
+            "Peak Memory" to "${peakMemoryUsageBytes / 1024 / 1024}MB",
+            "Files/Second" to "%.2f".format(filesPerSecond),
+            "Avg File Time" to "%.2fms".format(averageFileProcessingTimeMs)
         )
     }
 }
@@ -161,13 +160,13 @@ class ScanResultBuilder {
         requireNotNull(performance) { "Performance metrics are required" }
 
         return ScanResult(
-                scanId = scanId,
-                timestamp = timestamp,
-                configuration = configuration!!,
-                summary = summary!!,
-                findings = findings.toList(),
-                errors = errors.toList(),
-                performance = performance!!
+            scanId = scanId,
+            timestamp = timestamp,
+            configuration = configuration!!,
+            summary = summary!!,
+            findings = findings.toList(),
+            errors = errors.toList(),
+            performance = performance!!
         )
     }
 }
