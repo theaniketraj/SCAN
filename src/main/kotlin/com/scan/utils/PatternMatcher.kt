@@ -39,26 +39,26 @@ object PatternMatcher {
 
     /** Patterns for detecting different types of code contexts to ignore. */
     private val COMMENT_PATTERNS =
-            listOf(
-                    Pattern.compile("//.*?$", Pattern.MULTILINE), // Single-line comments
-                    Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL), // Multi-line comments
-                    Pattern.compile("#.*?$", Pattern.MULTILINE), // Shell/Python comments
-                    Pattern.compile("<!--.*?-->", Pattern.DOTALL), // HTML comments
-                    Pattern.compile("\\{\\s*#.*?#\\s*\\}", Pattern.DOTALL) // Template comments
-            )
+        listOf(
+            Pattern.compile("//.*?$", Pattern.MULTILINE), // Single-line comments
+            Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL), // Multi-line comments
+            Pattern.compile("#.*?$", Pattern.MULTILINE), // Shell/Python comments
+            Pattern.compile("<!--.*?-->", Pattern.DOTALL), // HTML comments
+            Pattern.compile("\\{\\s*#.*?#\\s*\\}", Pattern.DOTALL) // Template comments
+        )
 
     private val STRING_PATTERNS =
-            listOf(
-                    Pattern.compile(
-                            "\"(?:[^\"\\\\]|\\\\.)*\"",
-                            Pattern.DOTALL
-                    ), // Double-quoted strings
-                    Pattern.compile(
-                            "'(?:[^'\\\\]|\\\\.)*'",
-                            Pattern.DOTALL
-                    ), // Single-quoted strings
-                    Pattern.compile("`(?:[^`\\\\]|\\\\.)*`", Pattern.DOTALL) // Backtick strings
-            )
+        listOf(
+            Pattern.compile(
+                "\"(?:[^\"\\\\]|\\\\.)*\"",
+                Pattern.DOTALL
+            ), // Double-quoted strings
+            Pattern.compile(
+                "'(?:[^'\\\\]|\\\\.)*'",
+                Pattern.DOTALL
+            ), // Single-quoted strings
+            Pattern.compile("`(?:[^`\\\\]|\\\\.)*`", Pattern.DOTALL) // Backtick strings
+        )
 
     /**
      * Compiles a regex pattern with caching for performance optimization.
@@ -81,9 +81,9 @@ object PatternMatcher {
                 Pattern.compile(regex, flags)
             } catch (e: PatternSyntaxException) {
                 throw PatternSyntaxException(
-                        "Invalid regex pattern: ${e.description}",
-                        regex,
-                        e.index
+                    "Invalid regex pattern: ${e.description}",
+                    regex,
+                    e.index
                 )
             }
         }
@@ -99,10 +99,10 @@ object PatternMatcher {
      * @return List of PatternMatch objects
      */
     fun findMatches(
-            content: String,
-            pattern: String,
-            ignoreContext: Boolean = true,
-            maxMatches: Int = 0
+        content: String,
+        pattern: String,
+        ignoreContext: Boolean = true,
+        maxMatches: Int = 0
     ): List<PatternMatch> {
         return findMatches(content, compilePattern(pattern), ignoreContext, maxMatches)
     }
@@ -117,20 +117,20 @@ object PatternMatcher {
      * @return List of PatternMatch objects
      */
     fun findMatches(
-            content: String,
-            pattern: Pattern,
-            ignoreContext: Boolean = true,
-            maxMatches: Int = 0
+        content: String,
+        pattern: Pattern,
+        ignoreContext: Boolean = true,
+        maxMatches: Int = 0
     ): List<PatternMatch> {
         if (content.isEmpty()) return emptyList()
 
         // Truncate very large content for performance
         val searchContent =
-                if (content.length > MAX_CONTENT_LENGTH) {
-                    content.substring(0, MAX_CONTENT_LENGTH)
-                } else {
-                    content
-                }
+            if (content.length > MAX_CONTENT_LENGTH) {
+                content.substring(0, MAX_CONTENT_LENGTH)
+            } else {
+                content
+            }
 
         val matches = mutableListOf<PatternMatch>()
         val matcher = pattern.matcher(searchContent)
@@ -163,16 +163,16 @@ object PatternMatcher {
             val lineInfo = getLineInfo(searchContent, start)
 
             matches.add(
-                    PatternMatch(
-                            matchedText = matchedText,
-                            startIndex = start,
-                            endIndex = end,
-                            lineNumber = lineInfo.lineNumber,
-                            columnNumber = lineInfo.columnNumber,
-                            lineContent = lineInfo.lineContent,
-                            pattern = pattern.pattern(),
-                            groups = groups
-                    )
+                PatternMatch(
+                    matchedText = matchedText,
+                    startIndex = start,
+                    endIndex = end,
+                    lineNumber = lineInfo.lineNumber,
+                    columnNumber = lineInfo.columnNumber,
+                    lineContent = lineInfo.lineContent,
+                    pattern = pattern.pattern(),
+                    groups = groups
+                )
             )
         }
 
@@ -203,8 +203,8 @@ object PatternMatcher {
             PatternValidationResult(isValid = true, errorMessage = null)
         } catch (e: PatternSyntaxException) {
             PatternValidationResult(
-                    isValid = false,
-                    errorMessage = "Invalid regex at position ${e.index}: ${e.description}"
+                isValid = false,
+                errorMessage = "Invalid regex at position ${e.index}: ${e.description}"
             )
         }
     }
@@ -219,17 +219,17 @@ object PatternMatcher {
      * @return Map of pattern to list of matches
      */
     fun findMultiplePatternMatches(
-            content: String,
-            patterns: List<String>,
-            ignoreContext: Boolean = true,
-            maxMatchesPerPattern: Int = 0
+        content: String,
+        patterns: List<String>,
+        ignoreContext: Boolean = true,
+        maxMatchesPerPattern: Int = 0
     ): Map<String, List<PatternMatch>> {
         val results = mutableMapOf<String, List<PatternMatch>>()
 
         patterns.forEach { pattern ->
             try {
                 results[pattern] =
-                        findMatches(content, pattern, ignoreContext, maxMatchesPerPattern)
+                    findMatches(content, pattern, ignoreContext, maxMatchesPerPattern)
             } catch (e: PatternSyntaxException) {
                 // Skip invalid patterns, could log this
                 results[pattern] = emptyList()
@@ -248,9 +248,9 @@ object PatternMatcher {
      * @return List of potential secrets with confidence scores
      */
     fun extractPotentialSecrets(
-            content: String,
-            secretPatterns: List<String>,
-            contextKeywords: List<String> = DEFAULT_CONTEXT_KEYWORDS
+        content: String,
+        secretPatterns: List<String>,
+        contextKeywords: List<String> = DEFAULT_CONTEXT_KEYWORDS
     ): List<PotentialSecret> {
         val results = mutableListOf<PotentialSecret>()
         val allMatches = findMultiplePatternMatches(content, secretPatterns, ignoreContext = true)
@@ -259,13 +259,13 @@ object PatternMatcher {
             matches.forEach { match ->
                 val confidence = calculateConfidence(match, content, contextKeywords)
                 results.add(
-                        PotentialSecret(
-                                value = match.matchedText,
-                                pattern = pattern,
-                                location = match,
-                                confidence = confidence,
-                                secretType = inferSecretType(pattern, match.matchedText)
-                        )
+                    PotentialSecret(
+                        value = match.matchedText,
+                        pattern = pattern,
+                        location = match,
+                        confidence = confidence,
+                        secretType = inferSecretType(pattern, match.matchedText)
+                    )
                 )
             }
         }
@@ -334,29 +334,29 @@ object PatternMatcher {
         // Get the full line content
         val allLines = content.split('\n')
         val lineContent =
-                if (lineNumber <= allLines.size) {
-                    allLines[lineNumber - 1]
-                } else {
-                    ""
-                }
+            if (lineNumber <= allLines.size) {
+                allLines[lineNumber - 1]
+            } else {
+                ""
+            }
 
         return LineInfo(lineNumber, columnNumber, lineContent)
     }
 
     /** Calculates confidence score for a potential secret based on context. */
     private fun calculateConfidence(
-            match: PatternMatch,
-            content: String,
-            contextKeywords: List<String>
+        match: PatternMatch,
+        content: String,
+        contextKeywords: List<String>
     ): Double {
         var confidence = 0.5 // Base confidence
 
         // Check for context keywords nearby
         val contextWindow = getContextWindow(content, match.startIndex, match.endIndex, 100)
         val keywordMatches =
-                contextKeywords.count { keyword ->
-                    contextWindow.contains(keyword, ignoreCase = true)
-                }
+            contextKeywords.count { keyword ->
+                contextWindow.contains(keyword, ignoreCase = true)
+            }
 
         confidence += keywordMatches * 0.1
 
@@ -400,21 +400,21 @@ object PatternMatcher {
 
     /** Default context keywords that might indicate secrets. */
     val DEFAULT_CONTEXT_KEYWORDS =
-            listOf(
-                    "key",
-                    "secret",
-                    "password",
-                    "token",
-                    "auth",
-                    "api",
-                    "credential",
-                    "private",
-                    "public",
-                    "cert",
-                    "signature",
-                    "hash",
-                    "salt"
-            )
+        listOf(
+            "key",
+            "secret",
+            "password",
+            "token",
+            "auth",
+            "api",
+            "credential",
+            "private",
+            "public",
+            "cert",
+            "signature",
+            "hash",
+            "salt"
+        )
 
     // Pattern matching convenience methods for ContextAwareDetector
     fun matchesApiKeyPattern(value: String): Boolean {
@@ -478,14 +478,14 @@ object PatternMatcher {
 
 /** Represents a pattern match with detailed location and context information. */
 data class PatternMatch(
-        val matchedText: String,
-        val startIndex: Int,
-        val endIndex: Int,
-        val lineNumber: Int,
-        val columnNumber: Int,
-        val lineContent: String,
-        val pattern: String,
-        val groups: Map<String, String> = emptyMap()
+    val matchedText: String,
+    val startIndex: Int,
+    val endIndex: Int,
+    val lineNumber: Int,
+    val columnNumber: Int,
+    val lineContent: String,
+    val pattern: String,
+    val groups: Map<String, String> = emptyMap()
 ) {
     val length: Int
         get() = matchedText.length
@@ -503,15 +503,15 @@ data class PatternValidationResult(val isValid: Boolean, val errorMessage: Strin
 
 /** Represents a potential secret found through pattern matching. */
 data class PotentialSecret(
-        val value: String,
-        val pattern: String,
-        val location: PatternMatch,
-        val confidence: Double,
-        val secretType: SecretType
+    val value: String,
+    val pattern: String,
+    val location: PatternMatch,
+    val confidence: Double,
+    val secretType: SecretType
 ) {
     fun getDescription(): String {
         val confidencePercent = (confidence * 100).toInt()
-        return "Potential ${secretType.displayName} (${confidencePercent}% confidence) at line ${location.lineNumber}"
+        return "Potential ${secretType.displayName} ($confidencePercent% confidence) at line ${location.lineNumber}"
     }
 }
 
