@@ -14,12 +14,12 @@ import java.util.*
  * for new formats.
  */
 class ReportGenerator(private val configuration: ScanConfiguration) {
-    
+
     // Simple logger replacement
     private fun log(message: String) {
         println("[ReportGenerator] $message")
     }
-    
+
     private fun logError(message: String) {
         System.err.println("[ReportGenerator ERROR] $message")
     }
@@ -36,12 +36,12 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
         log("Generating scan reports for ${scanResults.size} findings...")
 
         val reportSummary =
-                ReportSummary(
-                        totalFindings = scanResults.size,
-                        timestamp = timestamp,
-                        projectPath = projectPath.absolutePath,
-                        scanDuration = calculateScanDuration(scanResults)
-                )
+            ReportSummary(
+                totalFindings = scanResults.size,
+                timestamp = timestamp,
+                projectPath = projectPath.absolutePath,
+                scanDuration = calculateScanDuration(scanResults)
+            )
 
         val generatedReports = mutableListOf<GeneratedReport>()
 
@@ -81,20 +81,20 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
 
     /** Generate JSON report */
     private fun generateJsonReport(
-            scanResults: List<ScanResult>,
-            @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
-            projectPath: File
+        scanResults: List<ScanResult>,
+        @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
+        projectPath: File
     ): GeneratedReport {
         log("Generating JSON report...")
         val startTime = System.currentTimeMillis()
 
         val outputFile =
-                resolveOutputFile(
-                        projectPath,
-                        null, // Use default path since json config doesn't exist
-                        "scan-report",
-                        "json"
-                )
+            resolveOutputFile(
+                projectPath,
+                null, // Use default path since json config doesn't exist
+                "scan-report",
+                "json"
+            )
 
         // Create a consolidated ScanResult from all results
         val consolidatedResult = if (scanResults.isNotEmpty()) {
@@ -110,29 +110,29 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
         log("JSON report generated: ${outputFile.absolutePath}")
 
         return GeneratedReport(
-                format = ReportFormat.JSON,
-                path = outputFile.absolutePath,
-                sizeBytes = outputFile.length(),
-                generationTimeMs = generationTime
+            format = ReportFormat.JSON,
+            path = outputFile.absolutePath,
+            sizeBytes = outputFile.length(),
+            generationTimeMs = generationTime
         )
     }
 
     /** Generate HTML report */
     private fun generateHtmlReport(
-            scanResults: List<ScanResult>,
-            @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
-            projectPath: File
+        scanResults: List<ScanResult>,
+        @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
+        projectPath: File
     ): GeneratedReport {
         log("Generating HTML report...")
         val startTime = System.currentTimeMillis()
 
         val outputFile =
-                resolveOutputFile(
-                        projectPath,
-                        null, // Use default path since html config doesn't exist
-                        "scan-report",
-                        "html"
-                )
+            resolveOutputFile(
+                projectPath,
+                null, // Use default path since html config doesn't exist
+                "scan-report",
+                "html"
+            )
 
         // Create a consolidated ScanResult from all results
         val consolidatedResult = if (scanResults.isNotEmpty()) {
@@ -153,30 +153,30 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
         log("HTML report generated: ${outputFile.absolutePath}")
 
         return GeneratedReport(
-                format = ReportFormat.HTML,
-                path = outputFile.absolutePath,
-                sizeBytes = outputFile.length(),
-                generationTimeMs = generationTime
+            format = ReportFormat.HTML,
+            path = outputFile.absolutePath,
+            sizeBytes = outputFile.length(),
+            generationTimeMs = generationTime
         )
     }
 
     /** Generate custom report using configured reporter */
     private fun generateCustomReport(
-            scanResults: List<ScanResult>,
-            @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
-            reporterName: String,
-            projectPath: File
+        scanResults: List<ScanResult>,
+        @Suppress("UNUSED_PARAMETER") summary: ReportSummary,
+        reporterName: String,
+        projectPath: File
     ): GeneratedReport {
         log("Generating custom report: $reporterName")
         val startTime = System.currentTimeMillis()
 
         val outputFile =
-                resolveOutputFile(
-                        projectPath,
-                        null,
-                        "scan-report-${reporterName.lowercase()}",
-                        "txt"
-                )
+            resolveOutputFile(
+                projectPath,
+                null,
+                "scan-report-${reporterName.lowercase()}",
+                "txt"
+            )
 
         // For now, just create a basic text report
         val report = buildString {
@@ -184,44 +184,44 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
             appendLine("Generated: ${java.time.LocalDateTime.now()}")
             appendLine("Total findings: ${scanResults.flatMap { it.findings }.size}")
         }
-        
+
         outputFile.writeText(report)
 
         val generationTime = System.currentTimeMillis() - startTime
         log("Custom report '$reporterName' generated: ${outputFile.absolutePath}")
 
         return GeneratedReport(
-                format = ReportFormat.CUSTOM,
-                path = outputFile.absolutePath,
-                sizeBytes = outputFile.length(),
-                generationTimeMs = generationTime,
-                customName = reporterName
+            format = ReportFormat.CUSTOM,
+            path = outputFile.absolutePath,
+            sizeBytes = outputFile.length(),
+            generationTimeMs = generationTime,
+            customName = reporterName
         )
     }
 
     /** Resolve output file path with timestamp and ensure directory exists */
     private fun resolveOutputFile(
-            projectPath: File,
-            configuredPath: String?,
-            defaultName: String,
-            extension: String
+        projectPath: File,
+        configuredPath: String?,
+        defaultName: String,
+        extension: String
     ): File {
         val outputDir =
-                if (configuredPath != null) {
-                    File(projectPath, configuredPath).parentFile ?: projectPath
-                } else {
-                    File(projectPath, "build/reports/scan")
-                }
+            if (configuredPath != null) {
+                File(projectPath, configuredPath).parentFile ?: projectPath
+            } else {
+                File(projectPath, "build/reports/scan")
+            }
 
         outputDir.mkdirs()
 
         val timestamp = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").format(LocalDateTime.now())
         val fileName =
-                if (configuredPath?.contains("/") == true) {
-                    File(configuredPath).name
-                } else {
-                    "${defaultName}-${timestamp}.${extension}"
-                }
+            if (configuredPath?.contains("/") == true) {
+                File(configuredPath).name
+            } else {
+                "$defaultName-$timestamp.$extension"
+            }
 
         return File(outputDir, fileName)
     }
@@ -238,7 +238,7 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
         log("=".repeat(60))
         log("Project: ${summary.projectPath}")
         log(
-                "Scan completed: ${summary.timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
+            "Scan completed: ${summary.timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
         )
         log("Total findings: ${summary.totalFindings}")
         log("Scan duration: ${summary.scanDuration}ms")
@@ -270,7 +270,7 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
 
             if (highSeverityCount > 0 || criticalSeverityCount > 0) {
                 logError(
-                        "Build will fail due to high/critical severity findings (failOnFindings=true)"
+                    "Build will fail due to high/critical severity findings (failOnFindings=true)"
                 )
             }
         }
@@ -317,4 +317,3 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
         }
     }
 }
-
