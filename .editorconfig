@@ -18,3 +18,5 @@ ktlint_standard_trailing-comma-on-declaration-site = disabled
 ktlint_standard_filename = disabled
 ktlint_standard_no-empty-file = disabled
 ktlint_standard_discouraged-comment-location = disabled
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_max-line-length = disabled
