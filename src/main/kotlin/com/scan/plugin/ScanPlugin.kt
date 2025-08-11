@@ -101,34 +101,34 @@ class ScanPlugin : Plugin<Project> {
 
             // Include common source directories that typically contain code
             includePatterns.convention(
-                    listOf(
-                            "src/**/*.kt",
-                            "src/**/*.java",
-                            "src/**/*.scala",
-                            "src/**/*.groovy",
-                            "src/**/*.properties",
-                            "src/**/*.yml",
-                            "src/**/*.yaml",
-                            "src/**/*.json",
-                            "src/**/*.xml",
-                            "*.gradle",
-                            "*.gradle.kts",
-                            "gradle.properties"
-                    )
+                listOf(
+                    "src/**/*.kt",
+                    "src/**/*.java",
+                    "src/**/*.scala",
+                    "src/**/*.groovy",
+                    "src/**/*.properties",
+                    "src/**/*.yml",
+                    "src/**/*.yaml",
+                    "src/**/*.json",
+                    "src/**/*.xml",
+                    "*.gradle",
+                    "*.gradle.kts",
+                    "gradle.properties"
+                )
             )
 
             // Exclude common directories that rarely contain secrets but often have false positives
             excludePatterns.convention(
-                    listOf(
-                            "**/build/**",
-                            "**/target/**",
-                            "**/.gradle/**",
-                            "**/.git/**",
-                            "**/node_modules/**",
-                            "**/*.class",
-                            "**/*.jar",
-                            "**/*.war"
-                    )
+                listOf(
+                    "**/build/**",
+                    "**/target/**",
+                    "**/.gradle/**",
+                    "**/.git/**",
+                    "**/node_modules/**",
+                    "**/*.class",
+                    "**/*.jar",
+                    "**/*.war"
+                )
             )
 
             // By default, be more lenient with test files since they often contain dummy data
@@ -158,8 +158,8 @@ class ScanPlugin : Plugin<Project> {
      * tasks when they're needed.
      */
     private fun registerScanTask(
-            project: Project,
-            extension: ScanExtension
+        project: Project,
+        extension: ScanExtension
     ): TaskProvider<ScanTask> {
         project.logger.debug("Registering main scan task: $SCAN_TASK_NAME")
 
@@ -167,7 +167,7 @@ class ScanPlugin : Plugin<Project> {
             // Set up task metadata that appears in 'gradle tasks' output
             task.group = TASK_GROUP
             task.description =
-                    "Scans the codebase for sensitive information like API keys, passwords, and tokens"
+                "Scans the codebase for sensitive information like API keys, passwords, and tokens"
 
             // Connect the task to the user's configuration
             // This is how the task knows what the user wants to scan and how to behave
@@ -188,8 +188,8 @@ class ScanPlugin : Plugin<Project> {
      * in different scenarios.
      */
     private fun configureBuildLifecycleIntegration(
-            project: Project,
-            scanTaskProvider: TaskProvider<ScanTask>
+        project: Project,
+        scanTaskProvider: TaskProvider<ScanTask>
     ) {
         project.logger.debug("Configuring build lifecycle integration")
 
@@ -223,16 +223,16 @@ class ScanPlugin : Plugin<Project> {
      * stricter checking in CI/CD pipelines but more lenient behavior during local development.
      */
     private fun configureBuildEnvironmentBehavior(
-            project: Project,
-            scanTaskProvider: TaskProvider<ScanTask>
+        project: Project,
+        scanTaskProvider: TaskProvider<ScanTask>
     ) {
         // Detect if we're running in a CI environment
         val isCI =
-                System.getenv("CI")?.toBoolean() == true ||
-                        System.getenv("CONTINUOUS_INTEGRATION")?.toBoolean() == true ||
-                        System.getenv("BUILD_NUMBER") != null ||
-                        System.getenv("JENKINS_URL") != null ||
-                        System.getenv("GITHUB_ACTIONS")?.toBoolean() == true
+            System.getenv("CI")?.toBoolean() == true ||
+                System.getenv("CONTINUOUS_INTEGRATION")?.toBoolean() == true ||
+                System.getenv("BUILD_NUMBER") != null ||
+                System.getenv("JENKINS_URL") != null ||
+                System.getenv("GITHUB_ACTIONS")?.toBoolean() == true
 
         if (isCI) {
             project.logger.info("CI environment detected - enabling strict security scanning")
@@ -269,7 +269,7 @@ class ScanPlugin : Plugin<Project> {
         val maxFileSize = extension.maxFileSizeBytes.get()
         if (maxFileSize <= 0) {
             throw IllegalArgumentException(
-                    "SCAN plugin configuration error: maxFileSizeBytes must be positive, got $maxFileSize"
+                "SCAN plugin configuration error: maxFileSizeBytes must be positive, got $maxFileSize"
             )
         }
 
@@ -277,8 +277,8 @@ class ScanPlugin : Plugin<Project> {
         val includePatterns = extension.includePatterns.get()
         if (includePatterns.isEmpty()) {
             project.logger.warn(
-                    "SCAN plugin warning: No include patterns specified. " +
-                            "This means no files will be scanned. Consider adding patterns like 'src/**/*.kt'"
+                "SCAN plugin warning: No include patterns specified. " +
+                    "This means no files will be scanned. Consider adding patterns like 'src/**/*.kt'"
             )
         }
 
@@ -286,7 +286,7 @@ class ScanPlugin : Plugin<Project> {
         val outputDir = extension.reportOutputDir.get().asFile
         if (!outputDir.parentFile.exists() && !outputDir.parentFile.mkdirs()) {
             project.logger.warn(
-                    "SCAN plugin warning: Cannot create report output directory: ${outputDir.absolutePath}"
+                "SCAN plugin warning: Cannot create report output directory: ${outputDir.absolutePath}"
             )
         }
 
@@ -298,8 +298,8 @@ class ScanPlugin : Plugin<Project> {
      * well in typical project setups.
      */
     private fun configurePluginIntegration(
-            project: Project,
-            scanTaskProvider: TaskProvider<ScanTask>
+        project: Project,
+        scanTaskProvider: TaskProvider<ScanTask>
     ) {
         project.logger.debug("Configuring integration with other plugins")
 
@@ -330,7 +330,7 @@ class ScanPlugin : Plugin<Project> {
         // Integration with Kotlin plugin if present
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
             project.logger.debug(
-                    "Kotlin JVM plugin detected - configuring Kotlin-specific integration"
+                "Kotlin JVM plugin detected - configuring Kotlin-specific integration"
             )
 
             project.afterEvaluate {
@@ -363,7 +363,7 @@ class ScanPlugin : Plugin<Project> {
 
         // The actual source files are inputs too - if they change, we need to re-scan
         inputs.files(project.fileTree(project.projectDir))
-                .withPropertyName("sourceFiles")
+            .withPropertyName("sourceFiles")
 
         // Configure outputs - these are the files the task produces
         if (extension.generateHtmlReport.get()) {
@@ -376,6 +376,6 @@ class ScanPlugin : Plugin<Project> {
         // Even if we don't generate file reports, we should have some output
         // to make Gradle's up-to-date checking work properly
         outputs.file(extension.reportOutputDir.get().file("scan-results.txt"))
-                .withPropertyName("scanResults")
+            .withPropertyName("scanResults")
     }
 }
