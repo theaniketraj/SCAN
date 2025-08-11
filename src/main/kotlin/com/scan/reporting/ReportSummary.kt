@@ -21,11 +21,11 @@ data class ReportSummary(
 
 /** Information about a generated report */
 data class GeneratedReport(
-        val format: ReportFormat,
-        val path: String,
-        val sizeBytes: Long,
-        val generationTimeMs: Long = 0,
-        val customName: String? = null
+    val format: ReportFormat,
+    val path: String,
+    val sizeBytes: Long,
+    val generationTimeMs: Long = 0,
+    val customName: String? = null
 )
 
 /** Supported report formats */
