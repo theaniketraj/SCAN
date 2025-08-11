@@ -1,12 +1,12 @@
 package com.scan.reporting
 
-import com.scan.core.ScanResult
 import com.scan.core.Finding
+import com.scan.core.ScanResult
 import com.scan.core.Severity
-import java.io.File
-import java.time.format.DateTimeFormatter
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import java.io.File
+import java.time.format.DateTimeFormatter
 
 /**
  * Console reporter that provides rich, formatted output for scan results. Supports color-coded
@@ -17,9 +17,9 @@ class ConsoleReporter {
 
     /** Generate console report with configurable verbosity and formatting */
     fun generateReport(
-            scanResults: List<ScanResult>,
-            summary: ReportSummary,
-            consoleOutput: Boolean = true
+        scanResults: List<ScanResult>,
+        summary: ReportSummary,
+        consoleOutput: Boolean = true
     ) {
         if (!consoleOutput) return
 
@@ -34,44 +34,44 @@ class ConsoleReporter {
     /** Print clean scan results (no findings) */
     private fun printCleanScanResults(summary: ReportSummary) {
         logger.lifecycle(
-                buildString {
-                    appendLine()
-                    appendLine(colorize("✅ SECURITY SCAN PASSED", ConsoleColor.GREEN, bold = true))
-                    appendLine(colorize("═".repeat(50), ConsoleColor.GREEN))
-                    appendLine("No security issues detected in your codebase!")
-                    appendLine()
-                    appendLine("📊 Scan Statistics:")
-                    appendLine("   • Project: ${File(summary.projectPath).name}")
-                    appendLine("   • Completed: ${formatTimestamp(summary.timestamp)}")
-                    appendLine("   • Duration: ${formatDuration(summary.scanDuration)}")
-                    appendLine("   • Files scanned: ${getScannedFileCount(summary)}")
-                    appendLine()
-                    appendLine(
-                            colorize(
-                                    "Your code is ready for version control! 🚀",
-                                    ConsoleColor.GREEN
-                            )
+            buildString {
+                appendLine()
+                appendLine(colorize("✅ SECURITY SCAN PASSED", ConsoleColor.GREEN, bold = true))
+                appendLine(colorize("═".repeat(50), ConsoleColor.GREEN))
+                appendLine("No security issues detected in your codebase!")
+                appendLine()
+                appendLine("📊 Scan Statistics:")
+                appendLine("   • Project: ${File(summary.projectPath).name}")
+                appendLine("   • Completed: ${formatTimestamp(summary.timestamp)}")
+                appendLine("   • Duration: ${formatDuration(summary.scanDuration)}")
+                appendLine("   • Files scanned: ${getScannedFileCount(summary)}")
+                appendLine()
+                appendLine(
+                    colorize(
+                        "Your code is ready for version control! 🚀",
+                        ConsoleColor.GREEN
                     )
-                    appendLine()
-                }
+                )
+                appendLine()
+            }
         )
     }
 
     /** Print detailed findings report */
     private fun printFindingsReport(
-            scanResults: List<ScanResult>,
-            summary: ReportSummary,
-            findings: List<Finding>
+        scanResults: List<ScanResult>,
+        summary: ReportSummary,
+        findings: List<Finding>
     ) {
         logger.lifecycle(
-                buildString {
-                    appendLine()
-                    appendLine(
-                            colorize("🔍 SECURITY SCAN RESULTS", ConsoleColor.YELLOW, bold = true)
-                    )
-                    appendLine(colorize("═".repeat(60), ConsoleColor.YELLOW))
-                    appendLine()
-                }
+            buildString {
+                appendLine()
+                appendLine(
+                    colorize("🔍 SECURITY SCAN RESULTS", ConsoleColor.YELLOW, bold = true)
+                )
+                appendLine(colorize("═".repeat(60), ConsoleColor.YELLOW))
+                appendLine()
+            }
         )
 
         // Print findings by severity
@@ -100,7 +100,7 @@ class ConsoleReporter {
                 val icon = getSeverityIcon(severity)
                 val color = getSeverityColor(severity)
                 logger.lifecycle(
-                        "   $icon ${colorize(severity.name, color, bold = true)}: $count ${if (count == 1) "finding" else "findings"}"
+                    "   $icon ${colorize(severity.name, color, bold = true)}: $count ${if (count == 1) "finding" else "findings"}"
                 )
             }
         }
@@ -124,7 +124,7 @@ class ConsoleReporter {
         val filePath = scanResult.findings.firstOrNull()?.location?.filePath ?: "Unknown"
         logger.lifecycle(colorize("📁 $filePath", ConsoleColor.BLUE, bold = true))
         logger.lifecycle(
-                "   ${colorize("─".repeat(filePath.length + 2), ConsoleColor.BLUE)}"
+            "   ${colorize("─".repeat(filePath.length + 2), ConsoleColor.BLUE)}"
         )
 
         scanResult.findings.forEachIndexed { index, finding ->
@@ -139,7 +139,7 @@ class ConsoleReporter {
         val severityColor = getSeverityColor(finding.severity)
 
         logger.lifecycle(
-                "   ${colorize("$index.", ConsoleColor.WHITE)} $severityIcon ${colorize(finding.severity.name, severityColor)} - ${finding.description}"
+            "   ${colorize("$index.", ConsoleColor.WHITE)} $severityIcon ${colorize(finding.severity.name, severityColor)} - ${finding.description}"
         )
 
         // Print location information
@@ -191,11 +191,11 @@ class ConsoleReporter {
 
             // Highlight the problematic line
             val formattedLine =
-                    if (index == 0 && lines.size == 1) {
-                        colorize(line, ConsoleColor.RED, background = ConsoleColor.BG_RED)
-                    } else {
-                        line
-                    }
+                if (index == 0 && lines.size == 1) {
+                    colorize(line, ConsoleColor.RED, background = ConsoleColor.BG_RED)
+                } else {
+                    line
+                }
 
             logger.lifecycle("$prefix$formattedLine")
         }
@@ -227,7 +227,7 @@ class ConsoleReporter {
                     val icon = getSeverityIcon(severity)
                     val color = getSeverityColor(severity)
                     logger.lifecycle(
-                            "   • $icon ${colorize(severity.name, color)}: $count ($percentage%)"
+                        "   • $icon ${colorize(severity.name, color)}: $count ($percentage%)"
                     )
                 }
             }
@@ -257,29 +257,29 @@ class ConsoleReporter {
         when {
             criticalCount > 0 -> {
                 logger.lifecycle(
-                        colorize(
-                                "   ⛔ CRITICAL: Immediate action required!",
-                                ConsoleColor.RED,
-                                bold = true
-                        )
+                    colorize(
+                        "   ⛔ CRITICAL: Immediate action required!",
+                        ConsoleColor.RED,
+                        bold = true
+                    )
                 )
                 logger.lifecycle("   • Review and fix critical security issues before committing")
                 logger.lifecycle("   • Consider these as blocking issues for production deployment")
             }
             highCount > 0 -> {
                 logger.lifecycle(
-                        colorize(
-                                "   ⚠️  HIGH: Address these issues soon",
-                                ConsoleColor.YELLOW,
-                                bold = true
-                        )
+                    colorize(
+                        "   ⚠️  HIGH: Address these issues soon",
+                        ConsoleColor.YELLOW,
+                        bold = true
+                    )
                 )
                 logger.lifecycle("   • Plan to fix high-severity issues in the next release cycle")
                 logger.lifecycle("   • Consider implementing additional security measures")
             }
             else -> {
                 logger.lifecycle(
-                        colorize("   ✅ Good security posture!", ConsoleColor.GREEN, bold = true)
+                    colorize("   ✅ Good security posture!", ConsoleColor.GREEN, bold = true)
                 )
                 logger.lifecycle("   • Consider fixing remaining issues for enhanced security")
             }
@@ -306,23 +306,23 @@ class ConsoleReporter {
 
     /** Get icon for severity level */
     private fun getSeverityIcon(severity: Severity): String =
-            when (severity) {
-                Severity.CRITICAL -> "🔴"
-                Severity.HIGH -> "🟠"
-                Severity.MEDIUM -> "🟡"
-                Severity.LOW -> "🔵"
-                Severity.INFO -> "ℹ️"
-            }
+        when (severity) {
+            Severity.CRITICAL -> "🔴"
+            Severity.HIGH -> "🟠"
+            Severity.MEDIUM -> "🟡"
+            Severity.LOW -> "🔵"
+            Severity.INFO -> "ℹ️"
+        }
 
     /** Get color for severity level */
     private fun getSeverityColor(severity: Severity): ConsoleColor =
-            when (severity) {
-                Severity.CRITICAL -> ConsoleColor.RED
-                Severity.HIGH -> ConsoleColor.YELLOW
-                Severity.MEDIUM -> ConsoleColor.BLUE
-                Severity.LOW -> ConsoleColor.GREEN
-                Severity.INFO -> ConsoleColor.GRAY
-            }
+        when (severity) {
+            Severity.CRITICAL -> ConsoleColor.RED
+            Severity.HIGH -> ConsoleColor.YELLOW
+            Severity.MEDIUM -> ConsoleColor.BLUE
+            Severity.LOW -> ConsoleColor.GREEN
+            Severity.INFO -> ConsoleColor.GRAY
+        }
 
     /** Format timestamp for display */
     private fun formatTimestamp(timestamp: java.time.LocalDateTime): String {
@@ -331,11 +331,11 @@ class ConsoleReporter {
 
     /** Format duration in human-readable format */
     private fun formatDuration(durationMs: Long): String =
-            when {
-                durationMs < 1000 -> "${durationMs}ms"
-                durationMs < 60000 -> "${durationMs / 1000}.${(durationMs % 1000) / 100}s"
-                else -> "${durationMs / 60000}m ${(durationMs % 60000) / 1000}s"
-            }
+        when {
+            durationMs < 1000 -> "${durationMs}ms"
+            durationMs < 60000 -> "${durationMs / 1000}.${(durationMs % 1000) / 100}s"
+            else -> "${durationMs / 60000}m ${(durationMs % 60000) / 1000}s"
+        }
 
     /** Get scanned file count from summary */
     private fun getScannedFileCount(@Suppress("UNUSED_PARAMETER") summary: ReportSummary): Int {
@@ -353,10 +353,10 @@ class ConsoleReporter {
 
     /** Apply console colors and formatting */
     private fun colorize(
-            text: String,
-            color: ConsoleColor,
-            bold: Boolean = false,
-            background: ConsoleColor? = null
+        text: String,
+        color: ConsoleColor,
+        bold: Boolean = false,
+        background: ConsoleColor? = null
     ): String {
         if (!supportsColor()) return text
 
@@ -416,13 +416,13 @@ enum class ConsoleColor(val code: String) {
 
 /** Represents a security finding for console reporting */
 data class ConsoleFinding(
-        val description: String,
-        val severity: com.scan.core.Severity,
-        val ruleName: String = "",
-        val lineNumber: Int? = null,
-        val columnStart: Int? = null,
-        val columnEnd: Int? = null,
-        val codeSnippet: String? = null,
-        val confidence: Double? = null,
-        val recommendations: List<String> = emptyList()
+    val description: String,
+    val severity: com.scan.core.Severity,
+    val ruleName: String = "",
+    val lineNumber: Int? = null,
+    val columnStart: Int? = null,
+    val columnEnd: Int? = null,
+    val codeSnippet: String? = null,
+    val confidence: Double? = null,
+    val recommendations: List<String> = emptyList()
 )
