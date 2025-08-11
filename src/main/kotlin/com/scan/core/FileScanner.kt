@@ -2,7 +2,6 @@ package com.scan.core
 
 import com.scan.detectors.DetectorInterface
 import com.scan.filters.FilterInterface
-import com.scan.utils.EntropyCalculator
 import com.scan.utils.FileUtils
 import java.io.File
 import java.io.IOException
@@ -17,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap
  * reading, content analysis, and coordinates with detectors and filters.
  */
 class FileScanner(
-        private val configuration: ScanConfiguration,
-        private val detectors: List<DetectorInterface> = emptyList(),
-        private val filters: List<FilterInterface> = emptyList()
+    private val configuration: ScanConfiguration,
+    private val detectors: List<DetectorInterface> = emptyList(),
+    private val filters: List<FilterInterface> = emptyList()
 ) {
-    
+
     // Legacy constructor for test compatibility
     constructor(configuration: ScanConfiguration) : this(
         configuration = configuration,
@@ -36,77 +35,77 @@ class FileScanner(
 
         // Common file extensions that should be scanned
         private val SCANNABLE_EXTENSIONS =
-                setOf(
-                        "kt",
-                        "java",
-                        "js",
-                        "ts",
-                        "py",
-                        "rb",
-                        "go",
-                        "rs",
-                        "cpp",
-                        "c",
-                        "h",
-                        "cs",
-                        "php",
-                        "scala",
-                        "clj",
-                        "swift",
-                        "dart",
-                        "sh",
-                        "bash",
-                        "zsh",
-                        "yml",
-                        "yaml",
-                        "json",
-                        "xml",
-                        "properties",
-                        "conf",
-                        "config",
-                        "ini",
-                        "env",
-                        "dockerfile",
-                        "sql",
-                        "md",
-                        "txt",
-                        "gradle",
-                        "kts"
-                )
+            setOf(
+                "kt",
+                "java",
+                "js",
+                "ts",
+                "py",
+                "rb",
+                "go",
+                "rs",
+                "cpp",
+                "c",
+                "h",
+                "cs",
+                "php",
+                "scala",
+                "clj",
+                "swift",
+                "dart",
+                "sh",
+                "bash",
+                "zsh",
+                "yml",
+                "yaml",
+                "json",
+                "xml",
+                "properties",
+                "conf",
+                "config",
+                "ini",
+                "env",
+                "dockerfile",
+                "sql",
+                "md",
+                "txt",
+                "gradle",
+                "kts"
+            )
 
         // Binary file extensions to skip
         private val BINARY_EXTENSIONS =
-                setOf(
-                        "jar",
-                        "zip",
-                        "tar",
-                        "gz",
-                        "7z",
-                        "rar",
-                        "exe",
-                        "dll",
-                        "so",
-                        "dylib",
-                        "png",
-                        "jpg",
-                        "jpeg",
-                        "gif",
-                        "bmp",
-                        "ico",
-                        "svg",
-                        "pdf",
-                        "doc",
-                        "docx",
-                        "xls",
-                        "xlsx",
-                        "ppt",
-                        "pptx",
-                        "mp3",
-                        "mp4",
-                        "avi",
-                        "mov",
-                        "wav"
-                )
+            setOf(
+                "jar",
+                "zip",
+                "tar",
+                "gz",
+                "7z",
+                "rar",
+                "exe",
+                "dll",
+                "so",
+                "dylib",
+                "png",
+                "jpg",
+                "jpeg",
+                "gif",
+                "bmp",
+                "ico",
+                "svg",
+                "pdf",
+                "doc",
+                "docx",
+                "xls",
+                "xlsx",
+                "ppt",
+                "pptx",
+                "mp3",
+                "mp4",
+                "avi",
+                "mov",
+                "wav"
+            )
     }
 
     // Cache for file hashes to avoid rescanning unchanged files
@@ -154,7 +153,7 @@ class FileScanner(
                 } catch (e: Exception) {
                     // Log detector error but continue with other detectors
                     System.err.println(
-                            "Detector ${detector.javaClass.simpleName} failed for ${filePath}: ${e.message}"
+                        "Detector ${detector.javaClass.simpleName} failed for $filePath: ${e.message}"
                     )
                 }
             }
@@ -163,23 +162,23 @@ class FileScanner(
             val processedFindings = postProcessFindings(findings, scanContext)
 
             FileScanResult.success(
-                    filePath = filePath.toString(),
-                    detections = processedFindings,
-                    scanTimeMs = System.currentTimeMillis() - startTime,
-                    fileSize = file.length()
+                filePath = filePath.toString(),
+                detections = processedFindings,
+                scanTimeMs = System.currentTimeMillis() - startTime,
+                fileSize = file.length()
             )
         } catch (e: Exception) {
-            System.err.println("Failed to scan file ${filePath}: ${e.message}")
+            System.err.println("Failed to scan file $filePath: ${e.message}")
             return FileScanResult.error(
-                    filePath = filePath.toString(),
-                    errorMessage = e.message ?: "Unknown error"
+                filePath = filePath.toString(),
+                errorMessage = e.message ?: "Unknown error"
             )
         }
     }
 
     /**
      * Legacy method for test compatibility - scans a file and returns simple results
-     * 
+     *
      * @param file The file to scan
      * @return List of LegacyScanResult objects (legacy format for tests)
      */
@@ -203,7 +202,7 @@ class FileScanner(
             try {
                 val content = readFileContent(file) ?: return emptyList()
                 val results = mutableListOf<LegacyScanResult>()
-                
+
                 detectors.forEach { detector ->
                     try {
                         val scanContext = ScanContext(
@@ -217,7 +216,7 @@ class FileScanner(
                             content = content,
                             lines = content.lines()
                         )
-                        
+
                         val findings = detector.detect(scanContext)
                         findings.forEach { finding ->
                             results.add(LegacyScanResult(
@@ -236,17 +235,17 @@ class FileScanner(
                         System.err.println("Detector failed: ${e.message}")
                     }
                 }
-                
+
                 return results
             } catch (e: Exception) {
                 throw IllegalArgumentException("Failed to scan file: ${e.message}", e)
             }
         }
-        
+
         // No detectors configured - return empty list
         return emptyList()
     }
-    
+
     private fun convertSeverity(severity: Severity): LegacyScanResult.Severity {
         return when (severity) {
             Severity.CRITICAL -> LegacyScanResult.Severity.HIGH
@@ -264,13 +263,13 @@ class FileScanner(
         val isTestFile = isTestFile(filePath)
 
         return ScanContext(
-                filePath = filePath,
-                fileName = file.name,
-                fileExtension = extension,
-                isTestFile = isTestFile,
-                fileSize = file.length(),
-                configuration = configuration,
-                relativePath = filePath.toString()
+            filePath = filePath,
+            fileName = file.name,
+            fileExtension = extension,
+            isTestFile = isTestFile,
+            fileSize = file.length(),
+            configuration = configuration,
+            relativePath = filePath.toString()
         )
     }
 
@@ -317,7 +316,7 @@ class FileScanner(
                 !filter.shouldIncludeFile(filePath.toFile(), scanContext.relativePath ?: filePath.toString())
             } catch (e: Exception) {
                 System.err.println(
-                        "Filter ${filter.javaClass.simpleName} failed for ${filePath}: ${e.message}"
+                    "Filter ${filter.javaClass.simpleName} failed for $filePath: ${e.message}"
                 )
                 false // Don't skip on filter error
             }
@@ -408,13 +407,13 @@ class FileScanner(
         val fileName = filePath.fileName.toString().lowercase()
 
         return pathStr.contains("/test/") ||
-                pathStr.contains("\\test\\") ||
-                pathStr.contains("/tests/") ||
-                pathStr.contains("\\tests\\") ||
-                fileName.contains("test") ||
-                fileName.contains("spec") ||
-                pathStr.contains("src/test") ||
-                pathStr.contains("src\\test")
+            pathStr.contains("\\test\\") ||
+            pathStr.contains("/tests/") ||
+            pathStr.contains("\\tests\\") ||
+            fileName.contains("test") ||
+            fileName.contains("spec") ||
+            pathStr.contains("src/test") ||
+            pathStr.contains("src\\test")
     }
 
     /**
@@ -430,7 +429,7 @@ class FileScanner(
         findings.forEach { finding ->
             // Create a unique key for deduplication
             val uniqueKey =
-                    "${finding.location.lineNumber}:${finding.location.columnStart}:${finding.detectorType}:${finding.secretInfo.detectedValue}"
+                "${finding.location.lineNumber}:${finding.location.columnStart}:${finding.detectorType}:${finding.secretInfo.detectedValue}"
 
             if (uniqueKey !in seenFindings) {
                 seenFindings.add(uniqueKey)
@@ -438,19 +437,19 @@ class FileScanner(
                 // Apply confidence scoring
                 val adjustedFinding = adjustConfidenceScore(finding, context)
 
-                // Filter based on minimum confidence threshold  
+                // Filter based on minimum confidence threshold
                 // TODO: Fix confidence comparison - needs proper comparison logic
                 // if (adjustedFinding.confidence >= configuration.minConfidence) {
-                    processed.add(adjustedFinding)
+                processed.add(adjustedFinding)
                 // }
             }
         }
 
         // Sort by confidence (highest first) and then by line number
         return processed.sortedWith(
-                compareByDescending<Finding> { it.confidence.ordinal }.thenBy { it.location.lineNumber }.thenBy {
-                    it.location.columnStart
-                }
+            compareByDescending<Finding> { it.confidence.ordinal }.thenBy { it.location.lineNumber }.thenBy {
+                it.location.columnStart
+            }
         )
     }
 
@@ -459,7 +458,7 @@ class FileScanner(
         // For now, return finding as-is
         // TODO: Implement proper confidence adjustment logic
         return finding
-        
+
         /*
         var adjustedConfidence = finding.confidence
 
@@ -490,7 +489,7 @@ class FileScanner(
         adjustedConfidence = adjustedConfidence.coerceIn(0.0, 1.0)
 
         return finding.copy(confidence = adjustedConfidence)
-        */
+         */
     }
 
     /** Checks if a finding is within a comment block or line. */
@@ -510,8 +509,8 @@ class FileScanner(
         // Check for block comments (simple heuristic)
         val trimmedLine = line.trim()
         if (trimmedLine.startsWith("*") ||
-                        trimmedLine.startsWith("/*") ||
-                        trimmedLine.endsWith("*/")
+            trimmedLine.startsWith("/*") ||
+            trimmedLine.endsWith("*/")
         ) {
             return true
         }
@@ -525,27 +524,27 @@ class FileScanner(
 
         // Common placeholder patterns
         val placeholders =
-                listOf(
-                        "example",
-                        "test",
-                        "demo",
-                        "sample",
-                        "placeholder",
-                        "dummy",
-                        "fake",
-                        "mock",
-                        "stub",
-                        "your_",
-                        "my_",
-                        "insert_",
-                        "put_your_",
-                        "xxxxxxxx",
-                        "12345",
-                        "abcdef",
-                        "foobar",
-                        "lorem",
-                        "ipsum"
-                )
+            listOf(
+                "example",
+                "test",
+                "demo",
+                "sample",
+                "placeholder",
+                "dummy",
+                "fake",
+                "mock",
+                "stub",
+                "your_",
+                "my_",
+                "insert_",
+                "put_your_",
+                "xxxxxxxx",
+                "12345",
+                "abcdef",
+                "foobar",
+                "lorem",
+                "ipsum"
+            )
 
         return placeholders.any { value.contains(it) }
     }
@@ -558,8 +557,8 @@ class FileScanner(
     /** Gets cache statistics for monitoring. */
     fun getCacheStats(): Map<String, Any> {
         return mapOf(
-                "cacheSize" to fileHashCache.size,
-                "memoryUsage" to (fileHashCache.size * 100) // Rough estimate
+            "cacheSize" to fileHashCache.size,
+            "memoryUsage" to (fileHashCache.size * 100) // Rough estimate
         )
     }
 }
