@@ -7,17 +7,17 @@ import com.scan.reporting.ConsoleReporter
 import com.scan.reporting.HtmlReporter
 import com.scan.reporting.JsonReporter
 import com.scan.reporting.ReportSummary
-import java.io.File
-import java.time.Duration
-import java.time.Instant
-import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.work.DisableCachingByDefault
-import kotlinx.coroutines.runBlocking
+import java.io.File
+import java.time.Duration
+import java.time.Instant
+import javax.inject.Inject
 
 /**
  * The main task that performs security scanning for sensitive information.
@@ -40,7 +40,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
      *
      * We use Gradle's Property API here, which provides lazy evaluation and proper integration with
      * Gradle's configuration cache and task isolation features.
-     * 
+     *
      * Marked as @Internal since we expose individual properties as @Input below.
      */
     @get:Internal abstract val scanConfiguration: Property<ScanExtension>
@@ -96,18 +96,22 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
     @get:Optional
     val htmlReportFile: File?
         get() =
-                if (scanConfiguration.get().generateHtmlReport.get()) {
-                    scanConfiguration.get().reportOutputDir.get().asFile.resolve("scan-report.html")
-                } else null
+            if (scanConfiguration.get().generateHtmlReport.get()) {
+                scanConfiguration.get().reportOutputDir.get().asFile.resolve("scan-report.html")
+            } else {
+                null
+            }
 
     /** Optional JSON report output for CI/CD integration and programmatic processing. */
     @get:OutputFile
     @get:Optional
     val jsonReportFile: File?
         get() =
-                if (scanConfiguration.get().generateJsonReport.get()) {
-                    scanConfiguration.get().reportOutputDir.get().asFile.resolve("scan-report.json")
-                } else null
+            if (scanConfiguration.get().generateJsonReport.get()) {
+                scanConfiguration.get().reportOutputDir.get().asFile.resolve("scan-report.json")
+            } else {
+                null
+            }
 
     /**
      * The main execution method that Gradle calls when this task needs to run. This is annotated
@@ -168,8 +172,8 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         val includePatterns = config.includePatterns.get()
         if (includePatterns.isEmpty()) {
             throw GradleException(
-                    "SCAN configuration error: No include patterns specified. " +
-                            "Add patterns like 'src/**/*.kt' to scan your source files."
+                "SCAN configuration error: No include patterns specified. " +
+                    "Add patterns like 'src/**/*.kt' to scan your source files."
             )
         }
 
@@ -177,14 +181,14 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         val maxFileSize = config.maxFileSizeBytes.get()
         if (maxFileSize <= 0) {
             throw GradleException(
-                    "SCAN configuration error: maxFileSizeBytes must be positive, got $maxFileSize"
+                "SCAN configuration error: maxFileSizeBytes must be positive, got $maxFileSize"
             )
         }
 
         // Warn about potentially problematic configurations
         if (maxFileSize < 1024) {
             logger.warn(
-                    "SCAN warning: Very small maxFileSizeBytes (${maxFileSize}). This might skip legitimate source files."
+                "SCAN warning: Very small maxFileSizeBytes ($maxFileSize). This might skip legitimate source files."
             )
         }
 
@@ -202,8 +206,8 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             val created = outputDir.mkdirs()
             if (!created) {
                 throw GradleException(
-                        "SCAN error: Cannot create output directory: ${outputDir.absolutePath}. " +
-                                "Please check permissions and disk space."
+                    "SCAN error: Cannot create output directory: ${outputDir.absolutePath}. " +
+                        "Please check permissions and disk space."
                 )
             }
             logger.debug("Created output directory: ${outputDir.absolutePath}")
@@ -211,8 +215,8 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         if (!outputDir.canWrite()) {
             throw GradleException(
-                    "SCAN error: Cannot write to output directory: ${outputDir.absolutePath}. " +
-                            "Please check directory permissions."
+                "SCAN error: Cannot write to output directory: ${outputDir.absolutePath}. " +
+                    "Please check directory permissions."
             )
         }
     }
@@ -227,33 +231,40 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         // Transform the Gradle extension configuration into the internal configuration format
         val internalConfig =
-                ScanConfiguration(
-                        includePatterns = config.includePatterns.getOrElse(emptySet()).toList(),
-                        excludePatterns = config.excludePatterns.getOrElse(emptySet()).toList(),
-                        maxFileSize = config.maxFileSizeBytes.getOrElse(10 * 1024 * 1024),
-                        performance = PerformanceConfiguration(
-                                maxConcurrency = if (config.parallelScanning.getOrElse(true)) 
-                                    Runtime.getRuntime().availableProcessors() else 1
-                        ),
-                        entropy = EntropyConfiguration(
-                                threshold = if (config.strictMode.getOrElse(false)) 3.5 else 4.0
-                        ),
-                        reporting = ReportingConfiguration(
-                                console = ConsoleReportConfiguration(),
-                                json = if (config.generateJsonReport.getOrElse(false))
-                                    JsonReportConfiguration()
-                                else JsonReportConfiguration(),
-                                html = if (config.generateHtmlReport.getOrElse(false))
-                                    HtmlReportConfiguration()
-                                else HtmlReportConfiguration()
-                        ),
-                        buildIntegration = BuildIntegrationConfiguration(
-                                strictMode = config.strictMode.getOrElse(false)
-                        )
+            ScanConfiguration(
+                includePatterns = config.includePatterns.getOrElse(emptySet()).toList(),
+                excludePatterns = config.excludePatterns.getOrElse(emptySet()).toList(),
+                maxFileSize = config.maxFileSizeBytes.getOrElse(10 * 1024 * 1024),
+                performance = PerformanceConfiguration(
+                    maxConcurrency = if (config.parallelScanning.getOrElse(true)) {
+                        Runtime.getRuntime().availableProcessors()
+                    } else {
+                        1
+                    }
+                ),
+                entropy = EntropyConfiguration(
+                    threshold = if (config.strictMode.getOrElse(false)) 3.5 else 4.0
+                ),
+                reporting = ReportingConfiguration(
+                    console = ConsoleReportConfiguration(),
+                    json = if (config.generateJsonReport.getOrElse(false)) {
+                        JsonReportConfiguration()
+                    } else {
+                        JsonReportConfiguration()
+                    },
+                    html = if (config.generateHtmlReport.getOrElse(false)) {
+                        HtmlReportConfiguration()
+                    } else {
+                        HtmlReportConfiguration()
+                    }
+                ),
+                buildIntegration = BuildIntegrationConfiguration(
+                    strictMode = config.strictMode.getOrElse(false)
                 )
+            )
 
         logger.debug(
-                "Created scan engine with configuration: strictMode=${internalConfig.buildIntegration.strictMode}"
+            "Created scan engine with configuration: strictMode=${internalConfig.buildIntegration.strictMode}"
         )
 
         return ScanEngine(internalConfig)
@@ -274,43 +285,43 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         // Apply additional filtering based on configuration
         val filteredFiles =
-                allFiles.filter { file ->
-                    when {
-                        !file.isFile -> {
-                            logger.debug("Skipping non-file: ${file.name}")
-                            false
-                        }
-                        file.length() == 0L -> {
-                            logger.debug("Skipping empty file: ${file.name}")
-                            false
-                        }
-                        file.length() > maxFileSize -> {
-                            logger.info(
-                                    "Skipping large file (${file.length()} bytes): ${file.name}"
-                            )
-                            false
-                        }
-                        !file.canRead() -> {
-                            logger.warn("Skipping unreadable file: ${file.name}")
-                            false
-                        }
-                        else -> true
+            allFiles.filter { file ->
+                when {
+                    !file.isFile -> {
+                        logger.debug("Skipping non-file: ${file.name}")
+                        false
                     }
+                    file.length() == 0L -> {
+                        logger.debug("Skipping empty file: ${file.name}")
+                        false
+                    }
+                    file.length() > maxFileSize -> {
+                        logger.info(
+                            "Skipping large file (${file.length()} bytes): ${file.name}"
+                        )
+                        false
+                    }
+                    !file.canRead() -> {
+                        logger.warn("Skipping unreadable file: ${file.name}")
+                        false
+                    }
+                    else -> true
                 }
+            }
 
         // Apply test file filtering if configured
         val finalFiles =
-                if (config.ignoreTestFiles.get()) {
-                    filteredFiles.filter { file ->
-                        val isTestFile = isTestFile(file)
-                        if (isTestFile) {
-                            logger.debug("Skipping test file: ${file.name}")
-                        }
-                        !isTestFile
+            if (config.ignoreTestFiles.get()) {
+                filteredFiles.filter { file ->
+                    val isTestFile = isTestFile(file)
+                    if (isTestFile) {
+                        logger.debug("Skipping test file: ${file.name}")
                     }
-                } else {
-                    filteredFiles
+                    !isTestFile
                 }
+            } else {
+                filteredFiles
+            }
 
         logger.info("Selected ${finalFiles.size} files for security scanning")
         return finalFiles
@@ -324,16 +335,16 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         val relativePath = project.rootDir.toPath().relativize(file.toPath()).toString()
 
         return relativePath.contains("/test/") ||
-                relativePath.contains("\\test\\") ||
-                relativePath.contains("/tests/") ||
-                relativePath.contains("\\tests\\") ||
-                file.name.endsWith("Test.kt") ||
-                file.name.endsWith("Test.java") ||
-                file.name.endsWith("Tests.kt") ||
-                file.name.endsWith("Tests.java") ||
-                file.name.startsWith("Test") ||
-                file.name.contains("Mock") ||
-                file.name.contains("Fake")
+            relativePath.contains("\\test\\") ||
+            relativePath.contains("/tests/") ||
+            relativePath.contains("\\tests\\") ||
+            file.name.endsWith("Test.kt") ||
+            file.name.endsWith("Test.java") ||
+            file.name.endsWith("Tests.kt") ||
+            file.name.endsWith("Tests.java") ||
+            file.name.startsWith("Test") ||
+            file.name.contains("Mock") ||
+            file.name.contains("Fake")
     }
 
     /**
@@ -363,7 +374,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         if (shouldReportProgress) {
             logger.lifecycle(
-                    "Scanning progress will be reported every ${progressReportingThreshold} files..."
+                "Scanning progress will be reported every $progressReportingThreshold files..."
             )
         }
 
@@ -474,7 +485,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
 
         // Always show console output using the console reporter
         val consoleReporter = ConsoleReporter()
-        // Create a dummy report summary for console reporter compatibility  
+        // Create a dummy report summary for console reporter compatibility
         val dummySummary = com.scan.reporting.ReportSummary(
             totalFindings = scanResults.findings.size,
             projectPath = project.projectDir.absolutePath,
@@ -489,31 +500,31 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             scanResults.findings.isEmpty() -> {
                 logger.lifecycle("✅ SCAN completed successfully: No sensitive information found")
                 logger.lifecycle(
-                        "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
+                    "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
                 )
             }
             config.failOnSecrets.get() -> {
                 val message =
-                        "❌ SCAN failed: Found ${scanResults.findings.size} potential security issues. " +
-                                "Review the findings and remove sensitive information before continuing."
+                    "❌ SCAN failed: Found ${scanResults.findings.size} potential security issues. " +
+                        "Review the findings and remove sensitive information before continuing."
                 logger.error(message)
                 throw GradleException(message)
             }
             config.warnOnSecrets.get() -> {
                 logger.lifecycle(
-                        "⚠️  SCAN completed with warnings: Found ${scanResults.findings.size} potential security issues"
+                    "⚠️  SCAN completed with warnings: Found ${scanResults.findings.size} potential security issues"
                 )
                 logger.lifecycle(
-                        "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
+                    "📊 Scanned ${scanResults.summary.totalFilesScanned} files in ${duration.toMillis()}ms"
                 )
                 logger.lifecycle(
-                        "💡 Consider reviewing and addressing these findings to improve security"
+                    "💡 Consider reviewing and addressing these findings to improve security"
                 )
             }
             else -> {
                 // Silent mode - just complete without fanfare
                 logger.info(
-                        "SCAN completed: ${scanResults.findings.size} findings, ${scanResults.summary.totalFilesScanned} files scanned"
+                    "SCAN completed: ${scanResults.findings.size} findings, ${scanResults.summary.totalFilesScanned} files scanned"
                 )
             }
         }
@@ -554,24 +565,24 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             }
             is SecurityException -> {
                 throw GradleException(
-                        "SCAN failed due to security restrictions: ${exception.message}. " +
-                                "Check file permissions and security policies.",
-                        exception
+                    "SCAN failed due to security restrictions: ${exception.message}. " +
+                        "Check file permissions and security policies.",
+                    exception
                 )
             }
             is OutOfMemoryError -> {
                 throw GradleException(
-                        "SCAN failed due to insufficient memory. " +
-                                "Try reducing maxFileSizeBytes or enabling parallel scanning with fewer threads.",
-                        exception
+                    "SCAN failed due to insufficient memory. " +
+                        "Try reducing maxFileSizeBytes or enabling parallel scanning with fewer threads.",
+                    exception
                 )
             }
             else -> {
                 logger.error("Unexpected error during security scanning", exception)
                 throw GradleException(
-                        "SCAN failed with unexpected error: ${exception.message}. " +
-                                "Please report this issue with your project details.",
-                        exception
+                    "SCAN failed with unexpected error: ${exception.message}. " +
+                        "Please report this issue with your project details.",
+                    exception
                 )
             }
         }
