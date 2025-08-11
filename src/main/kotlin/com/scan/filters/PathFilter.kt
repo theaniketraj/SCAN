@@ -3,7 +3,6 @@ package com.scan.filters
 import java.io.File
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
-import kotlin.math.min
 
 /**
  * PathFilter class for filtering files based on path patterns.
@@ -89,9 +88,9 @@ class PathFilter(
 
         // If any include patterns are specified, file must match at least one
         val hasIncludePatterns = normalizedIncludeExact.isNotEmpty() ||
-                normalizedIncludeDirectories.isNotEmpty() ||
-                compiledIncludeRegex.isNotEmpty() ||
-                compiledIncludeGlobs.isNotEmpty()
+            normalizedIncludeDirectories.isNotEmpty() ||
+            compiledIncludeRegex.isNotEmpty() ||
+            compiledIncludeGlobs.isNotEmpty()
 
         if (hasIncludePatterns) {
             // Check exact path inclusions
