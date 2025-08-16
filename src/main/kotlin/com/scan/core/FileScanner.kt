@@ -187,7 +187,7 @@ class FileScanner(
         if (!file.exists()) {
             throw IllegalArgumentException("File does not exist: ${file.path}")
         }
-        
+
         // Apply filters first if available
         if (filters.isNotEmpty()) {
             val shouldScan = filters.all { filter ->
@@ -325,7 +325,7 @@ class FileScanner(
                 }
                 return null
             }
-            
+
             // First, check if file is binary by sampling
             val sampleSize = minOf(1024, file.length().toInt())
             val sample = Files.readAllBytes(file.toPath()).take(sampleSize).toByteArray()

@@ -87,7 +87,7 @@ interface DetectorInterface {
         }
 
         // Check file extension support
-        if (supportedFileTypes.isNotEmpty() && 
+        if (supportedFileTypes.isNotEmpty() &&
             "*" !in supportedFileTypes &&
             context.fileExtension.lowercase() !in
             supportedFileTypes.map { it.lowercase() }
@@ -225,7 +225,7 @@ abstract class AbstractDetector : DetectorInterface {
             remediation = remediation
         )
     }
-    
+
     /** Creates a Finding from an EntropyMatch. */
     protected fun createFinding(
         match: EntropyDetector.EntropyMatch,

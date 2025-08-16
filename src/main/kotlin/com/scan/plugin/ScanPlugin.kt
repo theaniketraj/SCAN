@@ -116,7 +116,7 @@ class ScanPlugin : Plugin<Project> {
                     "gradle.properties"
                 )
             )
-            
+
             // Aliases for include/exclude patterns (empty by default)
             includeFiles.convention(emptySet())
             excludeFiles.convention(emptySet())
@@ -142,7 +142,7 @@ class ScanPlugin : Plugin<Project> {
             failOnSecrets.convention(true)
             failOnFound.convention(true) // Alias for failOnSecrets
             warnOnSecrets.convention(true)
-            
+
             // Basic configuration defaults
             enabled.convention(true)
             scanTests.convention(true)

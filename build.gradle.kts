@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.gradle.plugin.publish)
     alias(libs.plugins.dokka)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
     alias(libs.plugins.dependency.analysis)
 }
@@ -119,6 +120,20 @@ spotless {
                 "ktlint_standard_trailing-comma-on-call-site" to "disabled",
                 "ktlint_standard_trailing-comma-on-declaration-site" to "disabled"
             ))
+    }
+}
+
+detekt {
+    config.setFrom("${rootProject.projectDir}/config/detekt/detekt.yml")
+    baseline = file("${rootProject.projectDir}/config/detekt/baseline.xml")
+    buildUponDefaultConfig = true
+    allRules = false
+
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("build/reports/detekt/detekt.html"))
+        sarif.required.set(true)
+        sarif.outputLocation.set(file("build/reports/detekt/detekt.sarif"))
     }
 } // Documentation
 tasks.dokkaHtml.configure {

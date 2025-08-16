@@ -109,12 +109,12 @@ class EntropyDetector : AbstractDetector() {
     override fun performDetection(context: ScanContext): List<Finding> {
         // Configure detector from context
         configureFromContext(context)
-        
+
         // Check if entropy detection is enabled
         if (!context.configuration.entropy.enabled) {
             return emptyList()
         }
-        
+
         val findings = mutableListOf<Finding>()
         val lines = context.lines
 
