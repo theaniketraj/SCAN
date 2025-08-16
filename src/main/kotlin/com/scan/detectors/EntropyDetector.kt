@@ -107,6 +107,9 @@ class EntropyDetector : AbstractDetector() {
     )
 
     override fun performDetection(context: ScanContext): List<Finding> {
+        // Configure detector from context
+        configureFromContext(context)
+        
         val findings = mutableListOf<Finding>()
         val lines = context.lines
 
@@ -140,6 +143,15 @@ class EntropyDetector : AbstractDetector() {
                 .thenBy { it.location.lineNumber }
                 .thenBy { it.location.columnStart }
         )
+    }
+
+    /** Configure detector parameters from scan context */
+    private fun configureFromContext(context: ScanContext) {
+        val entropyConfig = context.configuration.entropy
+        minLength = entropyConfig.minLength
+        maxLength = entropyConfig.maxLength
+        entropyThreshold = entropyConfig.threshold
+        // Additional configuration mappings can be added here
     }
 
     // Configuration methods removed - handled by base class
