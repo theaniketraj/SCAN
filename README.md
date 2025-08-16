@@ -2,16 +2,13 @@
 
 > **Sensitive Code Analyzer for Nerds**
 
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.scan)](https://plugins.gradle.org/plugin/com.scan)
-[![Build Status](https://github.com/scan-security/scan-gradle-plugin/workflows/CI/badge.svg)](https://github.com/theaniketraj/SCAN/actions)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.scan)](https://plugins.gradle.org/plugin/io.github.theaniketraj.scan)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
 SCAN is an intelligent Gradle plugin that automatically detects secrets, API keys, credentials, and other sensitive information in your codebase. It acts as your first line of defense against accidental security leaks by scanning files during your build process.
 
 > Secure your code before it reaches version control
-
-- Note: SCAN is still in active development. Expect first public preview release soon!
 
 ## 🎯 What Does SCAN Do?
 
