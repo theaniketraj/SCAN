@@ -302,7 +302,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         // Create scan summary
         val summary =
             ScanSummary(
-                totalFilesScanned = stats.scannedFiles,
+                totalFilesScanned = stats.scannedFiles.get(),
                 totalFindingsCount = findings.size,
                 findingsBySeverity =
                 mapOf(
@@ -346,15 +346,15 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 peakMemoryUsageBytes = Runtime.getRuntime().maxMemory(),
                 filesPerSecond =
                 if (stats.endTime > stats.startTime) {
-                    stats.scannedFiles.toDouble() * 1000 /
+                    stats.scannedFiles.get().toDouble() * 1000 /
                         (stats.endTime - stats.startTime)
                 } else {
                     0.0
                 },
                 averageFileProcessingTimeMs =
-                if (stats.scannedFiles > 0) {
+                if (stats.scannedFiles.get() > 0) {
                     (stats.endTime - stats.startTime).toDouble() /
-                        stats.scannedFiles
+                        stats.scannedFiles.get()
                 } else {
                     0.0
                 }
@@ -515,9 +515,9 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     private fun updateStatistics(result: FileScanResult) {
-        stats.scannedFiles++
+        stats.scannedFiles.incrementAndGet()
         if (result.detections.isNotEmpty()) {
-            stats.filesWithSecrets++
+            stats.filesWithSecrets.incrementAndGet()
         }
     }
 
@@ -538,11 +538,11 @@ data class ScanStatistics(
     var startTime: Long = 0L,
     var endTime: Long = 0L,
     var totalFilesDiscovered: Int = 0,
-    var scannedFiles: Int = 0,
+    val scannedFiles: AtomicInteger = AtomicInteger(0),
     var skippedFiles: Int = 0,
     var errorFiles: Int = 0,
     var emptyFiles: Int = 0,
-    var filesWithSecrets: Int = 0,
+    val filesWithSecrets: AtomicInteger = AtomicInteger(0),
     var totalFindings: Int = 0,
     var criticalIssues: Int = 0,
     var highIssues: Int = 0,
