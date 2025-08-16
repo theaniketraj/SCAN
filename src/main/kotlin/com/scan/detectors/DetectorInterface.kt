@@ -87,7 +87,8 @@ interface DetectorInterface {
         }
 
         // Check file extension support
-        if (supportedFileTypes.isNotEmpty() &&
+        if (supportedFileTypes.isNotEmpty() && 
+            "*" !in supportedFileTypes &&
             context.fileExtension.lowercase() !in
             supportedFileTypes.map { it.lowercase() }
         ) {
@@ -222,6 +223,26 @@ abstract class AbstractDetector : DetectorInterface {
             secretInfo = secretInfo,
             context = findingContext,
             remediation = remediation
+        )
+    }
+    
+    /** Creates a Finding from an EntropyMatch. */
+    protected fun createFinding(
+        match: EntropyDetector.EntropyMatch,
+        context: ScanContext,
+        severity: Severity = Severity.MEDIUM
+    ): Finding {
+        return createFinding(
+            type = "HIGH_ENTROPY_STRING",
+            value = match.text,
+            lineNumber = match.lineNumber,
+            columnStart = match.columnNumber,
+            columnEnd = match.columnNumber + match.text.length,
+            confidence = match.analysis.confidence,
+            rule = "entropy_threshold_${match.analysis.entropy}",
+            context = context,
+            severity = severity,
+            contextText = match.context
         )
     }
 
