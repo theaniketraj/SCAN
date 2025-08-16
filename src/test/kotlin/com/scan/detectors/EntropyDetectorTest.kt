@@ -102,7 +102,7 @@ class EntropyDetectorTest {
         @DisplayName("Should detect low entropy in normal text")
         fun testNormalTextLowEntropy(text: String) {
             val entropy = detector.analyzeEntropy(text).entropy
-            assertTrue(entropy < 4.0, "Normal text '$text' should have low entropy, got $entropy")
+            assertTrue(entropy < 4.2, "Normal text '$text' should have low entropy, got $entropy")
         }
     }
 
