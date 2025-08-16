@@ -62,7 +62,7 @@ gradlePlugin {
 
     plugins {
         create("scanPlugin") {
-            id = "com.scan"
+            id = "io.github.theaniketraj.scan"
             implementationClass = "com.scan.plugin.ScanPlugin"
             displayName = "SCAN Security Plugin"
             description = "A comprehensive security scanning plugin for Gradle projects"
