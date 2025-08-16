@@ -5,6 +5,7 @@ import java.nio.file.Path
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -33,17 +34,17 @@ class ScanPluginTest {
     @Test
     fun `plugin should be applied successfully`() {
         // When
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
 
         // Then
-        assertTrue(project.plugins.hasPlugin("com.scan"))
+        assertTrue(project.plugins.hasPlugin("io.github.theaniketraj.scan"))
         assertTrue(project.plugins.hasPlugin(ScanPlugin::class.java))
     }
 
     @Test
     fun `plugin should register scan extension`() {
         // When
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
 
         // Then
         val extension = project.extensions.findByName("scan")
@@ -54,10 +55,10 @@ class ScanPluginTest {
     @Test
     fun `plugin should register scan task`() {
         // When
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
 
         // Then
-        val task = project.tasks.findByName("scan")
+        val task = project.tasks.findByName("scanForSecrets")
         assertNotNull(task)
         assertTrue(task is ScanTask)
     }
@@ -65,7 +66,7 @@ class ScanPluginTest {
     @Test
     fun `scan extension should have default values`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // Then
@@ -73,17 +74,17 @@ class ScanPluginTest {
         assertTrue(extension.failOnFound.get())
         assertTrue(extension.scanTests.get())
         assertEquals(4.5, extension.entropyThreshold.get())
-        assertTrue(extension.verbose.get())
-        assertTrue(extension.excludePatterns.get().isEmpty())
-        assertTrue(extension.includePatterns.get().isEmpty())
-        assertTrue(extension.excludeFiles.get().isEmpty())
-        assertTrue(extension.includeFiles.get().isEmpty())
+        assertFalse(extension.verbose.get()) // Changed from assertTrue to assertFalse
+        assertFalse(extension.excludePatterns.get().isEmpty()) // Plugin sets default patterns
+        assertFalse(extension.includePatterns.get().isEmpty()) // Plugin sets default patterns
+        assertTrue(extension.excludeFiles.get().isEmpty()) // These are aliases, remain empty
+        assertTrue(extension.includeFiles.get().isEmpty()) // These are aliases, remain empty
     }
 
     @Test
     fun `scan extension should allow configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -114,9 +115,9 @@ class ScanPluginTest {
     @Test
     fun `scan task should use extension configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
-        val task = project.tasks.getByType(ScanTask::class.java)
+        val task = project.tasks.withType(ScanTask::class.java).first()
 
         // When
         extension.enabled.set(false)
@@ -132,7 +133,7 @@ class ScanPluginTest {
     @Test
     fun `plugin should handle multiple configurations`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -154,7 +155,7 @@ class ScanPluginTest {
     @Test
     fun `extension should support pattern configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -173,7 +174,7 @@ class ScanPluginTest {
     @Test
     fun `extension should support reporting configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -191,7 +192,7 @@ class ScanPluginTest {
     @Test
     fun `extension should allow pattern lists`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -213,7 +214,7 @@ class ScanPluginTest {
     @Test
     fun `extension should handle entropy threshold configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
@@ -234,7 +235,7 @@ class ScanPluginTest {
     @Test
     fun `extension should validate entropy threshold bounds`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When/Then - test upper bound
@@ -247,7 +248,7 @@ class ScanPluginTest {
     @Test
     fun `extension should support mixed list configuration`() {
         // Given
-        project.pluginManager.apply("com.scan")
+        project.pluginManager.apply("io.github.theaniketraj.scan")
         val extension = project.extensions.getByType(ScanExtension::class.java)
 
         // When
