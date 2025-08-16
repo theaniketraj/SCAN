@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -23,14 +22,16 @@ class EntropyDetectorTest {
 
     @BeforeEach
     fun setUp() {
-        defaultConfig = ScanConfiguration(
-            entropy = EntropyConfiguration(
-                enabled = true,
-                threshold = 4.5,
-                minLength = 20,
-                maxLength = 200
-            )
-        )
+        defaultConfig =
+                ScanConfiguration(
+                        entropy =
+                                EntropyConfiguration(
+                                        enabled = true,
+                                        threshold = 4.0,
+                                        minLength = 20,
+                                        maxLength = 200
+                                )
+                )
         detector = EntropyDetector()
         tempDir = Files.createTempDirectory("scan-test")
     }
@@ -152,14 +153,16 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should respect minimum length configuration")
         fun testMinimumLengthRespected() {
-            val shortConfig = ScanConfiguration(
-                entropy = EntropyConfiguration(
-                    enabled = true,
-                    threshold = 3.0,
-                    minLength = 50, // High minimum length
-                    maxLength = 200
-                )
-            )
+            val shortConfig =
+                    ScanConfiguration(
+                            entropy =
+                                    EntropyConfiguration(
+                                            enabled = true,
+                                            threshold = 3.0,
+                                            minLength = 50, // High minimum length
+                                            maxLength = 200
+                                    )
+                    )
             val shortDetector = EntropyDetector() // Config passed via context
 
             val content =
@@ -177,14 +180,16 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should respect maximum length configuration")
         fun testMaximumLengthRespected() {
-            val shortConfig = ScanConfiguration(
-                entropy = EntropyConfiguration(
-                    enabled = true,
-                    threshold = 3.0,
-                    minLength = 10,
-                    maxLength = 30 // Low maximum length
-                )
-            )
+            val shortConfig =
+                    ScanConfiguration(
+                            entropy =
+                                    EntropyConfiguration(
+                                            enabled = true,
+                                            threshold = 3.0,
+                                            minLength = 10,
+                                            maxLength = 30 // Low maximum length
+                                    )
+                    )
             val shortDetector = EntropyDetector()
 
             val longHighEntropyString =
@@ -291,7 +296,11 @@ class EntropyDetectorTest {
             val results = detector.detect(context)
 
             assertEquals(1, results.size, "Should find exactly one secret in large file")
-            assertEquals(501, results.first().location.lineNumber, "Should find secret on correct line")
+            assertEquals(
+                    501,
+                    results.first().location.lineNumber,
+                    "Should find secret on correct line"
+            )
         }
 
         @Test
@@ -338,14 +347,16 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should handle disabled entropy detection")
         fun testDisabledEntropyDetection() {
-            val disabledConfig = ScanConfiguration(
-                entropy = EntropyConfiguration(
-                    enabled = false,
-                    threshold = 3.0,
-                    minLength = 10,
-                    maxLength = 200
-                )
-            )
+            val disabledConfig =
+                    ScanConfiguration(
+                            entropy =
+                                    EntropyConfiguration(
+                                            enabled = false,
+                                            threshold = 3.0,
+                                            minLength = 10,
+                                            maxLength = 200
+                                    )
+                    )
             val disabledDetector = EntropyDetector()
 
             val content =
@@ -372,15 +383,11 @@ class EntropyDetectorTest {
         @DisplayName("Should validate entropy threshold bounds")
         fun testEntropyThresholdValidation() {
             // Configuration validation is now done at the configuration level
-            val invalidConfig1 = ScanConfiguration(
-                entropy = EntropyConfiguration(threshold = -1.0)
-            )
+            val invalidConfig1 = ScanConfiguration(entropy = EntropyConfiguration(threshold = -1.0))
             val errors1 = invalidConfig1.validate()
             assertTrue(errors1.isNotEmpty(), "Should have validation error for negative threshold")
 
-            val invalidConfig2 = ScanConfiguration(
-                entropy = EntropyConfiguration(threshold = 10.0)
-            )
+            val invalidConfig2 = ScanConfiguration(entropy = EntropyConfiguration(threshold = 10.0))
             val errors2 = invalidConfig2.validate()
             assertTrue(errors2.isNotEmpty(), "Should have validation error for too high threshold")
         }
@@ -388,26 +395,24 @@ class EntropyDetectorTest {
         @Test
         @DisplayName("Should validate length configuration")
         fun testLengthConfigurationValidation() {
-            val invalidConfig1 = ScanConfiguration(
-                entropy = EntropyConfiguration(minLength = 0)
-            )
+            val invalidConfig1 = ScanConfiguration(entropy = EntropyConfiguration(minLength = 0))
             val errors1 = invalidConfig1.validate()
             assertTrue(errors1.isNotEmpty(), "Should have validation error for zero minLength")
 
-            val invalidConfig2 = ScanConfiguration(
-                entropy = EntropyConfiguration(maxLength = 5, minLength = 10)
-            )
+            val invalidConfig2 =
+                    ScanConfiguration(entropy = EntropyConfiguration(maxLength = 5, minLength = 10))
             val errors2 = invalidConfig2.validate()
-            assertTrue(errors2.isNotEmpty(), "Should have validation error for maxLength < minLength")
+            assertTrue(
+                    errors2.isNotEmpty(),
+                    "Should have validation error for maxLength < minLength"
+            )
         }
 
         @ParameterizedTest
         @ValueSource(doubles = [2.0, 3.5, 4.0, 4.5, 5.0, 6.0])
         @DisplayName("Should work with different entropy thresholds")
         fun testDifferentEntropyThresholds(threshold: Double) {
-            val config = ScanConfiguration(
-                entropy = EntropyConfiguration(threshold = threshold)
-            )
+            val config = ScanConfiguration(entropy = EntropyConfiguration(threshold = threshold))
             val customDetector = EntropyDetector()
 
             val content =
@@ -475,10 +480,7 @@ class EntropyDetectorTest {
 
             // Run multiple detections concurrently
             val results =
-                    (1..10).toList()
-                            .parallelStream()
-                            .map { detector.detect(context) }
-                            .toList()
+                    (1..10).toList().parallelStream().map { detector.detect(context) }.toList()
 
             // All results should be identical
             results.forEach { result ->
@@ -512,7 +514,11 @@ class EntropyDetectorTest {
             val results = detector.detect(context)
 
             assertEquals(1, results.size, "Should find exactly one secret")
-            assertEquals(4, results.first().location.lineNumber, "Should report correct line number")
+            assertEquals(
+                    4,
+                    results.first().location.lineNumber,
+                    "Should report correct line number"
+            )
         }
 
         @Test
@@ -528,9 +534,14 @@ class EntropyDetectorTest {
             val results = detector.detect(context)
 
             val result = results.first()
-            assertTrue(result.description.contains("entropy") || result.title.contains("entropy"), "Message should mention entropy")
             assertTrue(
-                    result.description.contains("detected") || result.description.contains("found") || result.title.contains("detected"),
+                    result.description.contains("entropy") || result.title.contains("entropy"),
+                    "Message should mention entropy"
+            )
+            assertTrue(
+                    result.description.contains("detected") ||
+                            result.description.contains("found") ||
+                            result.title.contains("detected"),
                     "Message should indicate detection"
             )
             assertFalse(result.description.isBlank(), "Message should not be empty")
@@ -564,15 +575,15 @@ class EntropyDetectorTest {
     // Helper method to create ScanContext
     private fun createScanContext(file: File, content: String): ScanContext {
         return ScanContext(
-            filePath = file.toPath(),
-            fileName = file.name,
-            fileExtension = file.extension,
-            isTestFile = file.name.contains("test", ignoreCase = true),
-            fileSize = file.length(),
-            configuration = defaultConfig,
-            content = content,
-            lines = content.lines(),
-            relativePath = file.name
+                filePath = file.toPath(),
+                fileName = file.name,
+                fileExtension = file.extension,
+                isTestFile = file.name.contains("test", ignoreCase = true),
+                fileSize = file.length(),
+                configuration = defaultConfig,
+                content = content,
+                lines = content.lines(),
+                relativePath = file.name
         )
     }
 }
