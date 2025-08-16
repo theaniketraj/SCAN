@@ -101,7 +101,7 @@ class ScanPlugin : Plugin<Project> {
 
             // Include common source directories that typically contain code
             includePatterns.convention(
-                listOf(
+                setOf(
                     "src/**/*.kt",
                     "src/**/*.java",
                     "src/**/*.scala",
@@ -116,10 +116,14 @@ class ScanPlugin : Plugin<Project> {
                     "gradle.properties"
                 )
             )
+            
+            // Aliases for include/exclude patterns (empty by default)
+            includeFiles.convention(emptySet())
+            excludeFiles.convention(emptySet())
 
             // Exclude common directories that rarely contain secrets but often have false positives
             excludePatterns.convention(
-                listOf(
+                setOf(
                     "**/build/**",
                     "**/target/**",
                     "**/.gradle/**",
@@ -136,7 +140,16 @@ class ScanPlugin : Plugin<Project> {
 
             // Default behavior for different build scenarios
             failOnSecrets.convention(true)
+            failOnFound.convention(true) // Alias for failOnSecrets
             warnOnSecrets.convention(true)
+            
+            // Basic configuration defaults
+            enabled.convention(true)
+            scanTests.convention(true)
+            entropyThreshold.convention(4.5)
+            contextAwareScanning.convention(true)
+            verbose.convention(false)
+            quiet.convention(false)
 
             // Reporting configuration
             generateHtmlReport.convention(false)
