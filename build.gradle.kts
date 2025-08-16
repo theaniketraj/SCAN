@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.dependency.analysis)
 }
 
-group = "com.scan"
+group = "io.github.theaniketraj"
 version = "1.0.0"
 
 java {
