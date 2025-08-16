@@ -110,6 +110,11 @@ class EntropyDetector : AbstractDetector() {
         // Configure detector from context
         configureFromContext(context)
         
+        // Check if entropy detection is enabled
+        if (!context.configuration.entropy.enabled) {
+            return emptyList()
+        }
+        
         val findings = mutableListOf<Finding>()
         val lines = context.lines
 
@@ -247,6 +252,13 @@ class EntropyDetector : AbstractDetector() {
     ): Double {
         var confidence = normalizedEntropy * confidenceMultiplier
 
+        // Entropy-based adjustments - higher entropy increases confidence
+        if (entropy > 4.0) {
+            confidence *= 1.2 // Very high entropy strings are more likely to be secrets
+        } else if (entropy > 3.0) {
+            confidence *= 1.1 // Moderately high entropy
+        }
+
         // Length-based adjustments
         confidence *=
             when {
@@ -304,7 +316,7 @@ class EntropyDetector : AbstractDetector() {
     /** Extract strings from quoted contexts */
     private fun extractQuotedStrings(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
-        val quotedStringRegex = Regex("""["']([^"']{$minLength,$maxLength})["']""")
+        val quotedStringRegex = Regex("""["']([^"']+)["']""")
 
         quotedStringRegex.findAll(content).forEach { match ->
             val quotedText = match.groupValues[1]
@@ -328,7 +340,7 @@ class EntropyDetector : AbstractDetector() {
         val candidates = mutableListOf<StringCandidate>()
         val assignmentRegex =
             Regex(
-                """(?i)(api[_-]?key|token|secret|password|auth)\s*[=:]\s*["']?([a-zA-Z0-9+/=_-]{$minLength,$maxLength})["']?"""
+                """(?i)(api[_-]?key|token|secret|password|auth)\s*[=:]\s*["']?([a-zA-Z0-9+/=_-]+)["']?"""
             )
 
         assignmentRegex.findAll(content).forEach { match ->
@@ -356,7 +368,7 @@ class EntropyDetector : AbstractDetector() {
     private fun extractUrlParameters(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
         val urlParamRegex =
-            Regex("""[?&](token|key|auth|secret)=([a-zA-Z0-9+/=_-]{$minLength,$maxLength})""")
+            Regex("""[?&](token|key|auth|secret)=([a-zA-Z0-9+/=_-]+)""")
 
         urlParamRegex.findAll(content).forEach { match ->
             val value = match.groupValues[2]
@@ -384,7 +396,7 @@ class EntropyDetector : AbstractDetector() {
         val candidates = mutableListOf<StringCandidate>()
         val jsonValueRegex =
             Regex(
-                """"(token|key|auth|secret|password)"\s*:\s*"([^"]{$minLength,$maxLength})""""
+                """"(token|key|auth|secret|password)"\s*:\s*"([^"]+)""""
             )
 
         jsonValueRegex.findAll(content).forEach { match ->
@@ -411,7 +423,7 @@ class EntropyDetector : AbstractDetector() {
     /** Extract continuous alphanumeric sequences */
     private fun extractAlphanumericSequences(content: String): List<StringCandidate> {
         val candidates = mutableListOf<StringCandidate>()
-        val alphanumericRegex = Regex("""[a-zA-Z0-9+/=_-]{$minLength,$maxLength}""")
+        val alphanumericRegex = Regex("""[a-zA-Z0-9+/=_-]+""")
 
         alphanumericRegex.findAll(content).forEach { match ->
             val text = match.value
