@@ -183,14 +183,15 @@ class FileScanner(
      * @return List of LegacyScanResult objects (legacy format for tests)
      */
     fun scanFile(file: File): List<LegacyScanResult> {
+        // Validate file exists
+        if (!file.exists()) {
+            throw IllegalArgumentException("File does not exist: ${file.path}")
+        }
+        
         // Apply filters first if available
         if (filters.isNotEmpty()) {
             val shouldScan = filters.all { filter ->
-                try {
-                    filter.shouldIncludeFile(file, file.path)
-                } catch (e: Exception) {
-                    true // Include on filter error
-                }
+                filter.shouldIncludeFile(file, file.path)
             }
             if (!shouldScan) {
                 return emptyList()
@@ -199,47 +200,38 @@ class FileScanner(
 
         // Apply detectors if available
         if (detectors.isNotEmpty()) {
-            try {
-                val content = readFileContent(file) ?: return emptyList()
-                val results = mutableListOf<LegacyScanResult>()
+            val content = readFileContent(file) ?: return emptyList()
+            val results = mutableListOf<LegacyScanResult>()
 
-                detectors.forEach { detector ->
-                    try {
-                        val scanContext = ScanContext(
-                            filePath = file.toPath(),
-                            fileName = file.name,
-                            fileExtension = file.extension,
-                            isTestFile = isTestFile(file.toPath()),
-                            fileSize = file.length(),
-                            configuration = configuration,
-                            relativePath = file.path,
-                            content = content,
-                            lines = content.lines()
-                        )
+            detectors.forEach { detector ->
+                val scanContext = ScanContext(
+                    filePath = file.toPath(),
+                    fileName = file.name,
+                    fileExtension = file.extension,
+                    isTestFile = isTestFile(file.toPath()),
+                    fileSize = file.length(),
+                    configuration = configuration,
+                    relativePath = file.path,
+                    content = content,
+                    lines = content.lines()
+                )
 
-                        val findings = detector.detect(scanContext)
-                        findings.forEach { finding ->
-                            results.add(LegacyScanResult(
-                                file = file,
-                                lineNumber = finding.location.lineNumber,
-                                columnStart = finding.location.columnStart,
-                                columnEnd = finding.location.columnEnd,
-                                content = finding.secretInfo.detectedValue,
-                                ruleId = finding.detectorName,
-                                severity = convertSeverity(finding.severity),
-                                message = finding.description
-                            ))
-                        }
-                    } catch (e: Exception) {
-                        // Log and continue with other detectors
-                        System.err.println("Detector failed: ${e.message}")
-                    }
+                val findings = detector.detect(scanContext)
+                findings.forEach { finding ->
+                    results.add(LegacyScanResult(
+                        file = file,
+                        lineNumber = finding.location.lineNumber,
+                        columnStart = finding.location.columnStart,
+                        columnEnd = finding.location.columnEnd,
+                        content = finding.secretInfo.detectedValue,
+                        ruleId = finding.detectorName,
+                        severity = convertSeverity(finding.severity),
+                        message = finding.description
+                    ))
                 }
-
-                return results
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Failed to scan file: ${e.message}", e)
             }
+
+            return results
         }
 
         // No detectors configured - return empty list
@@ -326,6 +318,14 @@ class FileScanner(
     /** Reads file content with proper encoding detection and validation. */
     private fun readFileContent(file: File): String? {
         return try {
+            // Check file size first (before reading)
+            if (file.length() > configuration.maxFileSize) {
+                if (configuration.reporting.verbose) {
+                    println("Skipping large file: ${file.path} (${file.length()} bytes)")
+                }
+                return null
+            }
+            
             // First, check if file is binary by sampling
             val sampleSize = minOf(1024, file.length().toInt())
             val sample = Files.readAllBytes(file.toPath()).take(sampleSize).toByteArray()
@@ -339,14 +339,6 @@ class FileScanner(
 
             // Read full content
             val content = Files.readString(file.toPath(), StandardCharsets.UTF_8)
-
-            // Validate content length and line lengths
-            if (content.length > configuration.maxFileSize) {
-                if (configuration.reporting.verbose) {
-                    println("Skipping large content file: ${file.path} (${content.length} chars)")
-                }
-                return null
-            }
 
             // Check for extremely long lines that might indicate binary or generated content
             val lines = content.lines()
