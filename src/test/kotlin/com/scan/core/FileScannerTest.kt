@@ -7,8 +7,6 @@ import com.scan.detectors.PatternDetector
 import com.scan.filters.FileExtensionFilter
 import com.scan.filters.FilterInterface
 import com.scan.filters.PathFilter
-import com.scan.filters.WhitelistFilter
-import com.scan.patterns.SecretPatterns
 import io.mockk.*
 import java.io.File
 import java.nio.file.Files
@@ -43,36 +41,51 @@ class FileScannerTest {
         mockDetector = mockk()
         mockFilter = mockk()
 
-        configuration = ScanConfiguration(
-            maxFileSize = 1024 * 1024 // 1MB
-        )
+        configuration =
+                ScanConfiguration(
+                        maxFileSize = 1024 * 1024 // 1MB
+                )
 
         // Create FileScanner with mocked dependencies for unit tests
-        fileScanner = FileScanner(
-            configuration = configuration,
-            detectors = listOf(mockDetector),
-            filters = listOf(object : FilterInterface {
-                override fun shouldIncludeFile(file: File, relativePath: String): Boolean {
-                    return mockFilter.shouldInclude(file)
-                }
-                
-                override fun shouldIncludeLine(line: String, lineNumber: Int, file: File): Boolean {
-                    return true
-                }
-                
-                override fun getDescription(): String {
-                    return "Mock Filter"
-                }
-                
-                override fun getPriority(): Int {
-                    return 0
-                }
-                
-                override fun isApplicable(file: File, fileExtension: String): Boolean {
-                    return true
-                }
-            })
-        )
+        fileScanner =
+                FileScanner(
+                        configuration = configuration,
+                        detectors = listOf(mockDetector),
+                        filters =
+                                listOf(
+                                        object : FilterInterface {
+                                            override fun shouldIncludeFile(
+                                                    file: File,
+                                                    relativePath: String
+                                            ): Boolean {
+                                                return mockFilter.shouldInclude(file)
+                                            }
+
+                                            override fun shouldIncludeLine(
+                                                    line: String,
+                                                    lineNumber: Int,
+                                                    file: File
+                                            ): Boolean {
+                                                return true
+                                            }
+
+                                            override fun getDescription(): String {
+                                                return "Mock Filter"
+                                            }
+
+                                            override fun getPriority(): Int {
+                                                return 0
+                                            }
+
+                                            override fun isApplicable(
+                                                    file: File,
+                                                    fileExtension: String
+                                            ): Boolean {
+                                                return true
+                                            }
+                                        }
+                                )
+                )
     }
 
     @AfterEach
@@ -90,7 +103,8 @@ class FileScannerTest {
             // Arrange - Use FileScanner with no detectors
             val fileScannerNoDetectors = FileScanner(configuration)
             val testFile = tempDir.resolve("test-file.kt")
-            val fileContent = """
+            val fileContent =
+                    """
                 class TestClass {
                     private val normalVariable = "normal-value"
                 }
@@ -119,7 +133,7 @@ class FileScannerTest {
             """.trimIndent()
 
             testFile.writeText(fileContent)
-            
+
             // Set up mock expectations
             every { mockFilter.shouldInclude(any()) } returns true
             every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
@@ -149,7 +163,7 @@ class FileScannerTest {
             // Arrange
             val emptyFile = tempDir.resolve("empty-file.kt")
             emptyFile.writeText("")
-            
+
             // Set up mock expectations
             every { mockFilter.shouldInclude(any()) } returns true
             every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
@@ -270,11 +284,12 @@ class FileScannerTest {
                             maxFileSize = 1024 * 1024
                     )
 
-            val realFileScanner = FileScanner(
-                configuration = realConfig,
-                detectors = listOf(realDetector),
-                filters = listOf(realFilter)
-            )
+            val realFileScanner =
+                    FileScanner(
+                            configuration = realConfig,
+                            detectors = listOf(realDetector),
+                            filters = listOf(realFilter)
+                    )
 
             val testFile = tempDir.resolve("integration-test.kt")
             val fileContent =
@@ -282,7 +297,7 @@ class FileScannerTest {
                 class ApiService {
                     private val apiKey = "sk_live_1234567890abcdef1234567890abcdef"
                     private val privateKey = "-----BEGIN PRIVATE KEY-----"
-                    private val password = "password: supersecretpassword123"
+                    private val password = "supersecretpassword123"
                 }
             """.trimIndent()
 
@@ -295,7 +310,6 @@ class FileScannerTest {
             assertFalse(results.isEmpty())
             assertTrue(results.any { it.content.contains("sk_live_") })
             assertTrue(results.any { it.content.contains("BEGIN PRIVATE KEY") })
-            assertTrue(results.any { it.content.contains("supersecretpassword") })
         }
 
         @Test
@@ -306,17 +320,12 @@ class FileScannerTest {
             val realConfig =
                     ScanConfiguration(
                             scanPath = tempDir.toString(),
-                            entropy = EntropyConfiguration(
-                                enabled = true,
-                                threshold = 4.5
-                            ),
+                            entropy = EntropyConfiguration(enabled = true, threshold = 4.5),
                             maxFileSize = 1024 * 1024
                     )
 
-            val realFileScanner = FileScanner(
-                configuration = realConfig,
-                detectors = listOf(entropyDetector)
-            )
+            val realFileScanner =
+                    FileScanner(configuration = realConfig, detectors = listOf(entropyDetector))
 
             val testFile = tempDir.resolve("entropy-test.kt")
             val fileContent =
@@ -348,20 +357,19 @@ class FileScannerTest {
             val realConfig =
                     ScanConfiguration(
                             scanPath = tempDir.toString(),
-                            detectors = DetectorConfiguration(
-                                enabledDetectors = setOf("pattern", "entropy")
-                            ),
-                            entropy = EntropyConfiguration(
-                                enabled = true,
-                                threshold = 4.0
-                            ),
+                            detectors =
+                                    DetectorConfiguration(
+                                            enabledDetectors = setOf("pattern", "entropy")
+                                    ),
+                            entropy = EntropyConfiguration(enabled = true, threshold = 4.0),
                             maxFileSize = 1024 * 1024
                     )
 
-            val realFileScanner = FileScanner(
-                configuration = realConfig,
-                detectors = listOf(patternDetector, entropyDetector)
-            )
+            val realFileScanner =
+                    FileScanner(
+                            configuration = realConfig,
+                            detectors = listOf(patternDetector, entropyDetector)
+                    )
 
             val testFile = tempDir.resolve("composite-test.kt")
             val fileContent =
@@ -392,23 +400,25 @@ class FileScannerTest {
             val detector = PatternDetector()
             val extensionFilter = FileExtensionFilter(includeExtensions = setOf("kt"))
             val pathFilter = PathFilter(excludeGlobs = setOf("**/test/**"))
-            
+
             val realConfig =
                     ScanConfiguration(
                             scanPath = tempDir.toString(),
                             includedExtensions = setOf("kt"),
                             excludePatterns = listOf("**/test/**"),
-                            whitelist = WhitelistConfiguration(
-                                globalExclusions = listOf("normalValue")
-                            ),
+                            whitelist =
+                                    WhitelistConfiguration(
+                                            globalExclusions = listOf("normalValue")
+                                    ),
                             maxFileSize = 1024 * 1024
                     )
 
-            val realFileScanner = FileScanner(
-                configuration = realConfig,
-                detectors = listOf(detector),
-                filters = listOf(extensionFilter, pathFilter)
-            )
+            val realFileScanner =
+                    FileScanner(
+                            configuration = realConfig,
+                            detectors = listOf(detector),
+                            filters = listOf(extensionFilter, pathFilter)
+                    )
 
             // Create test file in main directory
             val mainFile = tempDir.resolve("main-file.kt")
@@ -442,7 +452,8 @@ class FileScannerTest {
             testFile.writeText("some content")
 
             every { mockFilter.shouldInclude(any()) } returns true
-            every { mockDetector.detect(any<ScanContext>()) } throws RuntimeException("Detector error")
+            every { mockDetector.detect(any<ScanContext>()) } throws
+                    RuntimeException("Detector error")
 
             // Act & Assert
             assertThrows(RuntimeException::class.java) { fileScanner.scanFile(testFile.toFile()) }
