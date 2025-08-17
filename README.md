@@ -2,7 +2,7 @@
 
 > **Sensitive Code Analyzer for Nerds**
 
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.scan)](https://plugins.gradle.org/plugin/io.github.theaniketraj.scan)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.theaniketraj.scan)](https://plugins.gradle.org/plugin/io.github.theaniketraj.scan)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
