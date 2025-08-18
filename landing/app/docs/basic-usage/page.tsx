@@ -1,13 +1,21 @@
 import React from "react"
 import Link from "next/link"
+import DocsLayout from "../../../components/DocsLayout"
 
 export default function BasicUsagePage() {
-    return (
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-            <nav className="mb-8">
-                <Link href="/docs" className="text-primary-500 hover:text-primary-400 text-sm">← Back to Documentation</Link>
-            </nav>
+    const sections = [
+        { id: "overview", title: "Overview" },
+        { id: "quick-start", title: "Quick Start" },
+        { id: "common-commands", title: "Common Commands" },
+        { id: "gradle-tasks", title: "Gradle Tasks" },
+        { id: "build-integration", title: "Build Integration" },
+        { id: "ide-integration", title: "IDE Integration" },
+        { id: "common-scenarios", title: "Common Scenarios" },
+        { id: "troubleshooting", title: "Troubleshooting" }
+    ]
 
+    return (
+        <DocsLayout sections={sections} title="Basic Usage">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>Basic Usage Examples</h1>
                 
@@ -306,6 +314,6 @@ val testSecrets = mapOf(
                     </ul>
                 </div>
             </div>
-        </div>
+        </DocsLayout>
     )
 }
