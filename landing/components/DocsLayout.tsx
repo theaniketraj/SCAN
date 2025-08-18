@@ -80,6 +80,15 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                 `}>
                     <div className="h-full px-3 pb-4 overflow-y-auto">
                         <div className="space-y-2 font-medium">
+                            {/* Back to Docs Homepage */}
+                            <Link
+                                href="/docs"
+                                className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm border-b border-gray-200 dark:border-gray-700 mb-3"
+                            >
+                                <span className="mr-2">←</span>
+                                <span>Back to Docs Homepage</span>
+                            </Link>
+                            
                             <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Documentation
                             </div>
@@ -128,8 +137,8 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                                                 className={`
                                                     block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors
                                                     ${activeSection === section.id
-                                                        ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-r-2 border-primary-500"
-                                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                        ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 border-l-2 border-primary-500"
+                                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                     }
                                                 `}
                                             >
