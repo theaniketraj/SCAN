@@ -32,50 +32,70 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                // Find the entry that's most visible
+                let mostVisible = entries[0];
+                let maxRatio = 0;
+                
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(entry.target.id)
+                    if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+                        maxRatio = entry.intersectionRatio;
+                        mostVisible = entry;
                     }
-                })
+                });
+                
+                if (mostVisible && mostVisible.isIntersecting) {
+                    setActiveSection(mostVisible.target.id);
+                }
             },
             { 
-                rootMargin: "-20% 0px -70% 0px",
-                threshold: [0, 0.25, 0.5, 0.75, 1]
+                rootMargin: "-10% 0px -80% 0px",
+                threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
             }
-        )
+        );
 
-        // Small delay to ensure DOM is ready
+        // Wait for DOM to be fully ready
         const timer = setTimeout(() => {
             sections.forEach(({ id }) => {
-                const element = document.getElementById(id)
+                const element = document.getElementById(id);
                 if (element) {
-                    observer.observe(element)
+                    observer.observe(element);
                 }
-            })
-        }, 100)
+            });
+            
+            // Set the first section as active if none is set
+            if (!activeSection && sections.length > 0) {
+                const firstElement = document.getElementById(sections[0].id);
+                if (firstElement) {
+                    const rect = firstElement.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        setActiveSection(sections[0].id);
+                    }
+                }
+            }
+        }, 500);
 
         return () => {
-            clearTimeout(timer)
-            observer.disconnect()
-        }
-    }, [sections])
+            clearTimeout(timer);
+            observer.disconnect();
+        };
+    }, [sections, activeSection]);
 
     const scrollToSection = (id: string) => {
-        const element = document.getElementById(id)
+        const element = document.getElementById(id);
         if (element) {
-            const headerOffset = 100 // Account for fixed header
-            const elementPosition = element.getBoundingClientRect().top
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+            const headerOffset = 120; // Account for fixed header and padding
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            // Update active section immediately for better UX
+            setActiveSection(id);
             
             window.scrollTo({
                 top: offsetPosition,
                 behavior: "smooth"
-            })
-            
-            // Update active section immediately for better UX
-            setActiveSection(id)
+            });
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -159,7 +179,7 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                                                     block w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-200
                                                     ${activeSection === section.id
                                                         ? "text-primary-700 dark:text-primary-300 font-medium border-l-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30"
-                                                        : "text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+                                                        : "text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                                                     }
                                                 `}
                                             >
