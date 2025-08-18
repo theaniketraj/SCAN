@@ -1,13 +1,24 @@
 import React from "react"
 import Link from "next/link"
+import DocsLayout from "../../../components/DocsLayout"
 
 export default function UserGuidePage() {
-    return (
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-            <nav className="mb-8">
-                <Link href="/docs" className="text-primary-500 hover:text-primary-400 text-sm">← Back to Documentation</Link>
-            </nav>
+    const sections = [
+        { id: "overview", title: "Overview" },
+        { id: "installation", title: "Installation" },
+        { id: "basic-usage", title: "Basic Usage" },
+        { id: "configuration", title: "Configuration" },
+        { id: "patterns", title: "Understanding Patterns" },
+        { id: "custom-patterns", title: "Custom Patterns" },
+        { id: "output-formats", title: "Output Formats" },
+        { id: "exclusions", title: "File Exclusions" },
+        { id: "ci-integration", title: "CI Integration" },
+        { id: "troubleshooting", title: "Troubleshooting" },
+        { id: "best-practices", title: "Best Practices" }
+    ]
 
+    return (
+        <DocsLayout sections={sections} title="User Guide">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>SCAN Plugin User Guide</h1>
                 
@@ -183,6 +194,6 @@ jobs:
                     </ul>
                 </div>
             </div>
-        </div>
+        </DocsLayout>
     )
 }
