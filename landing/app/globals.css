@@ -1,6 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 html, body { height: 100%; }
 body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-pre { border-radius: 8px; padding: 16px; overflow: auto; }
+
+/* Code block styling fixes - ensure they work in both themes */
+pre {
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Default pre styling */
+pre:not([class*="bg-"]) {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+/* Inline code - responsive to theme */
+:not(pre) > code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* Dark mode inline code */
+.dark :not(pre) > code {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+/* Prose overrides to ensure proper styling */
+.prose pre code {
+  background-color: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: '' !important;
+}
