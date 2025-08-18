@@ -1,13 +1,22 @@
 import React from "react"
 import Link from "next/link"
+import DocsLayout from "../../../components/DocsLayout"
 
 export default function ConfigurationPage() {
-    return (
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-            <nav className="mb-8">
-                <Link href="/docs" className="text-primary-500 hover:text-primary-400 text-sm">← Back to Documentation</Link>
-            </nav>
+    const sections = [
+        { id: "overview", title: "Overview" },
+        { id: "basic-config", title: "Basic Configuration" },
+        { id: "scan-settings", title: "Scan Settings" },
+        { id: "output-config", title: "Output Configuration" },
+        { id: "pattern-config", title: "Pattern Configuration" },
+        { id: "performance", title: "Performance Settings" },
+        { id: "exclusions", title: "File Exclusions" },
+        { id: "environment", title: "Environment Variables" },
+        { id: "examples", title: "Complete Examples" }
+    ]
 
+    return (
+        <DocsLayout sections={sections} title="Configuration Reference">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>SCAN Plugin Configuration Reference</h1>
                 
@@ -242,6 +251,6 @@ export default function ConfigurationPage() {
                     </ul>
                 </div>
             </div>
-        </div>
+        </DocsLayout>
     )
 }
