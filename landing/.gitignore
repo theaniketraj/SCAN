@@ -1,0 +1,10 @@
+# .gitignore
+node_modules
+.next
+out
+dist
+.env
+.DS_Store
+*.log
+.cache
+coverage
