@@ -1,13 +1,22 @@
 import React from "react"
 import Link from "next/link"
+import DocsLayout from "../../../components/DocsLayout"
 
 export default function PatternsPage() {
-    return (
-        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
-            <nav className="mb-8">
-                <Link href="/docs" className="text-primary-500 hover:text-primary-400 text-sm">← Back to Documentation</Link>
-            </nav>
+    const sections = [
+        { id: "overview", title: "Overview" },
+        { id: "built-in-patterns", title: "Built-in Patterns" },
+        { id: "api-keys", title: "API Keys & Tokens" },
+        { id: "databases", title: "Database Credentials" },
+        { id: "cloud-services", title: "Cloud Services" },
+        { id: "crypto", title: "Cryptographic Keys" },
+        { id: "custom-patterns", title: "Custom Patterns" },
+        { id: "pattern-files", title: "Pattern Files" },
+        { id: "best-practices", title: "Best Practices" }
+    ]
 
+    return (
+        <DocsLayout sections={sections} title="Pattern Reference">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>SCAN Plugin Pattern Reference</h1>
                 
@@ -218,6 +227,6 @@ export default function PatternsPage() {
                     </ul>
                 </div>
             </div>
-        </div>
+        </DocsLayout>
     )
 }
