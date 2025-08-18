@@ -49,6 +49,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.bundles.testing)
+    // Gradle TestKit for plugin tests (ProjectBuilder, etc.)
+    testImplementation(gradleTestKit())
 
     // Performance Testing
     testImplementation(libs.bundles.performance)
