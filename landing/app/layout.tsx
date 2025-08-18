@@ -11,7 +11,8 @@ import Footer from "../components/Footer";
 
 export const metadata = {
     title: "SCAN — Secret detection for Gradle builds",
-    description: "Catch API keys, tokens, and credentials before they reach source control."
+    description: "Catch API keys, tokens and credentials before they reach source control.",
+    viewport: "width=device-width, initial-scale=1",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
