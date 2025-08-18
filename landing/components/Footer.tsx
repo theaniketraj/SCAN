@@ -21,7 +21,7 @@ export default function Footer() {
                     <div className="text-gray-400">⁛ Sensitive Code Analyzer for Nerds ⁛</div>
                     <div>© {new Date().getFullYear()} SCAN</div>
                     <div className="space-x-4">
-                        <a href="https://github.com/theaniketraj/SCAN/blob/main/LICENSE" target="_blank" className="hover:text-primary-400 dark:hover:text-white transition-colors">MIT License</a>
+                        <a href="https://github.com/theaniketraj/SCAN/blob/main/LICENSE" target="_blank" className="hover:text-primary-400 dark:hover:text-white transition-colors">License</a>
                         <a href="https://github.com/theaniketraj/SCAN/blob/main/SECURITY.md" target="_blank" className="hover:text-primary-400 dark:hover:text-white transition-colors">Privacy</a>
                     </div>
                 </div>
