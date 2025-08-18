@@ -38,21 +38,42 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                     }
                 })
             },
-            { rootMargin: "-20% 0px -80% 0px" }
+            { 
+                rootMargin: "-20% 0px -70% 0px",
+                threshold: [0, 0.25, 0.5, 0.75, 1]
+            }
         )
 
-        sections.forEach(({ id }) => {
-            const element = document.getElementById(id)
-            if (element) observer.observe(element)
-        })
+        // Small delay to ensure DOM is ready
+        const timer = setTimeout(() => {
+            sections.forEach(({ id }) => {
+                const element = document.getElementById(id)
+                if (element) {
+                    observer.observe(element)
+                }
+            })
+        }, 100)
 
-        return () => observer.disconnect()
+        return () => {
+            clearTimeout(timer)
+            observer.disconnect()
+        }
     }, [sections])
 
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id)
         if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "start" })
+            const headerOffset = 100 // Account for fixed header
+            const elementPosition = element.getBoundingClientRect().top
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            })
+            
+            // Update active section immediately for better UX
+            setActiveSection(id)
         }
     }
 
@@ -135,10 +156,10 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                                                 key={section.id}
                                                 onClick={() => scrollToSection(section.id)}
                                                 className={`
-                                                    block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors
+                                                    block w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-200
                                                     ${activeSection === section.id
-                                                        ? "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 border-l-2 border-primary-500"
-                                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                        ? "text-primary-700 dark:text-primary-300 font-medium border-l-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30"
+                                                        : "text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                                                     }
                                                 `}
                                             >
