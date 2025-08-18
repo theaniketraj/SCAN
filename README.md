@@ -2,6 +2,7 @@
 
 > **Sensitive Code Analyzer for Nerds**
 
+[![CI Status](https://github.com/theaniketraj/SCAN/actions/workflows/ci.yml/badge.svg)](https://github.com/theaniketraj/SCAN/actions/workflows/ci.yml)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.theaniketraj.scan)](https://plugins.gradle.org/plugin/io.github.theaniketraj.scan)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
@@ -74,7 +75,7 @@ plugins {
 ### Basic Usage
 
 ```bash
-./gradlew scan
+./gradlew scanForSecrets
 ```
 
 ### Simple Configuration

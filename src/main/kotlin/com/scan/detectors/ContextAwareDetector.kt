@@ -36,8 +36,7 @@ class ContextAwareDetectorImpl(
             "python" to listOf("#.*", "\"\"\"[\\s\\S]*?\"\"\"", "'''[\\s\\S]*?'''"),
             "yaml" to listOf("#.*"),
             "properties" to listOf("#.*", "!.*"),
-            "xml" to listOf("<!--[\\s\\S]*?-->"),
-            "json" to listOf() // JSON doesn't have comments
+            "xml" to listOf("<!--[\\s\\S]*?-->")
         )
 
         // String literal patterns
@@ -53,9 +52,9 @@ class ContextAwareDetectorImpl(
 
         // Variable assignment patterns
         private val ASSIGNMENT_PATTERNS = listOf(
-            "\\b(\\w+)\\s*[=:]\\s*([\"'][^\"']*[\"'])", // Simple assignment
-            "\\b(const|val|var|let)\\s+(\\w+)\\s*[=:]\\s*([\"'][^\"']*[\"'])", // Declaration with assignment
-            "\\b(\\w+)\\s*[=:]\\s*\\$\\{([^}]+)\\}", // Environment variable assignment
+            "\\b(\\w+)\\s*[:=]\\s*([\"'][^\"']*[\"'])", // Simple assignment
+            "\\b(const|val|var|let)\\s+(\\w+)\\s*[:=]\\s*([\"'][^\"']*[\"'])", // Declaration with assignment
+            "\\b(\\w+)\\s*[:=]\\s*\\$\\{([^}]+)\\}", // Environment variable assignment
             "\\bsetProperty\\s*\\(\\s*[\"']([^\"']+)[\"']\\s*,\\s*([\"'][^\"']*[\"'])\\)", // Property setting
             "(\\w+)\\.(\\w+)\\s*=\\s*([\"'][^\"']*[\"'])" // Object property assignment
         )
@@ -216,6 +215,7 @@ class ContextAwareDetectorImpl(
         return candidates
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun calculateConfidence(
         candidate: SecretCandidate,
         lineContext: LineContext,
@@ -282,6 +282,7 @@ class ContextAwareDetectorImpl(
         return minOf(1.0, maxOf(0.0, confidence))
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun shouldSkipLine(context: LineContext, isTestFile: Boolean): Boolean {
         // Skip comments unless they contain high-confidence patterns
         if (context.isComment && !containsHighConfidencePattern(context.content)) {
@@ -415,7 +416,7 @@ class ContextAwareDetectorImpl(
         val imports = mutableListOf<String>()
         val patterns = when (fileExtension) {
             "kotlin", "java" -> listOf("import\\s+([\\w.]+)")
-            "javascript", "typescript" -> listOf("import\\s+.*from\\s+['\"]([^'\"]+)['\"]")
+            "javascript", "typescript" -> listOf("import\\s+.*from\\s+['\"][^'\"]+['\"]")
             "python" -> listOf("from\\s+([\\w.]+)\\s+import", "import\\s+([\\w.]+)")
             else -> emptyList()
         }
