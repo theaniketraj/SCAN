@@ -25,19 +25,6 @@ export default function PatternsPage() {
                     and guidance on creating custom patterns.
                 </p>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 my-8">
-                    <h3 className="text-blue-800 dark:text-blue-200 mt-0">Table of Contents</h3>
-                    <ol className="text-blue-700 dark:text-blue-300 space-y-1">
-                        <li><a href="#overview" className="hover:text-blue-900 dark:hover:text-blue-100">Pattern Overview</a></li>
-                        <li><a href="#cloud-providers" className="hover:text-blue-900 dark:hover:text-blue-100">Cloud Provider Credentials</a></li>
-                        <li><a href="#version-control" className="hover:text-blue-900 dark:hover:text-blue-100">Version Control Systems</a></li>
-                        <li><a href="#databases" className="hover:text-blue-900 dark:hover:text-blue-100">Database Credentials</a></li>
-                        <li><a href="#api-keys" className="hover:text-blue-900 dark:hover:text-blue-100">API Keys and Tokens</a></li>
-                        <li><a href="#custom-patterns" className="hover:text-blue-900 dark:hover:text-blue-100">Custom Pattern Creation</a></li>
-                        <li><a href="#best-practices" className="hover:text-blue-900 dark:hover:text-blue-100">Best Practices</a></li>
-                    </ol>
-                </div>
-
                 <h2 id="overview">Pattern Overview</h2>
                 
                 <p>
@@ -53,7 +40,7 @@ export default function PatternsPage() {
                     <li><strong>Confidence Scoring</strong>: Each finding is assigned a confidence level based on multiple factors</li>
                 </ol>
 
-                <h2 id="cloud-providers">Cloud Provider Credentials</h2>
+                <h2 id="built-in-patterns">Built-in Patterns</h2>
 
                 <h3>AWS Patterns</h3>
 
@@ -95,7 +82,7 @@ export default function PatternsPage() {
                     </div>
                 </div>
 
-                <h2 id="version-control">Version Control Systems</h2>
+                <h2 id="cloud-services">Cloud Services</h2>
 
                 <h3>GitHub</h3>
 
@@ -159,6 +146,17 @@ export default function PatternsPage() {
                     </div>
                 </div>
 
+                <h2 id="crypto">Cryptographic Keys</h2>
+
+                <div className="space-y-4">
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                        <h4 className="text-red-800 dark:text-red-200 mt-0">Private Key</h4>
+                        <p className="text-red-700 dark:text-red-300"><strong>Pattern:</strong> <code>-----BEGIN [A-Z]+ PRIVATE KEY-----</code></p>
+                        <p className="text-red-700 dark:text-red-300"><strong>Description:</strong> PEM-formatted private keys</p>
+                        <p className="text-red-700 dark:text-red-300"><strong>Confidence:</strong> High</p>
+                    </div>
+                </div>
+
                 <h2 id="custom-patterns">Custom Pattern Creation</h2>
 
                 <h3>Basic Custom Patterns</h3>
@@ -186,6 +184,29 @@ export default function PatternsPage() {
         // Organization-specific format
         "ACME_[A-Z]{2}_[0-9]{8}_[A-Za-z0-9]{16}"
     )
+}`}</code></pre>
+
+                <h2 id="pattern-files">Pattern Files</h2>
+                
+                <p>
+                    You can organize custom patterns in separate YAML files for better maintainability:
+                </p>
+
+                <h3>patterns/custom-patterns.yml</h3>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`patterns:
+  - name: "Company API Key"
+    regex: "COMPANY_API_[A-Z0-9]{32}"
+    confidence: "high"
+    description: "Internal company API keys"
+    
+  - name: "Internal Secret"
+    regex: "INTERNAL_SECRET_[A-Za-z0-9]{16,}"
+    confidence: "medium"
+    description: "Internal application secrets"`}</code></pre>
+
+                <h3>Loading Pattern Files</h3>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+    customPatternsFile = "patterns/custom-patterns.yml"
 }`}</code></pre>
 
                 <h2 id="best-practices">Best Practices</h2>
