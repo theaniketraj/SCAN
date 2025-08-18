@@ -149,15 +149,15 @@ object PatternMatcher {
             val groups = mutableMapOf<String, String>()
 
             // Extract named capture groups
-            try {
-                for (i in 1..matcher.groupCount()) {
-                    val groupValue = matcher.group(i)
-                    if (groupValue != null) {
-                        groups["group$i"] = groupValue
-                    }
+            for (i in 1..matcher.groupCount()) {
+                val groupValue = try {
+                    matcher.group(i)
+                } catch (_: IllegalStateException) {
+                    null
                 }
-            } catch (e: Exception) {
-                // Ignore group extraction errors
+                if (groupValue != null) {
+                    groups["group$i"] = groupValue
+                }
             }
 
             val lineInfo = getLineInfo(searchContent, start)
