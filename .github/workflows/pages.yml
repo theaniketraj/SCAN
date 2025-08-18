@@ -44,6 +44,10 @@ jobs:
                   npm run build
                   npm run export
 
+            - name: Add .nojekyll
+              run: |
+                  echo > out/.nojekyll
+
             - name: Upload Pages artifact
               uses: actions/upload-pages-artifact@v3
               with:
