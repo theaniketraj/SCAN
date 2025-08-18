@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "export": "next export",
+    "export": "echo 'export not needed: output: export handles static build'",
         "start": "next start",
         "lint": "next lint",
         "test": "jest --passWithNoTests",

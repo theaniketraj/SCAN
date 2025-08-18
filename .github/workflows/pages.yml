@@ -42,7 +42,6 @@ jobs:
             - name: Build static site
               run: |
                   npm run build
-                  npm run export
 
             - name: Add .nojekyll
               run: |
