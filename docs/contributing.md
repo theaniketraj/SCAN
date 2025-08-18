@@ -34,7 +34,7 @@ This project adheres to a [Code of Conduct](../CODE_OF_CONDUCT.md). By participa
 2. Clone your fork locally:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/SCAN.git
+git clone https://github.com/theaniketraj/SCAN.git
 cd SCAN
 ```
 
@@ -63,7 +63,7 @@ git remote add upstream https://github.com/theaniketraj/SCAN.git
 
 ### Project Structure
 
-```
+```pgsql
 scan-gradle-plugin/
 ├── src/
 │   ├── main/kotlin/com/scan/
