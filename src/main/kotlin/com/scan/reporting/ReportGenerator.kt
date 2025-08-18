@@ -14,6 +14,13 @@ import java.util.*
  * for new formats.
  */
 class ReportGenerator(private val configuration: ScanConfiguration) {
+    companion object {
+        private const val KB: Long = 1024
+        private const val MB: Long = 1024 * KB
+        private const val GB: Long = 1024 * MB
+        private const val HEADER_WIDTH = 60
+        private val TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    }
 
     // Simple logger replacement
     private fun log(message: String) {
@@ -142,12 +149,8 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
             throw IllegalStateException("No scan results provided")
         }
 
-        try {
-            // For now, we'll use a synchronous approach until coroutines are properly configured
-            htmlReporter.generateReportSync(consolidatedResult, outputFile)
-        } catch (e: Exception) {
-            log("Failed to generate HTML report: ${e.message}")
-        }
+        // For now, we'll use a synchronous approach until coroutines are properly configured
+        htmlReporter.generateReportSync(consolidatedResult, outputFile)
 
         val generationTime = System.currentTimeMillis() - startTime
         log("HTML report generated: ${outputFile.absolutePath}")
@@ -233,13 +236,11 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
 
     /** Log comprehensive report summary */
     private fun logReportSummary(summary: ReportSummary) {
-        log("\n" + "=".repeat(60))
+        log("\n" + "=".repeat(HEADER_WIDTH))
         log("SECURITY SCAN REPORT SUMMARY")
-        log("=".repeat(60))
+        log("=".repeat(HEADER_WIDTH))
         log("Project: ${summary.projectPath}")
-        log(
-            "Scan completed: ${summary.timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}"
-        )
+        log("Scan completed: ${summary.timestamp.format(TIMESTAMP_FORMATTER)}")
         log("Total findings: ${summary.totalFindings}")
         log("Scan duration: ${summary.scanDuration}ms")
         log("Report generation: ${summary.generationTime}ms")
@@ -261,7 +262,7 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
             }
         }
 
-        log("=".repeat(60))
+        log("=".repeat(HEADER_WIDTH))
 
         // Exit with error code if high severity findings exist
         if (configuration.buildIntegration.failOnFindings && summary.totalFindings > 0) {
@@ -286,10 +287,10 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
     /** Format file size in human-readable format */
     private fun formatFileSize(bytes: Long): String {
         return when {
-            bytes < 1024 -> "${bytes}B"
-            bytes < 1024 * 1024 -> "${bytes / 1024}KB"
-            bytes < 1024 * 1024 * 1024 -> "${bytes / (1024 * 1024)}MB"
-            else -> "${bytes / (1024 * 1024 * 1024)}GB"
+            bytes < KB -> "${bytes}B"
+            bytes < MB -> "${bytes / KB}KB"
+            bytes < GB -> "${bytes / MB}MB"
+            else -> "${bytes / GB}GB"
         }
     }
 
@@ -312,7 +313,7 @@ class ReportGenerator(private val configuration: ScanConfiguration) {
     private fun isValidOutputPath(path: String): Boolean {
         return try {
             File(path).parentFile?.let { parent -> parent.exists() || parent.mkdirs() } ?: true
-        } catch (e: Exception) {
+        } catch (_: SecurityException) {
             false
         }
     }
