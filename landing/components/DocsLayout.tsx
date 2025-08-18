@@ -21,7 +21,8 @@ const docPages = [
     { href: "/docs/configuration", title: "Configuration", icon: "⚙️" },
     { href: "/docs/patterns", title: "Pattern Reference", icon: "🔍" },
     { href: "/docs/basic-usage", title: "Basic Usage", icon: "🚀" },
-    { href: "/docs/ci", title: "CI/CD Integration", icon: "🔧" }
+    { href: "/docs/ci", title: "CI/CD Integration", icon: "🔧" },
+    { href: "/docs/contributing", title: "Contributing", icon: "🤝" }
 ]
 
 export default function DocsLayout({ children, sections, title }: DocsLayoutProps) {
