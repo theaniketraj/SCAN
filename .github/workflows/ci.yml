@@ -1,0 +1,78 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+permissions:
+    contents: read
+
+jobs:
+    gradle:
+        name: Gradle build and test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 21
+              uses: actions/setup-java@v4
+              with:
+                  distribution: "temurin"
+                  java-version: "21"
+
+            - name: Ensure gradlew is executable
+              run: chmod +x gradlew
+
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v4
+
+            - name: Build (check, tests, static analysis)
+              run: |
+                  ./gradlew --no-daemon --stacktrace clean check build
+
+            - name: Upload test reports (always)
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: gradle-test-reports
+                  path: |
+                      **/build/test-results/**
+                      **/build/reports/tests/**
+                      **/build/reports/detekt/**
+                  if-no-files-found: ignore
+
+    landing:
+        name: Landing app lint, build, and test
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: landing
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - name: Install dependencies (npm ci)
+              if: hashFiles('landing/package-lock.json') != ''
+              run: npm ci
+
+            - name: Install dependencies (npm install)
+              if: hashFiles('landing/package-lock.json') == ''
+              run: npm install
+
+            - name: Lint
+              run: npm run lint --if-present
+
+            - name: Build
+              run: npm run build
+
+            - name: Test
+              run: npm test --if-present

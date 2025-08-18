@@ -1,0 +1,58 @@
+name: Deploy landing to GitHub Pages
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: landing
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+                  cache-dependency-path: "landing/package-lock.json"
+
+            - name: Install dependencies (npm ci)
+              if: hashFiles('landing/package-lock.json') != ''
+              run: npm ci
+
+            - name: Install dependencies (npm install)
+              if: hashFiles('landing/package-lock.json') == ''
+              run: npm install
+
+            - name: Build static site
+              run: |
+                  npm run build
+                  npm run export
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: landing/out
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
