@@ -137,6 +137,10 @@ class FileScannerTest {
             // Set up mock expectations
             every { mockFilter.shouldInclude(any()) } returns true
             every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
+            // On some OS/FS, permission changes may not take effect; ensure detector doesn't fail if invoked
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act
             val results = fileScanner.scanFile(testFile.toFile())
@@ -494,6 +498,8 @@ class FileScannerTest {
             }
 
             every { mockFilter.shouldInclude(any()) } returns true
+            // If the file remains readable on this OS/FS, ensure detector returns no findings
+            every { mockDetector.detect(any<ScanContext>()) } returns emptyList()
 
             // Act & Assert
             // On Windows or when FS doesn't support POSIX perms, canRead() may still be true.
