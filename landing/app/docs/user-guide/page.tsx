@@ -27,22 +27,15 @@ export default function UserGuidePage() {
                     This guide will walk you through everything you need to know to secure your codebase effectively.
                 </p>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 my-8">
-                    <h3 className="text-blue-800 dark:text-blue-200 mt-0">Table of Contents</h3>
-                    <ol className="text-blue-700 dark:text-blue-300 space-y-1">
-                        <li><a href="#quick-start" className="hover:text-blue-900 dark:hover:text-blue-100">Quick Start</a></li>
-                        <li><a href="#installation" className="hover:text-blue-900 dark:hover:text-blue-100">Installation</a></li>
-                        <li><a href="#basic-configuration" className="hover:text-blue-900 dark:hover:text-blue-100">Basic Configuration</a></li>
-                        <li><a href="#advanced-configuration" className="hover:text-blue-900 dark:hover:text-blue-100">Advanced Configuration</a></li>
-                        <li><a href="#understanding-results" className="hover:text-blue-900 dark:hover:text-blue-100">Understanding Results</a></li>
-                        <li><a href="#build-integration" className="hover:text-blue-900 dark:hover:text-blue-100">Build Lifecycle Integration</a></li>
-                        <li><a href="#cicd-integration" className="hover:text-blue-900 dark:hover:text-blue-100">CI/CD Integration</a></li>
-                        <li><a href="#troubleshooting" className="hover:text-blue-900 dark:hover:text-blue-100">Troubleshooting</a></li>
-                        <li><a href="#best-practices" className="hover:text-blue-900 dark:hover:text-blue-100">Best Practices</a></li>
-                    </ol>
-                </div>
+                <h2 id="overview">Overview</h2>
+                
+                <p>
+                    SCAN (Sensitive Code Analyzer for Nerds) is a comprehensive security tool that helps protect your 
+                    codebase from accidentally committed secrets. This guide covers everything from basic setup to 
+                    advanced configuration and best practices.
+                </p>
 
-                <h2 id="quick-start">Quick Start</h2>
+                <h2 id="installation">Installation</h2>
                 
                 <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
 
@@ -83,7 +76,18 @@ export default function UserGuidePage() {
 
 apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
 
-                <h2 id="basic-configuration">Basic Configuration</h2>
+                <h2 id="basic-usage">Basic Usage</h2>
+                
+                <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
+
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
+    id("io.github.theaniketraj.scan") version "1.0.0"
+}
+
+// Run the scan
+./gradlew scanForSecrets`}</code></pre>
+
+                <h2 id="configuration">Configuration</h2>
 
                 <h3>Minimal Configuration</h3>
 
@@ -108,6 +112,45 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
     
     // Enable verbose output (default: false)
     verbose = true
+}`}</code></pre>
+
+                <h2 id="patterns">Understanding Patterns</h2>
+                
+                <p>SCAN uses over 50 built-in patterns to detect common secret types:</p>
+                <ul>
+                    <li>API keys (AWS, GitHub, Stripe, etc.)</li>
+                    <li>Database connection strings</li>
+                    <li>Private keys and certificates</li>
+                    <li>OAuth tokens and JWT secrets</li>
+                </ul>
+
+                <h2 id="custom-patterns">Custom Patterns</h2>
+                
+                <p>Add organization-specific patterns:</p>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+    customPatterns = listOf(
+        "COMPANY_API_[A-Z0-9]{32}",
+        "INTERNAL_SECRET_.*"
+    )
+}`}</code></pre>
+
+                <h2 id="output-formats">Output Formats</h2>
+                
+                <p>Choose between console, JSON, or HTML output:</p>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+    generateHtmlReport = true  // Creates detailed HTML report
+    generateJsonReport = true  // Machine-readable JSON output
+}`}</code></pre>
+
+                <h2 id="exclusions">File Exclusions</h2>
+                
+                <p>Exclude files and directories from scanning:</p>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+    excludePatterns = setOf(
+        "**/test/**",
+        "**/build/**",
+        "**/*.min.js"
+    )
 }`}</code></pre>
 
                 <h2 id="understanding-results">Understanding Results</h2>
@@ -138,7 +181,7 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
    - Secrets found: 1 critical, 1 warning
    - Scan duration: 2.3s`}</code></pre>
 
-                <h2 id="cicd-integration">CI/CD Integration</h2>
+                <h2 id="ci-integration">CI Integration</h2>
 
                 <h3>GitHub Actions</h3>
 
@@ -164,6 +207,24 @@ jobs:
       with:
         name: security-report
         path: build/reports/scan/`}</code></pre>
+
+                <h2 id="troubleshooting">Troubleshooting</h2>
+
+                <h3>Common Issues</h3>
+
+                <div className="space-y-4">
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                        <h4 className="text-yellow-800 dark:text-yellow-200 mt-0">Build Failing on Test Files</h4>
+                        <p className="text-yellow-700 dark:text-yellow-300">
+                            <strong>Solution:</strong> Exclude test directories or disable test scanning
+                        </p>
+                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm"><code>{`scan {
+    scanTests = false
+    // or
+    excludePatterns = setOf("**/test/**")
+}`}</code></pre>
+                    </div>
+                </div>
 
                 <h2 id="best-practices">Best Practices</h2>
 
