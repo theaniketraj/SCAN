@@ -268,9 +268,10 @@ object FileUtils {
                             if (shouldScanFile(file, attrs, options)) {
                                 result.add(file)
                             }
-                        } catch (e: Exception) {
-                            // Log error but continue processing other files
-                            System.err.println("Error processing file $file: ${e.message}")
+                        } catch (e: SecurityException) {
+                            System.err.println("Security exception processing file $file: ${e.message}")
+                        } catch (e: IOException) {
+                            System.err.println("I/O error processing file $file: ${e.message}")
                         }
 
                         return FileVisitResult.CONTINUE
@@ -286,7 +287,7 @@ object FileUtils {
                 }
             )
         } catch (e: IOException) {
-            throw RuntimeException("Failed to traverse directory: $rootPath", e)
+            throw IOException("Failed to traverse directory: $rootPath", e)
         }
 
         return result.toList()
@@ -382,7 +383,9 @@ object FileUtils {
 
             val printableRatio = printableCount.toDouble() / bytes.size
             return printableRatio > 0.7 // At least 70% printable characters
-        } catch (e: Exception) {
+        } catch (_: IOException) {
+            return false
+        } catch (_: SecurityException) {
             return false
         }
     }
@@ -399,8 +402,10 @@ object FileUtils {
         val detectedEncoding =
             try {
                 detectEncodingInternal(file)
-            } catch (e: Exception) {
+            } catch (_: IOException) {
                 StandardCharsets.UTF_8 // Fallback to UTF-8
+            } catch (_: SecurityException) {
+                StandardCharsets.UTF_8
             }
 
         // Cache the result
@@ -439,7 +444,7 @@ object FileUtils {
             } else {
                 StandardCharsets.ISO_8859_1 // Fallback to Latin-1
             }
-        } catch (e: Exception) {
+        } catch (_: IllegalArgumentException) {
             StandardCharsets.ISO_8859_1
         }
     }
@@ -463,7 +468,7 @@ object FileUtils {
 
         return try {
             Files.readString(file, encoding)
-        } catch (e: Exception) {
+        } catch (_: IOException) {
             // Fallback to reading as bytes and converting
             val bytes = Files.readAllBytes(file)
             String(bytes, encoding)
@@ -510,7 +515,7 @@ object FileUtils {
                 if (includeHash) {
                     hash = calculateFileHash(file)
                 }
-            } catch (e: Exception) {
+            } catch (_: IOException) {
                 // Ignore errors in metadata calculation
             }
         }
@@ -531,11 +536,11 @@ object FileUtils {
 
         return try {
             Files.lines(file).use { lines -> lines.mapToInt { 1 }.sum() }
-        } catch (e: Exception) {
+        } catch (_: IOException) {
             // Fallback method
             try {
                 Files.readAllLines(file).size
-            } catch (e2: Exception) {
+            } catch (_: IOException) {
                 0
             }
         }
@@ -556,7 +561,7 @@ object FileUtils {
             }
 
             digest.digest().joinToString("") { String.format("%02x", it) }
-        } catch (e: Exception) {
+        } catch (_: IOException) {
             ""
         }
     }
@@ -565,7 +570,7 @@ object FileUtils {
     fun createTempFile(prefix: String = "scan", suffix: String = ".tmp"): Path {
         return try {
             Files.createTempFile(prefix, suffix)
-        } catch (e: Exception) {
+        } catch (_: IOException) {
             // Fallback to system temp directory
             val tempDir = System.getProperty("java.io.tmpdir")
             val fileName = "${prefix}_${System.currentTimeMillis()}$suffix"
@@ -612,7 +617,7 @@ object FileUtils {
                 Files.copy(source, target, *options.toTypedArray())
             }
         } catch (e: IOException) {
-            throw RuntimeException("Failed to copy file from $source to $target", e)
+            throw IOException("Failed to copy file from $source to $target", e)
         }
     }
 
@@ -620,7 +625,7 @@ object FileUtils {
     fun getRelativePath(basePath: Path, targetPath: Path): String {
         return try {
             basePath.relativize(targetPath).toString()
-        } catch (e: Exception) {
+        } catch (_: IllegalArgumentException) {
             targetPath.toString()
         }
     }
@@ -687,7 +692,7 @@ object FileUtils {
             val normalizedBase = basePath.normalize().toAbsolutePath()
             val normalizedTarget = targetPath.normalize().toAbsolutePath()
             normalizedTarget.startsWith(normalizedBase)
-        } catch (e: Exception) {
+        } catch (_: InvalidPathException) {
             false
         }
     }
