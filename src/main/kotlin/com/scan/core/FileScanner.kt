@@ -188,6 +188,11 @@ class FileScanner(
             throw IllegalArgumentException("File does not exist: ${file.path}")
         }
 
+        // Skip unreadable files gracefully to align with cross-OS behavior in tests
+        if (!Files.isReadable(file.toPath())) {
+            return emptyList()
+        }
+
         // Apply filters first if available
         if (filters.isNotEmpty()) {
             val shouldScan = filters.all { filter ->
@@ -218,16 +223,18 @@ class FileScanner(
 
                 val findings = detector.detect(scanContext)
                 findings.forEach { finding ->
-                    results.add(LegacyScanResult(
-                        file = file,
-                        lineNumber = finding.location.lineNumber,
-                        columnStart = finding.location.columnStart,
-                        columnEnd = finding.location.columnEnd,
-                        content = finding.secretInfo.detectedValue,
-                        ruleId = finding.detectorName,
-                        severity = convertSeverity(finding.severity),
-                        message = finding.description
-                    ))
+                    results.add(
+                        LegacyScanResult(
+                            file = file,
+                            lineNumber = finding.location.lineNumber,
+                            columnStart = finding.location.columnStart,
+                            columnEnd = finding.location.columnEnd,
+                            content = finding.secretInfo.detectedValue,
+                            ruleId = finding.detectorName,
+                            severity = convertSeverity(finding.severity),
+                            message = finding.description
+                        )
+                    )
                 }
             }
 
