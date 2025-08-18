@@ -32,28 +32,45 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                // Find the entry that's most visible
-                let mostVisible = entries[0];
-                let maxRatio = 0;
+                // Sort entries by their position and find the most visible one
+                const visibleEntries = entries.filter(entry => entry.isIntersecting);
                 
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-                        maxRatio = entry.intersectionRatio;
-                        mostVisible = entry;
-                    }
-                });
-                
-                if (mostVisible && mostVisible.isIntersecting) {
+                if (visibleEntries.length > 0) {
+                    // Find the entry with the highest intersection ratio
+                    const mostVisible = visibleEntries.reduce((prev, current) => {
+                        return current.intersectionRatio > prev.intersectionRatio ? current : prev;
+                    });
+                    
                     setActiveSection(mostVisible.target.id);
+                } else {
+                    // If no sections are visible, find the closest one to the top
+                    const elementsWithDistance = sections.map(({ id }) => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            const rect = element.getBoundingClientRect();
+                            return {
+                                id,
+                                distance: Math.abs(rect.top - 120) // 120px is our header offset
+                            };
+                        }
+                        return { id, distance: Infinity };
+                    }).filter(item => item.distance !== Infinity);
+                    
+                    if (elementsWithDistance.length > 0) {
+                        const closest = elementsWithDistance.reduce((prev, current) => {
+                            return current.distance < prev.distance ? current : prev;
+                        });
+                        setActiveSection(closest.id);
+                    }
                 }
             },
             { 
-                rootMargin: "-10% 0px -80% 0px",
+                rootMargin: "-120px 0px -60% 0px", // Account for header and better detection
                 threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
             }
         );
 
-        // Wait for DOM to be fully ready
+        // Wait for DOM to be fully ready and set initial active section
         const timer = setTimeout(() => {
             sections.forEach(({ id }) => {
                 const element = document.getElementById(id);
@@ -62,23 +79,30 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
                 }
             });
             
-            // Set the first section as active if none is set
-            if (!activeSection && sections.length > 0) {
-                const firstElement = document.getElementById(sections[0].id);
-                if (firstElement) {
-                    const rect = firstElement.getBoundingClientRect();
-                    if (rect.top < window.innerHeight) {
-                        setActiveSection(sections[0].id);
+            // Set initial active section based on scroll position
+            if (sections.length > 0) {
+                const firstVisibleSection = sections.find(({ id }) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        const rect = element.getBoundingClientRect();
+                        return rect.top <= 200; // Within view
                     }
+                    return false;
+                });
+                
+                if (firstVisibleSection) {
+                    setActiveSection(firstVisibleSection.id);
+                } else {
+                    setActiveSection(sections[0].id);
                 }
             }
-        }, 500);
+        }, 300);
 
         return () => {
             clearTimeout(timer);
             observer.disconnect();
         };
-    }, [sections, activeSection]);
+    }, [sections]);
 
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id);
@@ -90,10 +114,16 @@ export default function DocsLayout({ children, sections, title }: DocsLayoutProp
             // Update active section immediately for better UX
             setActiveSection(id);
             
+            // Smooth scroll to the element
             window.scrollTo({
-                top: offsetPosition,
+                top: Math.max(0, offsetPosition), // Ensure we don't scroll above the page
                 behavior: "smooth"
             });
+            
+            // Focus the element for accessibility
+            setTimeout(() => {
+                element.focus({ preventScroll: true });
+            }, 500);
         }
     };
 
