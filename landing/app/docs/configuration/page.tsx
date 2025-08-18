@@ -24,18 +24,6 @@ export default function ConfigurationPage() {
                     This document provides a comprehensive reference for all configuration options available in the SCAN Gradle Plugin.
                 </p>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 my-8">
-                    <h3 className="text-blue-800 dark:text-blue-200 mt-0">Table of Contents</h3>
-                    <ol className="text-blue-700 dark:text-blue-300 space-y-1">
-                        <li><a href="#overview" className="hover:text-blue-900 dark:hover:text-blue-100">Configuration Overview</a></li>
-                        <li><a href="#basic-settings" className="hover:text-blue-900 dark:hover:text-blue-100">Basic Settings</a></li>
-                        <li><a href="#file-patterns" className="hover:text-blue-900 dark:hover:text-blue-100">File Pattern Configuration</a></li>
-                        <li><a href="#detection-settings" className="hover:text-blue-900 dark:hover:text-blue-100">Detection Settings</a></li>
-                        <li><a href="#reporting" className="hover:text-blue-900 dark:hover:text-blue-100">Reporting Options</a></li>
-                        <li><a href="#examples" className="hover:text-blue-900 dark:hover:text-blue-100">Configuration Examples</a></li>
-                    </ol>
-                </div>
-
                 <h2 id="overview">Configuration Overview</h2>
                 
                 <p>All SCAN configuration is done through the <code>scan</code> extension block in your <code>build.gradle.kts</code>:</p>
@@ -44,7 +32,7 @@ export default function ConfigurationPage() {
     // Configuration options go here
 }`}</code></pre>
 
-                <h2 id="basic-settings">Basic Settings</h2>
+                <h2 id="basic-config">Basic Configuration</h2>
 
                 <div className="space-y-6">
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
@@ -84,7 +72,7 @@ export default function ConfigurationPage() {
                     </div>
                 </div>
 
-                <h2 id="file-patterns">File Pattern Configuration</h2>
+                <h2 id="pattern-config">Pattern Configuration</h2>
 
                 <div className="space-y-6">
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
@@ -132,7 +120,7 @@ export default function ConfigurationPage() {
                     </div>
                 </div>
 
-                <h2 id="detection-settings">Detection Settings</h2>
+                <h2 id="scan-settings">Scan Settings</h2>
 
                 <div className="space-y-6">
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
@@ -175,7 +163,7 @@ export default function ConfigurationPage() {
                     </div>
                 </div>
 
-                <h2 id="reporting">Reporting Options</h2>
+                <h2 id="output-config">Output Configuration</h2>
 
                 <div className="space-y-6">
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
@@ -203,7 +191,52 @@ export default function ConfigurationPage() {
                     </div>
                 </div>
 
-                <h2 id="examples">Configuration Examples</h2>
+                <h2 id="performance">Performance Settings</h2>
+                
+                <div className="space-y-6">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                        <h3 className="mt-0"><code>maxThreads</code></h3>
+                        <ul className="space-y-1">
+                            <li><strong>Type:</strong> <code>Integer</code></li>
+                            <li><strong>Default:</strong> <code>4</code></li>
+                            <li><strong>Description:</strong> Maximum number of threads for parallel scanning</li>
+                        </ul>
+                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm"><code>{`scan {
+    maxThreads = 8  // Use more threads for faster scanning
+}`}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="exclusions">File Exclusions</h2>
+                
+                <div className="space-y-6">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                        <h3 className="mt-0"><code>ignoreTestFiles</code></h3>
+                        <ul className="space-y-1">
+                            <li><strong>Type:</strong> <code>Boolean</code></li>
+                            <li><strong>Default:</strong> <code>true</code></li>
+                            <li><strong>Description:</strong> Skip scanning test files and directories</li>
+                        </ul>
+                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm"><code>{`scan {
+    ignoreTestFiles = false  // Include test files in scanning
+}`}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="environment">Environment Variables</h2>
+                
+                <div className="space-y-6">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                        <p>SCAN supports various environment variables for configuration:</p>
+                        <ul className="space-y-2">
+                            <li><code>SCAN_FAIL_ON_SECRETS</code> - Override failOnSecrets setting</li>
+                            <li><code>SCAN_VERBOSE</code> - Enable verbose output</li>
+                            <li><code>SCAN_OUTPUT_DIR</code> - Set custom output directory</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2 id="examples">Complete Examples</h2>
 
                 <h3>Development-Friendly Setup</h3>
 
