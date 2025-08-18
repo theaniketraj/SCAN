@@ -23,16 +23,12 @@ export default function BasicUsagePage() {
                     This guide contains simple examples demonstrating basic SCAN plugin usage and common patterns to fix.
                 </p>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 my-8">
-                    <h3 className="text-blue-800 dark:text-blue-200 mt-0">Table of Contents</h3>
-                    <ol className="text-blue-700 dark:text-blue-300 space-y-1">
-                        <li><a href="#quick-start" className="hover:text-blue-900 dark:hover:text-blue-100">Quick Start Example</a></li>
-                        <li><a href="#configurations" className="hover:text-blue-900 dark:hover:text-blue-100">Configuration Examples</a></li>
-                        <li><a href="#common-patterns" className="hover:text-blue-900 dark:hover:text-blue-100">Common Patterns to Fix</a></li>
-                        <li><a href="#gradle-integration" className="hover:text-blue-900 dark:hover:text-blue-100">Gradle Integration</a></li>
-                        <li><a href="#testing" className="hover:text-blue-900 dark:hover:text-blue-100">Testing the Setup</a></li>
-                    </ol>
-                </div>
+                <h2 id="overview">Overview</h2>
+                
+                <p>
+                    This guide demonstrates practical usage of the SCAN plugin with real-world examples. 
+                    Each example shows both the problem and the solution.
+                </p>
 
                 <h2 id="quick-start">Quick Start Example</h2>
 
@@ -128,7 +124,7 @@ FAILURE: Build failed with an exception.
 Execution failed for task ':scanForSecrets'.
 > Security scan failed: 3 potential secrets detected`}</code></pre>
 
-                <h2 id="configurations">Configuration Examples</h2>
+                <h2 id="common-commands">Common Commands</h2>
 
                 <h3>Lenient Configuration (Development)</h3>
 
@@ -189,7 +185,7 @@ Execution failed for task ':scanForSecrets'.
     }
 }`}</code></pre>
 
-                <h2 id="common-patterns">Common Patterns to Fix</h2>
+                <h2 id="gradle-tasks">Gradle Tasks</h2>
 
                 <h3>1. Hardcoded API Keys</h3>
 
@@ -256,7 +252,7 @@ database:
                     </div>
                 </div>
 
-                <h2 id="gradle-integration">Gradle Integration</h2>
+                <h2 id="build-integration">Build Integration</h2>
 
                 <h3>Task Dependencies</h3>
 
@@ -284,7 +280,37 @@ tasks.named("scanForSecrets") {
     }
 }`}</code></pre>
 
-                <h2 id="testing">Testing the Setup</h2>
+                <h2 id="ide-integration">IDE Integration</h2>
+                
+                <div className="space-y-6">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                        <h3 className="mt-0">IntelliJ IDEA / Android Studio</h3>
+                        <p>SCAN integrates seamlessly with Gradle-based IDEs:</p>
+                        <ol>
+                            <li>Open Gradle tool window</li>
+                            <li>Navigate to your project &gt; Tasks &gt; verification</li>
+                            <li>Double-click <code>scanForSecrets</code> to run</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="common-scenarios">Common Scenarios</h2>
+                
+                <div className="space-y-6">
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+                        <h3 className="text-yellow-800 dark:text-yellow-200 mt-0">Scenario: API Keys in Configuration</h3>
+                        <p className="text-yellow-700 dark:text-yellow-300">
+                            <strong>Problem:</strong> Hardcoded API keys in application.properties
+                        </p>
+                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm"><code>{`# ❌ Bad - hardcoded secret
+api.key=sk_live_1234567890abcdef
+
+# ✅ Good - environment variable
+api.key=\${API_KEY}`}</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="troubleshooting">Troubleshooting</h2>
 
                 <p>Create a test file to verify SCAN is working:</p>
 
