@@ -44,8 +44,9 @@ dependencies {
     // HTML Generation
     implementation(libs.kotlinx.html)
 
-    // Logging
-    implementation(libs.bundles.logging)
+    // Logging - Use Gradle's logging API instead of SLF4J for plugin
+    // Remove SLF4J from plugin dependencies to avoid conflicts
+    // implementation(libs.bundles.logging)
 
     // Testing
     testImplementation(libs.bundles.testing)
@@ -57,6 +58,14 @@ dependencies {
 
     // Test Runtime
     testRuntimeOnly(libs.junit.jupiter.engine)
+}
+
+// Exclude conflicting SLF4J implementations to prevent ClassCastException
+configurations.all {
+    exclude(group = "org.slf4j", module = "slf4j-simple")
+    exclude(group = "org.slf4j", module = "slf4j-log4j12")
+    exclude(group = "org.slf4j", module = "slf4j-jdk14")
+    exclude(group = "org.slf4j", module = "slf4j-reload4j")
 }
 
 gradlePlugin {
