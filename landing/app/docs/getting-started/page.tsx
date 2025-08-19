@@ -99,7 +99,7 @@ apply plugin: "io.github.theaniketraj.scan"`}</code></pre>
                         <h4 className="text-blue-800 dark:text-blue-200 font-semibold mb-2">💡 Pro Tip</h4>
                         <p className="text-blue-700 dark:text-blue-300 mb-0">
                             Always use the latest version for the best security patterns and performance improvements. 
-                            Check the <a href="https://github.com/theaniketraj/SCAN/releases" className="underline">releases page</a> for updates.
+                            Check the <a href="https://github.com/theaniketraj/SCAN/tags" className="underline" target="_blank">releases page</a> for updates.
                         </p>
                     </div>
                 </section>

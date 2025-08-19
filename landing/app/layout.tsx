@@ -10,7 +10,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export const metadata = {
-    title: "SCAN — Secret detection for Gradle builds",
+    title: "SCAN - Secret detection for Gradle builds",
     description: "Catch API keys, tokens and credentials before they reach source control.",
     viewport: "width=device-width, initial-scale=1",
 }
