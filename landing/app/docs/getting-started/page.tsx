@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "next/link"
 import DocsLayout from "../../../components/DocsLayout"
 
 export default function GettingStartedPage() {
@@ -134,14 +135,14 @@ Scanning 127 files...
 
 🔍 SCAN Results:
 ┌─────────────────────────────────────────────────┐
-│ Found 2 potential secrets in 1 file(s)         │
+│ Found 2 potential secrets in 1 file(s)          │
 ├─────────────────────────────────────────────────┤
-│ File: src/main/java/Config.java                │
+│ File: src/main/java/Config.java                 │
 │ Line: 15                                        │
 │ Type: API Key                                   │
 │ Match: sk_test_51H...                           │
 ├─────────────────────────────────────────────────┤
-│ File: src/main/java/Config.java                │
+│ File: src/main/java/Config.java                 │
 │ Line: 23                                        │
 │ Type: Database Password                         │
 │ Match: password=secret123                       │
@@ -265,9 +266,9 @@ BUILD FAILED`}</code></pre>
                             <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                 Learn advanced features, best practices, and troubleshooting tips.
                             </p>
-                            <a href="/docs/user-guide" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
+                            <Link href="/docs/user-guide" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
                                 Read User Guide →
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
@@ -275,9 +276,9 @@ BUILD FAILED`}</code></pre>
                             <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                 Customize patterns, exclusions, and output formats for your needs.
                             </p>
-                            <a href="/docs/configuration" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
+                            <Link href="/docs/configuration" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
                                 View Configuration →
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
@@ -285,9 +286,9 @@ BUILD FAILED`}</code></pre>
                             <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                 Understand built-in patterns and create custom detection rules.
                             </p>
-                            <a href="/docs/patterns" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
+                            <Link href="/docs/patterns" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
                                 Explore Patterns →
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
@@ -295,9 +296,9 @@ BUILD FAILED`}</code></pre>
                             <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                                 Integrate SCAN into your automated build and deployment pipelines.
                             </p>
-                            <a href="/docs/ci" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
+                            <Link href="/docs/ci" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm">
                                 Setup CI/CD →
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
