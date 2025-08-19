@@ -73,12 +73,12 @@ gradle --version
 
                     <h3>Kotlin DSL (build.gradle.kts)</h3>
                     <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0"
+    id("io.github.theaniketraj.scan") version "2.0.0"
 }`}</code></pre>
 
                     <h3>Groovy DSL (build.gradle)</h3>
                     <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id 'io.github.theaniketraj.scan' version '1.0.0'
+    id 'io.github.theaniketraj.scan' version '2.0.0'
 }`}</code></pre>
 
                     <h3>Legacy Plugin Application</h3>
@@ -88,7 +88,7 @@ gradle --version
         gradlePluginPortal()
     }
     dependencies {
-        classpath "io.github.theaniketraj:scan-gradle-plugin:1.0.0"
+        classpath "io.github.theaniketraj:scan-gradle-plugin:2.0.0"
     }
 }
 

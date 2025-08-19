@@ -68,7 +68,7 @@ SCAN is built for speed and efficiency:
 
 ```kotlin
 plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0"
+    id("io.github.theaniketraj.scan") version "2.0.0"
 }
 ```
 

@@ -40,7 +40,7 @@ export default function UserGuidePage() {
                 <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0"
+    id("io.github.theaniketraj.scan") version "2.0.0"
 }`}</code></pre>
 
                 <p>Run your first scan:</p>
@@ -54,13 +54,13 @@ export default function UserGuidePage() {
                 <h3>Gradle Kotlin DSL (build.gradle.kts)</h3>
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0"
+    id("io.github.theaniketraj.scan") version "2.0.0"
 }`}</code></pre>
 
                 <h3>Gradle Groovy DSL (build.gradle)</h3>
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id 'io.github.theaniketraj.scan' version '1.0.0'
+    id 'io.github.theaniketraj.scan' version '2.0.0'
 }`}</code></pre>
 
                 <h3>Legacy Plugin Application</h3>
@@ -70,7 +70,7 @@ export default function UserGuidePage() {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("io.github.theaniketraj:scan-gradle-plugin:1.0.0")
+        classpath("io.github.theaniketraj:scan-gradle-plugin:2.0.0")
     }
 }
 
@@ -81,7 +81,7 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
                 <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0"
+    id("io.github.theaniketraj.scan") version "2.0.0"
 }
 
 // Run the scan

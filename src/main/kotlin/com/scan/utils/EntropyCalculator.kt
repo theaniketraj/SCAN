@@ -11,7 +11,7 @@ import kotlin.math.log2
  * encrypted data.
  *
  * @author SCAN Plugin Team
- * @since 1.0.0
+ * @since 2.0.0
  */
 object EntropyCalculator {
 

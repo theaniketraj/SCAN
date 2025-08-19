@@ -710,7 +710,7 @@ gradle.beforeProject { project ->
 
 ```kotlin
 plugins {
-    id("io.github.theaniketraj.scan") version "1.0.0" apply false
+    id("io.github.theaniketraj.scan") version "2.0.0" apply false
 }
 
 // Configure security scanning for all projects

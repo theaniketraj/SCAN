@@ -14,7 +14,7 @@ export default function Hero() {
             </div>
             <div>
                 <pre className="bg-black/80 text-white p-4 rounded-md text-sm sm:text-base overflow-x-auto">{`plugins {
-  id("io.github.theaniketraj.scan") version "1.0.0"
+  id("io.github.theaniketraj.scan") version "2.0.0"
 }
 
 ./gradlew scanForSecrets`}</pre>
