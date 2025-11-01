@@ -9,6 +9,13 @@ module.exports = {
           100: "#e6f3ff",
           500: "#0ea5e9"
         }
+      },
+      screens: {
+        'xs': '375px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
       }
     }
   },

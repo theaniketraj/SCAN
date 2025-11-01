@@ -3,7 +3,27 @@
 @tailwind utilities;
 
 html, body { height: 100%; }
-body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+body { 
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile-friendly base styles */
+@media (max-width: 640px) {
+  body {
+    font-size: 16px; /* Prevents zoom on input focus on iOS */
+  }
+}
+
+/* Touch-friendly interactive elements */
+a, button, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Critical: Override prose and force code block appearance */
 div.prose pre,
@@ -11,16 +31,26 @@ div.prose pre,
 pre {
   background-color: rgb(31, 41, 55) !important; /* gray-900 */
   color: rgb(249, 250, 251) !important; /* white */
-  padding: 1rem !important;
+  padding: 0.75rem !important;
   border-radius: 0.5rem !important;
   overflow-x: auto !important;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
-  font-size: 0.875rem !important;
+  font-size: 0.75rem !important;
   line-height: 1.5 !important;
   margin: 1.5rem 0 !important;
   border: none !important;
-  white-space: pre !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
   display: block !important;
+}
+
+@media (min-width: 640px) {
+  div.prose pre,
+  .prose pre,
+  pre {
+    font-size: 0.875rem !important;
+    padding: 1rem !important;
+  }
 }
 
 /* Critical: Code inside pre - ensure it inherits properly */
@@ -68,4 +98,15 @@ div.prose :not(pre) > code::after,
 .prose :not(pre) > code::after {
   content: "" !important;
   display: none !important;
+}
+
+/* Ensure container doesn't overflow on mobile */
+.container {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: 100%;
+  }
 }

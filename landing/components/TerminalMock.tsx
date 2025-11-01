@@ -10,6 +10,6 @@ export default function TerminalMock() {
 ✅ Test key in TestConfig.kt:5 (whitelisted)
    test_key_12345`
     return (
-        <pre className="mt-4 rounded-md bg-[#0b1220] p-4 sm:p-6 text-xs sm:text-sm text-white overflow-x-auto whitespace-pre-wrap">{output}</pre>
+        <pre className="mt-4 sm:mt-6 rounded-md bg-[#0b1220] p-3 xs:p-4 sm:p-6 text-xs xs:text-sm sm:text-base text-white overflow-x-auto whitespace-pre-wrap break-words leading-relaxed">{output}</pre>
     )
 }
