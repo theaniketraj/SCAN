@@ -152,6 +152,11 @@ detekt {
         sarif.required.set(true)
         sarif.outputLocation.set(file("build/reports/detekt/detekt.sarif"))
     }
+}
+
+// Configure detekt tasks to use correct JVM target
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
 } // Documentation
 tasks.dokkaHtml.configure {
     outputDirectory.set(layout.buildDirectory.dir("dokka"))
