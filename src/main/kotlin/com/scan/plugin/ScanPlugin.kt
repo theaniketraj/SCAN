@@ -364,6 +364,9 @@ class ScanPlugin : Plugin<Project> {
      * Configures Gradle's input/output tracking for the scan task. This is crucial for build
      * performance - it tells Gradle what files the task reads and what files it produces, so Gradle
      * can skip the task if nothing has changed.
+     * 
+     * Note: sourceFiles input is already declared via @InputFiles in ScanTask, so we don't
+     * register it again here to avoid duplicate property registration in multi-module setups.
      */
     private fun ScanTask.setupTaskInputsAndOutputs(project: Project, extension: ScanExtension) {
         // Configure inputs - these are the things that, if changed, require re-running the task
@@ -374,9 +377,8 @@ class ScanPlugin : Plugin<Project> {
         inputs.property("customPatterns", extension.customPatterns)
         inputs.property("maxFileSizeBytes", extension.maxFileSizeBytes)
 
-        // The actual source files are inputs too - if they change, we need to re-scan
-        inputs.files(project.fileTree(project.projectDir))
-            .withPropertyName("sourceFiles")
+        // Note: sourceFiles are already tracked via @InputFiles annotation on ScanTask.sourceFiles
+        // Registering them again here would cause "Multiple input file properties" error
 
         // Configure outputs - these are the files the task produces
         if (extension.generateHtmlReport.get()) {
