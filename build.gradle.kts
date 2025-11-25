@@ -40,6 +40,12 @@ dependencies {
 
     // File Processing
     implementation(libs.bundles.file.processing)
+    implementation(libs.tika.parser.pdf.module)
+    implementation(libs.poi.ooxml)
+
+    // Security Updates (Transitive dependencies forced to newer versions)
+    implementation(libs.commons.text)
+    implementation(libs.bouncycastle.bcpkix)
 
     // HTML Generation
     implementation(libs.kotlinx.html)

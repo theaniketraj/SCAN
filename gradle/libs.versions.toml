@@ -32,6 +32,9 @@ commons-io = "2.16.1"
 commons-codec = "1.17.1"
 commons-lang3 = "3.15.0"
 guava = "33.2.1-jre"
+commons-text = "1.9"
+bouncycastle = "1.77"
+poi = "5.2.5"
 
 # HTML Generation
 kotlinx-html = "0.11.0"
@@ -108,6 +111,8 @@ commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
 
 # HTML Generation
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinx-html" }
@@ -115,6 +120,8 @@ kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref 
 # File Processing
 apache-tika-core = { module = "org.apache.tika:tika-core", version.ref = "apache-tika" }
 apache-tika-parsers = { module = "org.apache.tika:tika-parsers-standard-package", version.ref = "apache-tika" }
+tika-parser-pdf-module = { module = "org.apache.tika:tika-parser-pdf-module", version.ref = "apache-tika" }
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
 
 # Configuration Management
 konf-core = { module = "com.uchuhimo:konf-core", version.ref = "konf" }
