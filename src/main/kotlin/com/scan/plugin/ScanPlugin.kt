@@ -364,7 +364,7 @@ class ScanPlugin : Plugin<Project> {
      * Configures Gradle's input/output tracking for the scan task. This is crucial for build
      * performance - it tells Gradle what files the task reads and what files it produces, so Gradle
      * can skip the task if nothing has changed.
-     * 
+     *
      * Note: sourceFiles input is already declared via @InputFiles in ScanTask, so we don't
      * register it again here to avoid duplicate property registration in multi-module setups.
      */
