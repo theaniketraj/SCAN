@@ -77,7 +77,13 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val sourceFiles: FileTree
-        get() = project.fileTree(project.projectDir)
+        get() = project.fileTree(project.projectDir).apply {
+            exclude("**/.gradle/**")
+            exclude("**/build/**")
+            exclude("**/.git/**")
+            exclude("**/node_modules/**")
+            exclude(scanConfiguration.get().excludePatterns.getOrElse(emptySet()))
+        }
 
     /**
      * The main output file that always gets generated, even if no secrets are found. This ensures
@@ -381,7 +387,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         try {
             // Delegate the actual scanning to the engine - convert to async call
             return runBlocking {
-                scanEngine.executeScan(filesToScan.first().parent)
+                scanEngine.executeScan(project.projectDir.absolutePath)
             }
         } catch (exception: Exception) {
             throw GradleException("Scanning failed: ${exception.message}", exception)

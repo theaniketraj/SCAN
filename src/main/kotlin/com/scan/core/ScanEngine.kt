@@ -57,6 +57,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     suspend fun executeScan(rootPath: String): ScanResult {
         logger.info("Starting security scan of: $rootPath")
 
+        var result: ScanResult? = null
         val totalTime = measureTimeMillis {
             try {
                 // Initialize scan process
@@ -72,11 +73,12 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 }
 
                 // Execute scanning with parallel processing
+                val rootPathObj = java.nio.file.Paths.get(rootPath)
                 val scanResults =
                     if (configuration.performance.maxConcurrency > 1) {
-                        scanFilesParallel(filesToScan)
+                        scanFilesParallel(filesToScan, rootPathObj)
                     } else {
-                        scanFilesSequential(filesToScan)
+                        scanFilesSequential(filesToScan, rootPathObj)
                     }
 
                 // Process and aggregate results
@@ -99,7 +101,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 }
 
                 // Generate final scan result
-                createFinalResult(finalResults, rootPath)
+                result = createFinalResult(finalResults, rootPath)
             } catch (e: Exception) {
                 logger.error("Scan execution failed", e)
                 throw ScanException("Scan execution failed: ${e.message}", e)
@@ -107,7 +109,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         }
 
         logger.info("Scan completed in ${totalTime}ms")
-        return createFinalResult(emptyList(), rootPath)
+        return result ?: createFinalResult(emptyList(), rootPath)
     }
 
     /** Initialize the scanning process */
@@ -129,6 +131,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     /** Discover all files that should be scanned based on configuration */
     private suspend fun discoverFiles(rootPath: String): List<File> {
         val root = File(rootPath)
+        val rootPathObj = root.toPath()
         if (!root.exists() || !root.isDirectory) {
             throw ScanException("Root path does not exist or is not a directory: $rootPath")
         }
@@ -136,9 +139,9 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         val allFiles = mutableListOf<File>()
 
         // Walk the file tree
-        Files.walk(root.toPath()).filter { Files.isRegularFile(it) }.forEach { path ->
+        Files.walk(rootPathObj).filter { Files.isRegularFile(it) }.forEach { path ->
             val file = path.toFile()
-            if (shouldScanFile(file)) {
+            if (shouldScanFile(file, rootPathObj)) {
                 allFiles.add(file)
             }
         }
@@ -150,13 +153,15 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     /** Check if a file should be scanned based on filters */
-    private fun shouldScanFile(file: File): Boolean {
-        val relativePath = file.toPath().toAbsolutePath().toString()
+    private fun shouldScanFile(file: File, rootPath: Path): Boolean {
+        // Calculate relative path for pattern matching (e.g., "src/main/kotlin/App.kt")
+        // We replace backslashes with forward slashes to ensure consistent glob matching on Windows
+        val relativePath = rootPath.relativize(file.toPath()).toString().replace("\\", "/")
         return fileFilters.all { filter -> filter.shouldIncludeFile(file, relativePath) }
     }
 
     /** Scan files in parallel using coroutines */
-    private suspend fun scanFilesParallel(files: List<File>): List<FileScanResult> {
+    private suspend fun scanFilesParallel(files: List<File>, rootPath: Path): List<FileScanResult> {
         val results = ConcurrentHashMap<String, FileScanResult>()
         val processedCount = AtomicInteger(0)
         val totalFiles = files.size
@@ -169,7 +174,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
                 .map { file ->
                     async {
                         try {
-                            val result = scanSingleFile(file)
+                            val result = scanSingleFile(file, rootPath)
                             results[file.absolutePath] = result
 
                             val processed = processedCount.incrementAndGet()
@@ -194,12 +199,12 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     /** Scan files sequentially (fallback for low-memory environments) */
-    private suspend fun scanFilesSequential(files: List<File>): List<FileScanResult> {
+    private suspend fun scanFilesSequential(files: List<File>, rootPath: Path): List<FileScanResult> {
         val results = mutableListOf<FileScanResult>()
 
         files.forEachIndexed { index, file ->
             try {
-                val result = scanSingleFile(file)
+                val result = scanSingleFile(file, rootPath)
                 results.add(result)
 
                 if ((index + 1) % 50 == 0 || index == files.size - 1) {
@@ -215,7 +220,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
     }
 
     /** Scan a single file for secrets */
-    private suspend fun scanSingleFile(file: File): FileScanResult {
+    private suspend fun scanSingleFile(file: File, rootPath: Path): FileScanResult {
         val filePath = file.absolutePath
         val fileHash = calculateFileHash(file)
 
@@ -252,7 +257,7 @@ class ScanEngine(private val configuration: ScanConfiguration) {
         }
 
         // Use FileScanner to scan the file
-        val result = fileScanner.scanFile(file.toPath()) ?: return FileScanResult.empty(filePath)
+        val result = fileScanner.scanFile(file.toPath(), rootPath) ?: return FileScanResult.empty(filePath)
 
         // Cache result if enabled
         if (configuration.performance.enableCaching) {

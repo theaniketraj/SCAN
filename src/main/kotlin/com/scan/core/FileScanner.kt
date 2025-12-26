@@ -115,9 +115,10 @@ class FileScanner(
      * Scans a single file for secrets and sensitive information.
      *
      * @param filePath The path to the file to scan
+     * @param rootPath The root directory of the scan (optional, used for relative path calculation)
      * @return ScanResult containing any findings or null if file should be skipped
      */
-    fun scanFile(filePath: Path): FileScanResult? {
+    fun scanFile(filePath: Path, rootPath: Path? = null): FileScanResult? {
         val file = filePath.toFile()
         val startTime = System.currentTimeMillis()
 
@@ -127,7 +128,7 @@ class FileScanner(
         }
 
         return try {
-            val scanContext = createScanContext(file.toPath())
+            val scanContext = createScanContext(file.toPath(), rootPath)
             val findings = mutableListOf<Finding>()
 
             // Apply filters before scanning
@@ -256,10 +257,16 @@ class FileScanner(
     }
 
     /** Creates scan context with file metadata and initial setup. */
-    private fun createScanContext(filePath: Path): ScanContext {
+    private fun createScanContext(filePath: Path, rootPath: Path? = null): ScanContext {
         val file = filePath.toFile()
         val extension = FileUtils.getFileExtension(filePath)
         val isTestFile = isTestFile(filePath)
+        
+        val relativePath = if (rootPath != null) {
+            rootPath.relativize(filePath).toString().replace("\\", "/")
+        } else {
+            filePath.toString()
+        }
 
         return ScanContext(
             filePath = filePath,
@@ -268,7 +275,7 @@ class FileScanner(
             isTestFile = isTestFile,
             fileSize = file.length(),
             configuration = configuration,
-            relativePath = filePath.toString()
+            relativePath = relativePath
         )
     }
 

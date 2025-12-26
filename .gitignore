@@ -149,3 +149,5 @@ jacoco.exec
 
 # Local Gradle properties
 gradle-local.properties
+
+.vscode/
