@@ -1,0 +1,46 @@
+services:
+  database:
+    host: localhost
+    port: 5432
+    username: dbadmin
+    password: "MyDbP@ssw0rd!2024"
+    
+  aws:
+    region: us-west-2
+    access_key_id: AKIAIOSFODNN7EXAMPLE
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    
+  github:
+    token: "ghp_abcdefghijklmnopqrstuvwxyz123456"
+    webhook_secret: "MyGitHubWebhookSecret123!"
+    
+  slack:
+    webhook_url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX"
+    bot_token: "xoxb-1234567890-1234567890-abcdefghijklmnopqrstuv"
+    
+  google:
+    api_key: "AIzaSyDabcdefghijklmnopqrstuvwxyz12345"
+    oauth_client_id: "123456789-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com"
+    oauth_client_secret: "AbCdEfGh-IjKlMnOpQrStUvWx"
+    
+  azure:
+    tenant_id: "12345678-1234-1234-1234-123456789012"
+    client_id: "87654321-4321-4321-4321-210987654321"
+    client_secret: "MyAzure~Client.Secret-ABC123_xyz"
+    
+  encryption:
+    secret_key: "ThisIsMyEncryptionSecretKey123456789!"
+    initialization_vector: "RandomIV12345678"
+    
+  jwt:
+    secret: "MyJWTSigningSecretKey123456789ABCDEF"
+    issuer: "myapp.example.com"
+    expiry_hours: 24
+
+# Legitimate configuration values
+application:
+  name: "My Application"
+  version: "2.0.0"
+  environment: "production"
+  max_connections: 100
+  timeout_seconds: 30

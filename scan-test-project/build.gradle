@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'io.github.theaniketraj.scan' version '2.0.0'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+scan {
+    generateHtmlReport.set(true)
+    generateJsonReport.set(true)
+    generateSarifReport.set(true)
+    strictMode.set(false)
+    failOnSecrets.set(false)
+}
