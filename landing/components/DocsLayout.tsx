@@ -25,7 +25,7 @@ const docPages = [
     { href: "/docs/contributing", title: "Contributing", icon: "🤝" }
 ]
 
-export default function DocsLayout({ children, sections, title }: DocsLayoutProps) {
+export default function DocsLayout({ children, sections }: DocsLayoutProps) {
     const pathname = usePathname()
     const [activeSection, setActiveSection] = useState("")
     const [sidebarOpen, setSidebarOpen] = useState(false)
