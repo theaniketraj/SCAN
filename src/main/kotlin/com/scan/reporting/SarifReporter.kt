@@ -62,7 +62,7 @@ class SarifReporter {
         sb.append("  \"version\": \"$SARIF_VERSION\",\n")
         sb.append("  \"runs\": [\n")
         sb.append("    {\n")
-        
+
         // Tool information
         sb.append("      \"tool\": {\n")
         sb.append("        \"driver\": {\n")
@@ -75,15 +75,15 @@ class SarifReporter {
         sb.append("            \"text\": \"Security scanner for detecting secrets and credentials in source code\"\n")
         sb.append("          },\n")
         sb.append("          \"rules\": [\n")
-        
+
         // Generate unique rules from findings
         val rules = generateRules(allFindings)
         sb.append(rules.joinToString(",\n") { "            $it" })
-        
+
         sb.append("\n          ]\n")
         sb.append("        }\n")
         sb.append("      },\n")
-        
+
         // Results
         sb.append("      \"results\": [\n")
         val resultEntries = allFindings.mapIndexed { index, finding ->
@@ -91,12 +91,12 @@ class SarifReporter {
         }
         sb.append(resultEntries.joinToString(",\n") { "        $it" })
         sb.append("\n      ],\n")
-        
+
         // Automation details
         sb.append("      \"automationDetails\": {\n")
         sb.append("        \"id\": \"scan/${timestamp}\"\n")
         sb.append("      },\n")
-        
+
         // Invocations
         sb.append("      \"invocations\": [\n")
         sb.append("        {\n")
@@ -104,7 +104,7 @@ class SarifReporter {
         sb.append("          \"endTimeUtc\": \"$timestamp\"\n")
         sb.append("        }\n")
         sb.append("      ]\n")
-        
+
         sb.append("    }\n")
         sb.append("  ]\n")
         sb.append("}\n")
@@ -115,10 +115,10 @@ class SarifReporter {
     /** Generates SARIF rules from findings. */
     private fun generateRules(findings: List<Finding>): List<String> {
         val uniqueRules = findings
-            .groupBy { it.type }
-            .map { (type, findingsOfType) ->
+            .groupBy { it.secretInfo.secretType }
+            .map { (secretType, findingsOfType) ->
                 val firstFinding = findingsOfType.first()
-                createSarifRule(type, firstFinding)
+                createSarifRule(secretType.toString(), firstFinding)
             }
         return uniqueRules
     }
@@ -155,29 +155,29 @@ class SarifReporter {
     private fun createSarifResult(finding: Finding, index: Int, repositoryUri: String?): String {
         val sb = StringBuilder()
         sb.append("{\n")
-        sb.append("          \"ruleId\": \"${escapeJson(finding.type)}\",\n")
+        sb.append("          \"ruleId\": \"${escapeJson(finding.secretInfo.secretType.toString())}\",\n")
         sb.append("          \"ruleIndex\": $index,\n")
         sb.append("          \"level\": \"${mapSeverityToSarifLevel(finding.severity)}\",\n")
         sb.append("          \"message\": {\n")
-        sb.append("            \"text\": \"${escapeJson(finding.message)}\"\n")
+        sb.append("            \"text\": \"${escapeJson(finding.description)}\"\n")
         sb.append("          },\n")
         sb.append("          \"locations\": [\n")
         sb.append("            {\n")
         sb.append("              \"physicalLocation\": {\n")
         sb.append("                \"artifactLocation\": {\n")
-        sb.append("                  \"uri\": \"${escapeJson(finding.file)}\",\n")
+        sb.append("                  \"uri\": \"${escapeJson(finding.location.relativePath)}\",\n")
         if (repositoryUri != null) {
             sb.append("                  \"uriBaseId\": \"%SRCROOT%\",\n")
         }
         sb.append("                  \"index\": 0\n")
         sb.append("                },\n")
         sb.append("                \"region\": {\n")
-        sb.append("                  \"startLine\": ${finding.lineNumber},\n")
-        sb.append("                  \"startColumn\": ${finding.column},\n")
-        sb.append("                  \"endLine\": ${finding.lineNumber},\n")
-        sb.append("                  \"endColumn\": ${finding.column + finding.match.length},\n")
+        sb.append("                  \"startLine\": ${finding.location.lineNumber},\n")
+        sb.append("                  \"startColumn\": ${finding.location.columnStart},\n")
+        sb.append("                  \"endLine\": ${finding.location.lineNumber},\n")
+        sb.append("                  \"endColumn\": ${finding.location.columnEnd},\n")
         sb.append("                  \"snippet\": {\n")
-        sb.append("                    \"text\": \"${escapeJson(finding.lineContent.trim())}\"\n")
+        sb.append("                    \"text\": \"${escapeJson(finding.location.lineContent.trim())}\"\n")
         sb.append("                  }\n")
         sb.append("                }\n")
         sb.append("              }\n")
@@ -188,7 +188,7 @@ class SarifReporter {
         sb.append("          },\n")
         sb.append("          \"properties\": {\n")
         sb.append("            \"detectorType\": \"${escapeJson(finding.detectorType)}\",\n")
-        sb.append("            \"confidence\": ${finding.confidence}\n")
+        sb.append("            \"confidence\": \"${finding.confidence}\"\n")
         sb.append("          }\n")
         sb.append("        }")
         return sb.toString()
@@ -217,26 +217,25 @@ class SarifReporter {
     /** Generates tags for a finding. */
     private fun generateTags(finding: Finding): String {
         val tags = mutableListOf("security", "secrets")
-        
+
         when (finding.detectorType.lowercase()) {
             "pattern" -> tags.add("pattern-matching")
             "entropy" -> tags.add("entropy-analysis")
             "contextaware", "context-aware" -> tags.add("context-aware")
         }
-        
+
         // Add severity tag
         tags.add("severity-${finding.severity.toString().lowercase()}")
-        
+
         return "[${tags.joinToString(", ") { "\"$it\"" }}]"
     }
 
     /** Determines precision level for a finding. */
     private fun determinePrecision(finding: Finding): String {
-        return when {
-            finding.confidence >= 0.9 -> "very-high"
-            finding.confidence >= 0.7 -> "high"
-            finding.confidence >= 0.5 -> "medium"
-            else -> "low"
+        return when (finding.confidence) {
+            com.scan.core.Confidence.HIGH -> "very-high"
+            com.scan.core.Confidence.MEDIUM -> "medium"
+            com.scan.core.Confidence.LOW -> "low"
         }
     }
 
@@ -253,7 +252,7 @@ class SarifReporter {
     /** Generates help text in Markdown format. */
     private fun generateHelpMarkdown(finding: Finding): String {
         return buildString {
-            append("## ${finding.type}\\n\\n")
+            append("## ${finding.secretInfo.secretType}\\n\\n")
             append("**Description:** ${finding.description}\\n\\n")
             append("**Severity:** ${finding.severity}\\n\\n")
             append("### Recommendations\\n\\n")
@@ -267,7 +266,7 @@ class SarifReporter {
 
     /** Generates a fingerprint for deduplication. */
     private fun generateFingerprint(finding: Finding): String {
-        val content = "${finding.file}:${finding.lineNumber}:${finding.type}"
+        val content = "${finding.location.filePath}:${finding.location.lineNumber}:${finding.secretInfo.secretType}"
         return content.hashCode().toString(16)
     }
 

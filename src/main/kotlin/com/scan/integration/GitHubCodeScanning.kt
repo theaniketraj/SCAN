@@ -26,10 +26,10 @@ class GitHubCodeScanning(
         private const val API_VERSION = "2022-11-28"
         private const val UPLOAD_ENDPOINT = "/repos/{owner}/{repo}/code-scanning/sarifs"
         private const val MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB limit for GitHub API
-        
+
         /**
          * Creates a GitHubCodeScanning instance from environment variables.
-         * 
+         *
          * Required environment variables:
          * - GITHUB_TOKEN: Personal access token or GitHub Actions token
          * - GITHUB_REPOSITORY: Repository in format "owner/repo"
@@ -39,10 +39,10 @@ class GitHubCodeScanning(
             val token = System.getenv("GITHUB_TOKEN") ?: return null
             val repository = System.getenv("GITHUB_REPOSITORY") ?: return null
             val ref = System.getenv("GITHUB_REF") ?: "refs/heads/main"
-            
+
             val parts = repository.split("/")
             if (parts.size != 2) return null
-            
+
             return GitHubCodeScanning(
                 githubToken = token,
                 owner = parts[0],
@@ -116,7 +116,7 @@ class GitHubCodeScanning(
         val endpoint = UPLOAD_ENDPOINT
             .replace("{owner}", owner)
             .replace("{repo}", repo)
-        
+
         val url = URL("$apiUrl$endpoint")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -210,7 +210,7 @@ class GitHubCodeScanning(
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
-            
+
             process.waitFor()
             process.inputStream.bufferedReader().readText().trim()
         } catch (e: Exception) {

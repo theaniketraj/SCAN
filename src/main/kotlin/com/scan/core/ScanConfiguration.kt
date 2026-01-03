@@ -923,7 +923,9 @@ data class HtmlReportConfiguration(
             includeCharts = other.includeCharts,
             includeDetails = other.includeDetails,
             theme = if (other.theme != "light") other.theme else this.theme
- 
+        )
+    }
+}
 
 /** SARIF report configuration */
 data class SarifReportConfiguration(
@@ -961,27 +963,25 @@ data class GitHubIntegrationConfiguration(
             apiUrl = if (other.apiUrl != "https://api.github.com") other.apiUrl else this.apiUrl
         )
     }
-    
+
     fun validate(): List<ConfigurationError> {
         val errors = mutableListOf<ConfigurationError>()
-        
+
         if (enabled && uploadSarif) {
             if (token.isEmpty()) {
                 errors.add(ConfigurationError("GitHub token is required when uploadSarif is enabled", "github.token"))
             }
-            
+
             if (repository.isEmpty()) {
                 errors.add(ConfigurationError("GitHub repository is required when uploadSarif is enabled", "github.repository"))
             }
-            
+
             if (commitSha.isEmpty()) {
                 errors.add(ConfigurationError("Commit SHA is required when uploadSarif is enabled", "github.commitSha"))
             }
         }
-        
+
         return errors
-    }
-}       )
     }
 }
 

@@ -271,7 +271,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                     github = GitHubIntegrationConfiguration(
                         enabled = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false,
                         uploadSarif = config.generateSarifReport.getOrElse(false) &&
-                                     (System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false)
+                            (System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false)
                     )
                 ),
                 buildIntegration = BuildIntegrationConfiguration(
@@ -512,7 +512,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             }
             val sarifFile = outputDir.resolve("scan-results.sarif")
             logger.info("Generated SARIF report: ${sarifFile.absolutePath}")
-            
+
             // Upload to GitHub if configured
             uploadToGitHub(sarifFile)
         } catch (exception: Exception) {
@@ -524,13 +524,16 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
     /** Uploads SARIF report to GitHub Code Scanning. */
     private fun uploadToGitHub(sarifFile: File) {
         val config = scanConfiguration.get()
-        val githubConfig = config.githubIntegration
-        
-        if (!githubConfig.enabled || !githubConfig.uploadSarif) {
-            logger.debug("GitHub upload disabled")
+
+        // Check if GitHub Actions environment and SARIF is enabled
+        val isGitHubActions = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
+        val sarifEnabled = config.generateSarifReport.getOrElse(false)
+
+        if (!isGitHubActions || !sarifEnabled) {
+            logger.debug("GitHub upload disabled (GitHub Actions: $isGitHubActions, SARIF: $sarifEnabled)")
             return
         }
-        
+
         try {
             val github = com.scan.integration.GitHubCodeScanning.fromEnvironment()
             if (github == null) {
@@ -538,7 +541,7 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                 logger.warn("Required: GITHUB_TOKEN, GITHUB_REPOSITORY")
                 return
             }
-            
+
             // Validate configuration
             val validation = github.validate()
             if (!validation.valid) {
@@ -546,20 +549,16 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                 validation.errors.forEach { error -> logger.warn("  - $error") }
                 return
             }
-            
+
             // Get commit SHA
-            val commitSha = if (githubConfig.commitSha.isNotEmpty()) {
-                githubConfig.commitSha
-            } else {
-                github.getCurrentCommitSha(project.projectDir) ?: run {
-                    logger.warn("Could not determine current commit SHA")
-                    return
-                }
+            val commitSha = System.getenv("GITHUB_SHA") ?: github.getCurrentCommitSha(project.projectDir) ?: run {
+                logger.warn("Could not determine current commit SHA")
+                return
             }
-            
+
             logger.lifecycle(" Uploading SARIF to GitHub Code Scanning...")
             val result = github.uploadSarif(sarifFile, commitSha)
-            
+
             if (result.success) {
                 logger.lifecycle(" ${result.message}")
                 result.uploadId?.let { id ->
