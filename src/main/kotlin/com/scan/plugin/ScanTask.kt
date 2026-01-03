@@ -471,12 +471,14 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
     private fun generateJsonReport(scanResults: ScanResult, outputDir: File) {
         try {
             val jsonReporter = JsonReporter()
-            val jsonFile = outputDir.resolve("scan-report.json")
+            // Pass the directory path, not the file path - JsonReporter appends the filename
             runBlocking {
-                jsonReporter.generateReport(listOf(scanResults), jsonFile.absolutePath)
+                jsonReporter.generateReport(listOf(scanResults), outputDir.absolutePath)
             }
+            val jsonFile = outputDir.resolve("scan-results.json")
             logger.info("Generated JSON report: ${jsonFile.absolutePath}")
         } catch (exception: Exception) {
+            logger.error("Failed to generate JSON report", exception)
             logger.warn("Failed to generate JSON report: ${exception.message}")
         }
     }

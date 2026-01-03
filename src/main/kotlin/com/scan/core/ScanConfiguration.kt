@@ -46,7 +46,7 @@ data class ScanConfiguration(
 
     companion object {
         // Default file patterns
-        val DEFAULT_INCLUDE_PATTERNS = listOf("**/*")
+        val DEFAULT_INCLUDE_PATTERNS = listOf("**/*", "*")
         val DEFAULT_EXCLUDE_PATTERNS =
             listOf(
                 "**/.*",

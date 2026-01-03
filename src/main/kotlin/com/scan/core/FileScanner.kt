@@ -261,7 +261,7 @@ class FileScanner(
         val file = filePath.toFile()
         val extension = FileUtils.getFileExtension(filePath)
         val isTestFile = isTestFile(filePath)
-        
+
         val relativePath = if (rootPath != null) {
             rootPath.relativize(filePath).toString().replace("\\", "/")
         } else {

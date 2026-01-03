@@ -86,6 +86,7 @@ scan-reports/
 *.scan-report.json
 *.scan-report.html
 *.scan-report.xml
+.scan-cache/
 
 # Local configuration overrides
 local-scan-config.yml
