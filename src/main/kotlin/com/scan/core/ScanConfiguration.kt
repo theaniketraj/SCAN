@@ -624,7 +624,9 @@ data class ReportingConfiguration(
     val includeMetrics: Boolean = true,
     val console: ConsoleReportConfiguration = ConsoleReportConfiguration(),
     val json: JsonReportConfiguration = JsonReportConfiguration(),
-    val html: HtmlReportConfiguration = HtmlReportConfiguration()
+    val html: HtmlReportConfiguration = HtmlReportConfiguration(),
+    val sarif: SarifReportConfiguration = SarifReportConfiguration(),
+    val github: GitHubIntegrationConfiguration = GitHubIntegrationConfiguration()
 ) {
     /** Helper property to check if verbose logging is enabled */
     val verbose: Boolean get() = verbosity == Verbosity.VERBOSE || verbosity == Verbosity.DEBUG
@@ -665,7 +667,9 @@ data class ReportingConfiguration(
             includeMetrics = other.includeMetrics,
             console = this.console.mergeWith(other.console),
             json = this.json.mergeWith(other.json),
-            html = this.html.mergeWith(other.html)
+            html = this.html.mergeWith(other.html),
+            sarif = this.sarif.mergeWith(other.sarif),
+            github = this.github.mergeWith(other.github)
         )
     }
 }
@@ -919,7 +923,65 @@ data class HtmlReportConfiguration(
             includeCharts = other.includeCharts,
             includeDetails = other.includeDetails,
             theme = if (other.theme != "light") other.theme else this.theme
+ 
+
+/** SARIF report configuration */
+data class SarifReportConfiguration(
+    val enabled: Boolean = false,
+    val outputFile: String = "scan-results.sarif",
+    val includeRules: Boolean = true
+) {
+    fun mergeWith(other: SarifReportConfiguration): SarifReportConfiguration {
+        return copy(
+            enabled = other.enabled,
+            outputFile = if (other.outputFile != "scan-results.sarif") other.outputFile else this.outputFile,
+            includeRules = other.includeRules
         )
+    }
+}
+
+/** GitHub Code Scanning integration configuration */
+data class GitHubIntegrationConfiguration(
+    val enabled: Boolean = false,
+    val uploadSarif: Boolean = false,
+    val token: String = System.getenv("GITHUB_TOKEN") ?: "",
+    val repository: String = System.getenv("GITHUB_REPOSITORY") ?: "",
+    val ref: String = System.getenv("GITHUB_REF") ?: "refs/heads/main",
+    val commitSha: String = System.getenv("GITHUB_SHA") ?: "",
+    val apiUrl: String = "https://api.github.com"
+) {
+    fun mergeWith(other: GitHubIntegrationConfiguration): GitHubIntegrationConfiguration {
+        return copy(
+            enabled = other.enabled,
+            uploadSarif = other.uploadSarif,
+            token = if (other.token.isNotEmpty() && other.token != System.getenv("GITHUB_TOKEN")) other.token else this.token,
+            repository = if (other.repository.isNotEmpty() && other.repository != System.getenv("GITHUB_REPOSITORY")) other.repository else this.repository,
+            ref = if (other.ref != "refs/heads/main" && other.ref != System.getenv("GITHUB_REF")) other.ref else this.ref,
+            commitSha = if (other.commitSha.isNotEmpty() && other.commitSha != System.getenv("GITHUB_SHA")) other.commitSha else this.commitSha,
+            apiUrl = if (other.apiUrl != "https://api.github.com") other.apiUrl else this.apiUrl
+        )
+    }
+    
+    fun validate(): List<ConfigurationError> {
+        val errors = mutableListOf<ConfigurationError>()
+        
+        if (enabled && uploadSarif) {
+            if (token.isEmpty()) {
+                errors.add(ConfigurationError("GitHub token is required when uploadSarif is enabled", "github.token"))
+            }
+            
+            if (repository.isEmpty()) {
+                errors.add(ConfigurationError("GitHub repository is required when uploadSarif is enabled", "github.repository"))
+            }
+            
+            if (commitSha.isEmpty()) {
+                errors.add(ConfigurationError("Commit SHA is required when uploadSarif is enabled", "github.commitSha"))
+            }
+        }
+        
+        return errors
+    }
+}       )
     }
 }
 

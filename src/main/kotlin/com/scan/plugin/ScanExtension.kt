@@ -26,6 +26,7 @@ abstract class ScanExtension {
     abstract val scanTests: Property<Boolean>
     abstract val generateHtmlReport: Property<Boolean>
     abstract val generateJsonReport: Property<Boolean>
+    abstract val generateSarifReport: Property<Boolean>
     abstract val reportOutputDir: DirectoryProperty
     abstract val reportPath: Property<String>
     abstract val reportFormats: SetProperty<String>
@@ -53,6 +54,11 @@ abstract class ScanExtension {
 
     fun reporting(action: ReportingConfig.() -> Unit) {
         val config = ReportingConfig()
+        action(config)
+    }
+
+    fun github(action: GitHubConfig.() -> Unit) {
+        val config = GitHubConfig()
         action(config)
     }
 
@@ -99,6 +105,16 @@ abstract class ScanExtension {
         var sortByRisk: Boolean = true
         var maskSecrets: Boolean = true
         var maxSecretLength: Int = 50
+    }
+
+    class GitHubConfig {
+        var enabled: Boolean = false
+        var uploadSarif: Boolean = false
+        var token: String = System.getenv("GITHUB_TOKEN") ?: ""
+        var repository: String = System.getenv("GITHUB_REPOSITORY") ?: ""
+        var ref: String = System.getenv("GITHUB_REF") ?: "refs/heads/main"
+        var commitSha: String = System.getenv("GITHUB_SHA") ?: ""
+        var apiUrl: String = "https://api.github.com"
     }
 
     /**

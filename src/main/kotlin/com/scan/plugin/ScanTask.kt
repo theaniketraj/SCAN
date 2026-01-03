@@ -262,7 +262,17 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
                         HtmlReportConfiguration()
                     } else {
                         HtmlReportConfiguration()
-                    }
+                    },
+                    sarif = if (config.generateSarifReport.getOrElse(false)) {
+                        SarifReportConfiguration(enabled = true)
+                    } else {
+                        SarifReportConfiguration()
+                    },
+                    github = GitHubIntegrationConfiguration(
+                        enabled = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false,
+                        uploadSarif = config.generateSarifReport.getOrElse(false) &&
+                                     (System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false)
+                    )
                 ),
                 buildIntegration = BuildIntegrationConfiguration(
                     strictMode = config.strictMode.getOrElse(false)
@@ -416,6 +426,11 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
             if (config.generateJsonReport.get()) {
                 generateJsonReport(scanResults, outputDir)
             }
+
+            // Generate SARIF report if enabled
+            if (config.generateSarifReport.getOrElse(false)) {
+                generateSarifReport(scanResults, outputDir)
+            }
         } catch (exception: Exception) {
             // Report generation failures shouldn't stop the build, but users should know
             logger.error("Failed to generate some reports: ${exception.message}", exception)
@@ -480,6 +495,92 @@ abstract class ScanTask @Inject constructor() : DefaultTask() {
         } catch (exception: Exception) {
             logger.error("Failed to generate JSON report", exception)
             logger.warn("Failed to generate JSON report: ${exception.message}")
+        }
+    }
+
+    /** Generates a SARIF report for GitHub Code Scanning integration. */
+    private fun generateSarifReport(scanResults: ScanResult, outputDir: File) {
+        try {
+            val sarifReporter = com.scan.reporting.SarifReporter()
+            val repositoryUri = detectRepositoryUri()
+            runBlocking {
+                sarifReporter.generateReport(
+                    listOf(scanResults),
+                    outputDir.absolutePath,
+                    repositoryUri
+                )
+            }
+            val sarifFile = outputDir.resolve("scan-results.sarif")
+            logger.info("Generated SARIF report: ${sarifFile.absolutePath}")
+            
+            // Upload to GitHub if configured
+            uploadToGitHub(sarifFile)
+        } catch (exception: Exception) {
+            logger.error("Failed to generate SARIF report", exception)
+            logger.warn("Failed to generate SARIF report: ${exception.message}")
+        }
+    }
+
+    /** Uploads SARIF report to GitHub Code Scanning. */
+    private fun uploadToGitHub(sarifFile: File) {
+        val config = scanConfiguration.get()
+        val githubConfig = config.githubIntegration
+        
+        if (!githubConfig.enabled || !githubConfig.uploadSarif) {
+            logger.debug("GitHub upload disabled")
+            return
+        }
+        
+        try {
+            val github = com.scan.integration.GitHubCodeScanning.fromEnvironment()
+            if (github == null) {
+                logger.warn("GitHub integration is enabled but environment variables are not configured")
+                logger.warn("Required: GITHUB_TOKEN, GITHUB_REPOSITORY")
+                return
+            }
+            
+            // Validate configuration
+            val validation = github.validate()
+            if (!validation.valid) {
+                logger.warn("GitHub configuration validation failed:")
+                validation.errors.forEach { error -> logger.warn("  - $error") }
+                return
+            }
+            
+            // Get commit SHA
+            val commitSha = if (githubConfig.commitSha.isNotEmpty()) {
+                githubConfig.commitSha
+            } else {
+                github.getCurrentCommitSha(project.projectDir) ?: run {
+                    logger.warn("Could not determine current commit SHA")
+                    return
+                }
+            }
+            
+            logger.lifecycle(" Uploading SARIF to GitHub Code Scanning...")
+            val result = github.uploadSarif(sarifFile, commitSha)
+            
+            if (result.success) {
+                logger.lifecycle(" ${result.message}")
+                result.uploadId?.let { id ->
+                    logger.lifecycle("   Upload ID: $id")
+                }
+            } else {
+                logger.warn(" GitHub upload failed: ${result.message}")
+                result.error?.let { error ->
+                    logger.debug("Error details: ${error.stackTraceToString()}")
+                }
+            }
+        } catch (exception: Exception) {
+            logger.warn("Failed to upload SARIF to GitHub: ${exception.message}")
+            logger.debug("Upload error details:", exception)
+        }
+    }
+
+    /** Detects the repository URI for SARIF report. */
+    private fun detectRepositoryUri(): String? {
+        return System.getenv("GITHUB_REPOSITORY")?.let { repo ->
+            "https://github.com/$repo"
         }
     }
 
