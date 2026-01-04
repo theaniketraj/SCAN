@@ -20,7 +20,7 @@ The fastest way to get started with SCAN is to add it to your `build.gradle.kts`
 
 ```kotlin
 plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 ```
 
@@ -38,7 +38,7 @@ That's it! SCAN will analyze your codebase with sensible defaults and report any
 
 ```kotlin
 plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 ```
 
