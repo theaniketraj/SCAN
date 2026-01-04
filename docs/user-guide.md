@@ -46,7 +46,7 @@ plugins {
 
 ```groovy
 plugins {
-    id 'io.github.theaniketraj.scan' version '2.0.0'
+    id 'io.github.theaniketraj.scan' version '2.2.0'
 }
 ```
 
@@ -58,7 +58,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("io.github.theaniketraj:scan-gradle-plugin:2.0.0")
+        classpath("io.github.theaniketraj:scan-gradle-plugin:2.2.0")
     }
 }
 

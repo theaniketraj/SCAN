@@ -478,7 +478,7 @@ What you expected to happen.
 - OS: [e.g. Windows 10, macOS 12, Ubuntu 20.04]
 - Java version: [e.g. OpenJDK 21]
 - Gradle version: [e.g. 8.14]
-- Plugin version: [e.g. 2.0.0]
+- Plugin version: [e.g. 2.2.0]
 
 **Additional context**
 Any other context about the problem.

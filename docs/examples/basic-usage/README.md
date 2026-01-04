@@ -9,7 +9,7 @@ This directory contains simple examples demonstrating basic SCAN plugin usage.
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.20"
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 repositories {

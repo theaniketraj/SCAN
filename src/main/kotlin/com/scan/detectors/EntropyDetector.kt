@@ -13,7 +13,7 @@ class EntropyDetector : AbstractDetector() {
 
     override val detectorId: String = "entropy"
     override val detectorName: String = "Entropy Detector"
-    override val version: String = "2.0.0"
+    override val version: String = "2.2.0"
     override val supportedFileTypes: Set<String> = setOf("*")
 
     companion object {

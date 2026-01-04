@@ -24,7 +24,7 @@ class ContextAwareDetectorImpl(
 
     override val detectorId: String = "context-aware"
     override val detectorName: String = "Context-Aware Detector"
-    override val version: String = "2.0.0"
+    override val version: String = "2.2.0"
     override val supportedFileTypes: Set<String> = setOf("*")
 
     companion object {

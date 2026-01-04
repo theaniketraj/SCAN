@@ -12,7 +12,7 @@ class PatternDetector : AbstractDetector() {
 
     override val detectorId: String = "pattern"
     override val detectorName: String = "Pattern Detector"
-    override val version: String = "2.0.0"
+    override val version: String = "2.2.0"
     override val supportedFileTypes: Set<String> = emptySet() // Supports all file types
 
     private val compiledPatterns = mutableMapOf<String, CompiledPattern>()

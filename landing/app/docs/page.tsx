@@ -232,7 +232,7 @@ export default function DocsIndex() {
                             </h3>
                             <pre className="bg-gray-900 text-white p-3 rounded text-sm overflow-x-auto">
                                 <code>{`plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }`}</code>
                             </pre>
                         </div>

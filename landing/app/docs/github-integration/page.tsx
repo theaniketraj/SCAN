@@ -72,7 +72,7 @@ export default function GitHubIntegrationPage() {
                         <li>
                             GitHub Actions workflow or appropriate GitHub token
                         </li>
-                        <li>SCAN plugin version 2.0.0 or higher</li>
+                        <li>SCAN plugin version 2.2.0 or higher</li>
                     </ul>
                 </section>
 
@@ -127,7 +127,7 @@ jobs:
                     <h3>2. Configure build.gradle.kts</h3>
                     <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                         <code>{`plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 scan {
@@ -348,7 +348,7 @@ curl -X POST \\
     "tool": {
       "driver": {
         "name": "SCAN",
-        "version": "2.0.0",
+        "version": "2.2.0",
         "rules": [...]
       }
     },

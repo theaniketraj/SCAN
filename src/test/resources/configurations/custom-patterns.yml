@@ -4,7 +4,7 @@
 # Metadata about this pattern configuration
 metadata:
   name: "Custom Organization Patterns"
-  version: "2.0.0"
+  version: "2.2.0"
   description: "Custom patterns for detecting organization-specific secrets and sensitive data"
   author: "Security Team"
   lastUpdated: "2024-01-15"

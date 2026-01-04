@@ -40,7 +40,7 @@ services:
 # Legitimate configuration values
 application:
   name: "My Application"
-  version: "2.0.0"
+  version: "2.2.0"
   environment: "production"
   max_connections: 100
   timeout_seconds: 30

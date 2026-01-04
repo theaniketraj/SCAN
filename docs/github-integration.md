@@ -47,7 +47,7 @@ GitHub Code Scanning allows you to find, triage, and prioritize fixes for securi
 
 - GitHub repository with Code Scanning enabled (available for all public repositories and private repositories with GitHub Advanced Security)
 - GitHub Actions workflow or appropriate GitHub token
-- SCAN plugin version 2.0.0 or higher
+- SCAN plugin version 2.2.0 or higher
 
 ## Quick Start (GitHub Actions)
 
@@ -100,7 +100,7 @@ jobs:
 
 ```kotlin
 plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 scan {
@@ -229,7 +229,7 @@ Example SARIF structure:
     "tool": {
       "driver": {
         "name": "SCAN",
-        "version": "2.0.0",
+        "version": "2.2.0",
         "rules": [...]
       }
     },

@@ -31,7 +31,7 @@ class CompositeDetector(
 
     override val detectorId: String = "composite"
     override val detectorName: String = "Composite Detector"
-    override val version: String = "2.0.0"
+    override val version: String = "2.2.0"
     override val supportedFileTypes: Set<String> = emptySet() // supports all file types
 
     private val resultCache =

@@ -29,7 +29,7 @@ export default function Hero() {
             </div>
             <div className="overflow-hidden">
                 <pre className="bg-black/80 text-white p-3 xs:p-4 sm:p-6 rounded-md text-xs xs:text-sm sm:text-base overflow-x-auto whitespace-pre-wrap break-words">{`plugins {
-  id("io.github.theaniketraj.scan") version "2.0.0"
+  id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 ./gradlew scanForSecrets`}</pre>

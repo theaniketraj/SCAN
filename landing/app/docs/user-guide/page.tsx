@@ -48,7 +48,7 @@ export default function UserGuidePage() {
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                     <code>{`plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }`}</code>
                 </pre>
 
@@ -69,7 +69,7 @@ export default function UserGuidePage() {
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                     <code>{`plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }`}</code>
                 </pre>
 
@@ -77,7 +77,7 @@ export default function UserGuidePage() {
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                     <code>{`plugins {
-    id 'io.github.theaniketraj.scan' version '2.0.0'
+    id 'io.github.theaniketraj.scan' version '2.2.0'
 }`}</code>
                 </pre>
 
@@ -89,7 +89,7 @@ export default function UserGuidePage() {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("io.github.theaniketraj:scan-gradle-plugin:2.0.0")
+        classpath("io.github.theaniketraj:scan-gradle-plugin:2.2.0")
     }
 }
 
@@ -105,7 +105,7 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code>
 
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                     <code>{`plugins {
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 // Run the scan

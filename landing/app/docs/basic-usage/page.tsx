@@ -39,7 +39,7 @@ export default function BasicUsagePage() {
                 <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
                     <code>{`plugins {
     kotlin("jvm") version "2.0.20"
-    id("io.github.theaniketraj.scan") version "2.0.0"
+    id("io.github.theaniketraj.scan") version "2.2.0"
 }
 
 repositories {

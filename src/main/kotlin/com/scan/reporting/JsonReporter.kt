@@ -49,7 +49,7 @@ class JsonReporter {
         sb.append("  \"scanReport\": {\n")
         sb.append("    \"metadata\": {\n")
         sb.append("      \"timestamp\": \"$timestamp\",\n")
-        sb.append("      \"version\": \"2.0.0\",\n")
+        sb.append("      \"version\": \"2.2.0\",\n")
         sb.append("      \"tool\": \"SCAN Security Scanner\"\n")
         sb.append("    },\n")
         sb.append("    \"summary\": {\n")
