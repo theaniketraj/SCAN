@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import DocsLayout from "../../../components/DocsLayout";
 
 export default function GitHubIntegrationPage() {
