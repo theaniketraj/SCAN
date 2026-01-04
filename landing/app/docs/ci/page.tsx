@@ -1,5 +1,5 @@
-import React from "react"
-import DocsLayout from "../../../components/DocsLayout"
+import React from "react";
+import DocsLayout from "../../../components/DocsLayout";
 
 export default function CIPage() {
     const sections = [
@@ -11,32 +11,39 @@ export default function CIPage() {
         { id: "circle-ci", title: "CircleCI" },
         { id: "teamcity", title: "TeamCity" },
         { id: "best-practices", title: "Best Practices" },
-        { id: "troubleshooting", title: "Troubleshooting" }
-    ]
+        { id: "troubleshooting", title: "Troubleshooting" },
+    ];
 
     return (
         <DocsLayout sections={sections} title="CI/CD Integration">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>CI/CD Integration</h1>
                 <p className="text-xl text-gray-600 dark:text-gray-300">
-                    Integrate SCAN into your continuous integration and deployment pipelines to automatically detect secrets and sensitive data.
+                    Integrate SCAN into your continuous integration and
+                    deployment pipelines to automatically detect secrets and
+                    sensitive data.
                 </p>
 
                 <section id="overview">
                     <h2>Overview</h2>
                     <p>
-                        SCAN can be easily integrated into various CI/CD platforms to provide automatic security scanning 
-                        as part of your build pipeline. This ensures that secrets and sensitive data are caught before 
-                        they reach production.
+                        SCAN can be easily integrated into various CI/CD
+                        platforms to provide automatic security scanning as part
+                        of your build pipeline. This ensures that secrets and
+                        sensitive data are caught before they reach production.
                     </p>
-                    
+
                     <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 my-6">
-                        <h3 className="text-blue-800 dark:text-blue-200 text-lg font-semibold mb-2">Key Benefits</h3>
+                        <h3 className="text-blue-800 dark:text-blue-200 text-lg font-semibold mb-2">
+                            Key Benefits
+                        </h3>
                         <ul className="text-blue-700 dark:text-blue-300 mb-0">
                             <li>Automated security scanning on every commit</li>
                             <li>Fail builds when secrets are detected</li>
                             <li>Generate security reports for compliance</li>
-                            <li>Integrate with existing workflows seamlessly</li>
+                            <li>
+                                Integrate with existing workflows seamlessly
+                            </li>
                         </ul>
                     </div>
                 </section>
@@ -44,11 +51,13 @@ export default function CIPage() {
                 <section id="github-actions">
                     <h2>GitHub Actions</h2>
                     <p>
-                        Integration with GitHub Actions is straightforward using the standard Gradle wrapper approach.
+                        Integration with GitHub Actions is straightforward using
+                        the standard Gradle wrapper approach.
                     </p>
 
                     <h3>Basic Workflow</h3>
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`name: Security Scan
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`name: Security Scan
 
 on:
   push:
@@ -80,10 +89,12 @@ jobs:
       if: always()
       with:
         name: scan-results
-        path: scan-results/`}</code></pre>
+        path: scan-results/`}</code>
+                    </pre>
 
                     <h3>Advanced Configuration</h3>
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`    - name: Run SCAN with Custom Config
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`    - name: Run SCAN with Custom Config
       run: |
         ./gradlew scanForSecrets \\
           --config-file=ci/scan-config.yml \\
@@ -100,17 +111,20 @@ jobs:
           if (fs.existsSync(resultsPath)) {
             const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
             // Process and comment results
-          }`}</code></pre>
+          }`}</code>
+                    </pre>
                 </section>
 
                 <section id="jenkins">
                     <h2>Jenkins</h2>
                     <p>
-                        Jenkins integration can be achieved through pipeline scripts or traditional job configurations.
+                        Jenkins integration can be achieved through pipeline
+                        scripts or traditional job configurations.
                     </p>
 
                     <h3>Declarative Pipeline</h3>
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`pipeline {
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`pipeline {
     agent any
     
     tools {
@@ -151,10 +165,12 @@ jobs:
             }
         }
     }
-}`}</code></pre>
+}`}</code>
+                    </pre>
 
                     <h3>Scripted Pipeline</h3>
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`node {
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`node {
     stage('Checkout') {
         checkout scm
     }
@@ -169,16 +185,19 @@ jobs:
             archiveArtifacts artifacts: 'scan-results/**/*'
         }
     }
-}`}</code></pre>
+}`}</code>
+                    </pre>
                 </section>
 
                 <section id="gitlab-ci">
                     <h2>GitLab CI</h2>
                     <p>
-                        GitLab CI integration using the <code>.gitlab-ci.yml</code> configuration file.
+                        GitLab CI integration using the{" "}
+                        <code>.gitlab-ci.yml</code> configuration file.
                     </p>
 
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`stages:
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`stages:
   - security
 
 variables:
@@ -217,16 +236,16 @@ security_scan_mr:
         cat scan-results/scan-report.json
       fi
   only:
-    - merge_requests`}</code></pre>
+    - merge_requests`}</code>
+                    </pre>
                 </section>
 
                 <section id="azure-devops">
                     <h2>Azure DevOps</h2>
-                    <p>
-                        Integration with Azure DevOps using YAML pipelines.
-                    </p>
+                    <p>Integration with Azure DevOps using YAML pipelines.</p>
 
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`trigger:
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`trigger:
   branches:
     include:
       - main
@@ -276,16 +295,19 @@ steps:
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: 'scan-results/scan-report.xml'
-    testRunTitle: 'Security Scan Results'`}</code></pre>
+    testRunTitle: 'Security Scan Results'`}</code>
+                    </pre>
                 </section>
 
                 <section id="circle-ci">
                     <h2>CircleCI</h2>
                     <p>
-                        CircleCI configuration using the <code>.circleci/config.yml</code> file.
+                        CircleCI configuration using the{" "}
+                        <code>.circleci/config.yml</code> file.
                     </p>
 
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`version: 2.1
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`version: 2.1
 
 orbs:
   gradle: circleci/gradle@2.2.0
@@ -319,28 +341,45 @@ workflows:
             branches:
               only:
                 - main
-                - develop`}</code></pre>
+                - develop`}</code>
+                    </pre>
                 </section>
 
                 <section id="teamcity">
                     <h2>TeamCity</h2>
                     <p>
-                        TeamCity integration through build configuration and build steps.
+                        TeamCity integration through build configuration and
+                        build steps.
                     </p>
 
                     <h3>Build Step Configuration</h3>
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 my-4">
-                        <h4 className="font-semibold mb-2">Step 1: Gradle Build Step</h4>
+                        <h4 className="font-semibold mb-2">
+                            Step 1: Gradle Build Step
+                        </h4>
                         <ul className="space-y-1 text-sm">
-                            <li><strong>Runner type:</strong> Gradle</li>
-                            <li><strong>Gradle tasks:</strong> scanForSecrets</li>
-                            <li><strong>Gradle home path:</strong> Use Gradle wrapper</li>
-                            <li><strong>Additional command line parameters:</strong> --info</li>
+                            <li>
+                                <strong>Runner type:</strong> Gradle
+                            </li>
+                            <li>
+                                <strong>Gradle tasks:</strong> scanForSecrets
+                            </li>
+                            <li>
+                                <strong>Gradle home path:</strong> Use Gradle
+                                wrapper
+                            </li>
+                            <li>
+                                <strong>
+                                    Additional command line parameters:
+                                </strong>{" "}
+                                --info
+                            </li>
                         </ul>
                     </div>
 
                     <h3>Kotlin DSL Configuration</h3>
-                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`import jetbrains.buildServer.configs.kotlin.v2019_2.*
+                    <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                        <code>{`import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
@@ -370,16 +409,19 @@ object SecurityScan : BuildType({
             artifactRules = "scan-results/** => security-reports.zip"
         }
     }
-})`}</code></pre>
+})`}</code>
+                    </pre>
                 </section>
 
                 <section id="best-practices">
                     <h2>Best Practices</h2>
-                    
+
                     <h3>Pipeline Configuration</h3>
                     <div className="grid gap-4 md:grid-cols-2 my-6">
                         <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4">
-                            <h4 className="text-green-800 dark:text-green-200 font-semibold mb-2">✅ Do</h4>
+                            <h4 className="text-green-800 dark:text-green-200 font-semibold mb-2">
+                                ✅ Do
+                            </h4>
                             <ul className="text-green-700 dark:text-green-300 text-sm space-y-1 mb-0">
                                 <li>Run scans on every pull request</li>
                                 <li>Cache Gradle dependencies</li>
@@ -389,10 +431,15 @@ object SecurityScan : BuildType({
                             </ul>
                         </div>
                         <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg p-4">
-                            <h4 className="text-red-800 dark:text-red-200 font-semibold mb-2">❌ Don&apos;t</h4>
+                            <h4 className="text-red-800 dark:text-red-200 font-semibold mb-2">
+                                ❌ Don&apos;t
+                            </h4>
                             <ul className="text-red-700 dark:text-red-300 text-sm space-y-1 mb-0">
                                 <li>Ignore scan failures in production</li>
-                                <li>Skip scans for &quot;urgent&quot; deployments</li>
+                                <li>
+                                    Skip scans for &quot;urgent&quot;
+                                    deployments
+                                </li>
                                 <li>Store secrets in CI environment</li>
                                 <li>Run scans without proper logging</li>
                                 <li>Use overly permissive configurations</li>
@@ -402,66 +449,130 @@ object SecurityScan : BuildType({
 
                     <h3>Security Considerations</h3>
                     <ul>
-                        <li><strong>Credential Management:</strong> Use CI platform&apos;s secret management features</li>
-                        <li><strong>Access Control:</strong> Limit who can modify scan configurations</li>
-                        <li><strong>Result Storage:</strong> Ensure scan results are stored securely</li>
-                        <li><strong>Notification:</strong> Set up alerts for security violations</li>
+                        <li>
+                            <strong>Credential Management:</strong> Use CI
+                            platform&apos;s secret management features
+                        </li>
+                        <li>
+                            <strong>Access Control:</strong> Limit who can
+                            modify scan configurations
+                        </li>
+                        <li>
+                            <strong>Result Storage:</strong> Ensure scan results
+                            are stored securely
+                        </li>
+                        <li>
+                            <strong>Notification:</strong> Set up alerts for
+                            security violations
+                        </li>
                     </ul>
 
                     <h3>Performance Optimization</h3>
                     <ul>
-                        <li><strong>Parallel Execution:</strong> Use Gradle&apos;s parallel execution features</li>
-                        <li><strong>Incremental Scanning:</strong> Configure for changed files only</li>
-                        <li><strong>Build Caching:</strong> Enable Gradle build cache for faster builds</li>
-                        <li><strong>Resource Limits:</strong> Set appropriate memory and CPU limits</li>
+                        <li>
+                            <strong>Parallel Execution:</strong> Use
+                            Gradle&apos;s parallel execution features
+                        </li>
+                        <li>
+                            <strong>Incremental Scanning:</strong> Configure for
+                            changed files only
+                        </li>
+                        <li>
+                            <strong>Build Caching:</strong> Enable Gradle build
+                            cache for faster builds
+                        </li>
+                        <li>
+                            <strong>Resource Limits:</strong> Set appropriate
+                            memory and CPU limits
+                        </li>
                     </ul>
                 </section>
 
                 <section id="troubleshooting">
                     <h2>Troubleshooting</h2>
-                    
+
                     <h3>Common Issues</h3>
-                    
+
                     <div className="space-y-4">
                         <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                            <h4 className="font-semibold text-red-600 dark:text-red-400">Build Timeout</h4>
+                            <h4 className="font-semibold text-red-600 dark:text-red-400">
+                                Build Timeout
+                            </h4>
                             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Solution: Increase timeout values or optimize scan configuration
+                                Solution: Increase timeout values or optimize
+                                scan configuration
                             </p>
-                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2"><code>timeout: 30m  # Increase timeout in CI configuration</code></pre>
+                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2">
+                                <code>
+                                    timeout: 30m # Increase timeout in CI
+                                    configuration
+                                </code>
+                            </pre>
                         </div>
 
                         <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                            <h4 className="font-semibold text-red-600 dark:text-red-400">Memory Issues</h4>
+                            <h4 className="font-semibold text-red-600 dark:text-red-400">
+                                Memory Issues
+                            </h4>
                             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 Solution: Increase JVM heap size
                             </p>
-                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2"><code>export GRADLE_OPTS=&quot;-Xmx4g -XX:MaxMetaspaceSize=1g&quot;</code></pre>
+                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2">
+                                <code>
+                                    export GRADLE_OPTS=&quot;-Xmx4g
+                                    -XX:MaxMetaspaceSize=1g&quot;
+                                </code>
+                            </pre>
                         </div>
 
                         <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                            <h4 className="font-semibold text-red-600 dark:text-red-400">False Positives</h4>
+                            <h4 className="font-semibold text-red-600 dark:text-red-400">
+                                False Positives
+                            </h4>
                             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Solution: Configure exclusions and custom patterns
+                                Solution: Configure exclusions and custom
+                                patterns
                             </p>
-                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2"><code>./gradlew scanForSecrets --exclude-paths=&quot;test/**&quot; --config-file=&quot;ci-config.yml&quot;</code></pre>
+                            <pre className="bg-gray-900 text-white p-2 rounded text-xs mt-2">
+                                <code>
+                                    ./gradlew scanForSecrets
+                                    --exclude-paths=&quot;test/**&quot;
+                                    --config-file=&quot;ci-config.yml&quot;
+                                </code>
+                            </pre>
                         </div>
                     </div>
 
                     <h3>Debug Mode</h3>
                     <p>Enable debug output for detailed troubleshooting:</p>
-                    <pre className="bg-gray-900 text-white p-3 rounded-lg"><code>./gradlew scanForSecrets --debug --stacktrace</code></pre>
+                    <pre className="bg-gray-900 text-white p-3 rounded-lg">
+                        <code>
+                            ./gradlew scanForSecrets --debug --stacktrace
+                        </code>
+                    </pre>
 
                     <h3>Log Analysis</h3>
                     <p>Check these log sections for common issues:</p>
                     <ul>
-                        <li><strong>Configuration Loading:</strong> Verify custom configs are loaded</li>
-                        <li><strong>Pattern Matching:</strong> Check pattern compilation and matching</li>
-                        <li><strong>File Processing:</strong> Monitor file scanning progress</li>
-                        <li><strong>Report Generation:</strong> Ensure output files are created</li>
+                        <li>
+                            <strong>Configuration Loading:</strong> Verify
+                            custom configs are loaded
+                        </li>
+                        <li>
+                            <strong>Pattern Matching:</strong> Check pattern
+                            compilation and matching
+                        </li>
+                        <li>
+                            <strong>File Processing:</strong> Monitor file
+                            scanning progress
+                        </li>
+                        <li>
+                            <strong>Report Generation:</strong> Ensure output
+                            files are created
+                        </li>
                     </ul>
                 </section>
             </div>
         </DocsLayout>
-    )
+    );
 }

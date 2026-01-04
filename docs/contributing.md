@@ -38,7 +38,7 @@ git clone https://github.com/theaniketraj/SCAN.git
 cd SCAN
 ```
 
-3. Add the upstream remote:
+1. Add the upstream remote:
 
 ```bash
 git remote add upstream https://github.com/theaniketraj/SCAN.git
@@ -55,7 +55,7 @@ git remote add upstream https://github.com/theaniketraj/SCAN.git
 ./gradlew build
 ```
 
-3. **Run tests** to ensure everything works:
+1. **Run tests** to ensure everything works:
 
 ```bash
 ./gradlew test
@@ -398,7 +398,7 @@ git checkout your-feature-branch
 git rebase develop
 ```
 
-2. **Run all checks**:
+1. **Run all checks**:
 
 ```bash
 ./gradlew build
@@ -408,7 +408,7 @@ git rebase develop
 ./gradlew detekt
 ```
 
-3. **Update documentation** if needed
+1. **Update documentation** if needed
 
 ### PR Guidelines
 

@@ -2,6 +2,39 @@
 
 This guide explains how to integrate the SCAN plugin with GitHub Code Scanning to automatically upload security findings to your GitHub repository.
 
+## Table of Contents
+
+- [GitHub Security Scanning Integration](#github-security-scanning-integration)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start (GitHub Actions)](#quick-start-github-actions)
+    - [1. Add Workflow File](#1-add-workflow-file)
+    - [2. Configure build.gradle.kts](#2-configure-buildgradlekts)
+  - [Configuration Options](#configuration-options)
+    - [Basic Configuration](#basic-configuration)
+    - [Advanced GitHub Configuration](#advanced-github-configuration)
+    - [Environment Variables](#environment-variables)
+  - [Manual SARIF Upload](#manual-sarif-upload)
+    - [1. Generate SARIF Report Only](#1-generate-sarif-report-only)
+    - [2. Upload Using GitHub CLI](#2-upload-using-github-cli)
+    - [3. Upload Using curl](#3-upload-using-curl)
+  - [Viewing Results](#viewing-results)
+  - [SARIF Report Format](#sarif-report-format)
+  - [GitHub Security Severity Mapping](#github-security-severity-mapping)
+  - [CI/CD Integration Examples](#cicd-integration-examples)
+    - [GitLab CI](#gitlab-ci)
+    - [Jenkins Pipeline](#jenkins-pipeline)
+    - [Azure Pipelines](#azure-pipelines)
+  - [Troubleshooting](#troubleshooting)
+    - [Upload Fails with 403 Forbidden](#upload-fails-with-403-forbidden)
+    - [SARIF File Too Large](#sarif-file-too-large)
+    - [Results Not Appearing](#results-not-appearing)
+    - [Authentication Errors](#authentication-errors)
+  - [Best Practices](#best-practices)
+  - [Additional Resources](#additional-resources)
+  - [Support](#support)
+
 ## Overview
 
 GitHub Code Scanning allows you to find, triage, and prioritize fixes for security vulnerabilities and errors in your code. SCAN integrates with GitHub Code Scanning by:

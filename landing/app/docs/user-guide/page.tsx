@@ -1,6 +1,6 @@
-import React from "react"
-import Link from "next/link"
-import DocsLayout from "../../../components/DocsLayout"
+import React from "react";
+import Link from "next/link";
+import DocsLayout from "../../../components/DocsLayout";
 
 export default function UserGuidePage() {
     const sections = [
@@ -14,58 +14,77 @@ export default function UserGuidePage() {
         { id: "exclusions", title: "File Exclusions" },
         { id: "ci-integration", title: "CI Integration" },
         { id: "troubleshooting", title: "Troubleshooting" },
-        { id: "best-practices", title: "Best Practices" }
-    ]
+        { id: "best-practices", title: "Best Practices" },
+    ];
 
     return (
         <DocsLayout sections={sections} title="User Guide">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>SCAN Plugin User Guide</h1>
-                
+
                 <p className="text-xl text-gray-600 dark:text-gray-300">
-                    Welcome to the comprehensive user guide for the SCAN (Sensitive Code Analyzer for Nerds) Gradle Plugin. 
-                    This guide will walk you through everything you need to know to secure your codebase effectively.
+                    Welcome to the comprehensive user guide for the SCAN
+                    (Sensitive Code Analyzer for Nerds) Gradle Plugin. This
+                    guide will walk you through everything you need to know to
+                    secure your codebase effectively.
                 </p>
 
                 <h2 id="overview">Overview</h2>
-                
+
                 <p>
-                    SCAN (Sensitive Code Analyzer for Nerds) is a comprehensive security tool that helps protect your 
-                    codebase from accidentally committed secrets. This guide covers everything from basic setup to 
-                    advanced configuration and best practices.
+                    SCAN (Sensitive Code Analyzer for Nerds) is a comprehensive
+                    security tool that helps protect your codebase from
+                    accidentally committed secrets. This guide covers everything
+                    from basic setup to advanced configuration and best
+                    practices.
                 </p>
 
                 <h2 id="installation">Installation</h2>
-                
-                <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
+                <p>
+                    The fastest way to get started with SCAN is to add it to
+                    your <code>build.gradle.kts</code> and run a scan:
+                </p>
+
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`plugins {
     id("io.github.theaniketraj.scan") version "2.0.0"
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <p>Run your first scan:</p>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>./gradlew scanForSecrets</code></pre>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>./gradlew scanForSecrets</code>
+                </pre>
 
-                <p>That&apos;s it! SCAN will analyze your codebase with sensible defaults and report any potential security issues.</p>
+                <p>
+                    That&apos;s it! SCAN will analyze your codebase with
+                    sensible defaults and report any potential security issues.
+                </p>
 
                 <h2 id="installation">Installation</h2>
 
                 <h3>Gradle Kotlin DSL (build.gradle.kts)</h3>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`plugins {
     id("io.github.theaniketraj.scan") version "2.0.0"
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h3>Gradle Groovy DSL (build.gradle)</h3>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`plugins {
     id 'io.github.theaniketraj.scan' version '2.0.0'
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h3>Legacy Plugin Application</h3>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`buildscript {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`buildscript {
     repositories {
         gradlePluginPortal()
     }
@@ -74,18 +93,24 @@ export default function UserGuidePage() {
     }
 }
 
-apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
+apply(plugin = "io.github.theaniketraj.scan")`}</code>
+                </pre>
 
                 <h2 id="basic-usage">Basic Usage</h2>
-                
-                <p>The fastest way to get started with SCAN is to add it to your <code>build.gradle.kts</code> and run a scan:</p>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`plugins {
+                <p>
+                    The fastest way to get started with SCAN is to add it to
+                    your <code>build.gradle.kts</code> and run a scan:
+                </p>
+
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`plugins {
     id("io.github.theaniketraj.scan") version "2.0.0"
 }
 
 // Run the scan
-./gradlew scanForSecrets`}</code></pre>
+./gradlew scanForSecrets`}</code>
+                </pre>
 
                 <h2 id="configuration">Configuration</h2>
 
@@ -93,11 +118,14 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
 
                 <p>SCAN works out of the box with zero configuration:</p>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`// No configuration needed - SCAN uses intelligent defaults`}</code></pre>
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`// No configuration needed - SCAN uses intelligent defaults`}</code>
+                </pre>
 
                 <h3>Common Configurations</h3>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`scan {
     // Fail the build if secrets are found (default: true)
     failOnSecrets = true
     
@@ -112,11 +140,15 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
     
     // Enable verbose output (default: false)
     verbose = true
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h2 id="patterns">Understanding Patterns</h2>
-                
-                <p>SCAN uses over 50 built-in patterns to detect common secret types:</p>
+
+                <p>
+                    SCAN uses over 50 built-in patterns to detect common secret
+                    types:
+                </p>
                 <ul>
                     <li>API keys (AWS, GitHub, Stripe, etc.)</li>
                     <li>Database connection strings</li>
@@ -125,33 +157,39 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
                 </ul>
 
                 <h2 id="custom-patterns">Custom Patterns</h2>
-                
+
                 <p>Add organization-specific patterns:</p>
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`scan {
     customPatterns = listOf(
         "COMPANY_API_[A-Z0-9]{32}",
         "INTERNAL_SECRET_.*"
     )
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h2 id="output-formats">Output Formats</h2>
-                
+
                 <p>Choose between console, JSON, or HTML output:</p>
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`scan {
     generateHtmlReport = true  // Creates detailed HTML report
     generateJsonReport = true  // Machine-readable JSON output
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h2 id="exclusions">File Exclusions</h2>
-                
+
                 <p>Exclude files and directories from scanning:</p>
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`scan {
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`scan {
     excludePatterns = setOf(
         "**/test/**",
         "**/build/**",
         "**/*.min.js"
     )
-}`}</code></pre>
+}`}</code>
+                </pre>
 
                 <h2 id="understanding-results">Understanding Results</h2>
 
@@ -159,7 +197,8 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
 
                 <p>SCAN provides clear, actionable output:</p>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto text-sm"><code>{`> Task :scanForSecrets
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto text-sm">
+                    <code>{`> Task :scanForSecrets
 🔍 SCAN: Analyzing 147 files for sensitive information...
 
 ❌ CRITICAL: AWS Access Key detected
@@ -179,13 +218,15 @@ apply(plugin = "io.github.theaniketraj.scan")`}</code></pre>
 📊 Scan Results:
    - Files scanned: 147
    - Secrets found: 1 critical, 1 warning
-   - Scan duration: 2.3s`}</code></pre>
+   - Scan duration: 2.3s`}</code>
+                </pre>
 
                 <h2 id="ci-integration">CI Integration</h2>
 
                 <h3>GitHub Actions</h3>
 
-                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code>{`name: Security Scan
+                <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto">
+                    <code>{`name: Security Scan
 on: [push, pull_request]
 
 jobs:
@@ -206,7 +247,8 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: security-report
-        path: build/reports/scan/`}</code></pre>
+        path: build/reports/scan/`}</code>
+                </pre>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
 
@@ -214,15 +256,20 @@ jobs:
 
                 <div className="space-y-4">
                     <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                        <h4 className="text-yellow-800 dark:text-yellow-200 mt-0">Build Failing on Test Files</h4>
+                        <h4 className="text-yellow-800 dark:text-yellow-200 mt-0">
+                            Build Failing on Test Files
+                        </h4>
                         <p className="text-yellow-700 dark:text-yellow-300">
-                            <strong>Solution:</strong> Exclude test directories or disable test scanning
+                            <strong>Solution:</strong> Exclude test directories
+                            or disable test scanning
                         </p>
-                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm"><code>{`scan {
+                        <pre className="bg-gray-900 text-white p-3 rounded mt-3 text-sm">
+                            <code>{`scan {
     scanTests = false
     // or
     excludePatterns = setOf("**/test/**")
-}`}</code></pre>
+}`}</code>
+                        </pre>
                     </div>
                 </div>
 
@@ -231,30 +278,81 @@ jobs:
                 <h3>Development Workflow</h3>
 
                 <ol>
-                    <li><strong>Run locally first</strong>: Always test SCAN locally before pushing</li>
-                    <li><strong>Start permissive</strong>: Begin with <code>failOnSecrets = false</code> to understand findings</li>
-                    <li><strong>Iterate gradually</strong>: Slowly tighten security as you clean up existing issues</li>
-                    <li><strong>Document exceptions</strong>: Use comments to explain why certain patterns are safe</li>
+                    <li>
+                        <strong>Run locally first</strong>: Always test SCAN
+                        locally before pushing
+                    </li>
+                    <li>
+                        <strong>Start permissive</strong>: Begin with{" "}
+                        <code>failOnSecrets = false</code> to understand
+                        findings
+                    </li>
+                    <li>
+                        <strong>Iterate gradually</strong>: Slowly tighten
+                        security as you clean up existing issues
+                    </li>
+                    <li>
+                        <strong>Document exceptions</strong>: Use comments to
+                        explain why certain patterns are safe
+                    </li>
                 </ol>
 
                 <h3>Security Hygiene</h3>
 
                 <ol>
-                    <li><strong>Regular scans</strong>: Run SCAN on every commit</li>
-                    <li><strong>Review findings</strong>: Don&apos;t just ignore warnings</li>
-                    <li><strong>Update patterns</strong>: Keep custom patterns current</li>
-                    <li><strong>Document decisions</strong>: Record why certain patterns are excluded</li>
+                    <li>
+                        <strong>Regular scans</strong>: Run SCAN on every commit
+                    </li>
+                    <li>
+                        <strong>Review findings</strong>: Don&apos;t just ignore
+                        warnings
+                    </li>
+                    <li>
+                        <strong>Update patterns</strong>: Keep custom patterns
+                        current
+                    </li>
+                    <li>
+                        <strong>Document decisions</strong>: Record why certain
+                        patterns are excluded
+                    </li>
                 </ol>
 
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 my-8">
-                    <h3 className="text-green-800 dark:text-green-200 mt-0">Next Steps</h3>
+                    <h3 className="text-green-800 dark:text-green-200 mt-0">
+                        Next Steps
+                    </h3>
                     <ul className="text-green-700 dark:text-green-300 space-y-2">
-                        <li><Link href="/docs/configuration" className="hover:text-green-900 dark:hover:text-green-100">Configuration Reference</Link>: Detailed explanation of all configuration options</li>
-                        <li><Link href="/docs/patterns" className="hover:text-green-900 dark:hover:text-green-100">Pattern Reference</Link>: Complete list of built-in patterns and how to create custom ones</li>
-                        <li><Link href="/docs/ci" className="hover:text-green-900 dark:hover:text-green-100">CI/CD Examples</Link>: Real-world usage examples and integrations</li>
+                        <li>
+                            <Link
+                                href="/docs/configuration"
+                                className="hover:text-green-900 dark:hover:text-green-100"
+                            >
+                                Configuration Reference
+                            </Link>
+                            : Detailed explanation of all configuration options
+                        </li>
+                        <li>
+                            <Link
+                                href="/docs/patterns"
+                                className="hover:text-green-900 dark:hover:text-green-100"
+                            >
+                                Pattern Reference
+                            </Link>
+                            : Complete list of built-in patterns and how to
+                            create custom ones
+                        </li>
+                        <li>
+                            <Link
+                                href="/docs/ci"
+                                className="hover:text-green-900 dark:hover:text-green-100"
+                            >
+                                CI/CD Examples
+                            </Link>
+                            : Real-world usage examples and integrations
+                        </li>
                     </ul>
                 </div>
             </div>
         </DocsLayout>
-    )
+    );
 }

@@ -1,74 +1,92 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface Section {
-    id: string
-    title: string
+    id: string;
+    title: string;
 }
 
 interface DocsLayoutProps {
-    children: React.ReactNode
-    sections: Section[]
-    title: string
+    children: React.ReactNode;
+    sections: Section[];
+    title: string;
 }
 
 const docPages = [
     { href: "/docs/getting-started", title: "Getting Started", icon: "⚡" },
     { href: "/docs/user-guide", title: "User Guide", icon: "📖" },
     { href: "/docs/configuration", title: "Configuration", icon: "⚙️" },
+    {
+        href: "/docs/github-integration",
+        title: "GitHub Integration",
+        icon: "🐙",
+    },
     { href: "/docs/patterns", title: "Pattern Reference", icon: "🔍" },
     { href: "/docs/basic-usage", title: "Basic Usage", icon: "🚀" },
     { href: "/docs/ci", title: "CI/CD Integration", icon: "🔧" },
-    { href: "/docs/contributing", title: "Contributing", icon: "🤝" }
-]
+    { href: "/docs/contributing", title: "Contributing", icon: "🤝" },
+];
 
 export default function DocsLayout({ children, sections }: DocsLayoutProps) {
-    const pathname = usePathname()
-    const [activeSection, setActiveSection] = useState("")
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const pathname = usePathname();
+    const [activeSection, setActiveSection] = useState("");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 // Sort entries by their position and find the most visible one
-                const visibleEntries = entries.filter(entry => entry.isIntersecting);
-                
+                const visibleEntries = entries.filter(
+                    (entry) => entry.isIntersecting,
+                );
+
                 if (visibleEntries.length > 0) {
                     // Find the entry with the highest intersection ratio
-                    const mostVisible = visibleEntries.reduce((prev, current) => {
-                        return current.intersectionRatio > prev.intersectionRatio ? current : prev;
-                    });
-                    
+                    const mostVisible = visibleEntries.reduce(
+                        (prev, current) => {
+                            return current.intersectionRatio >
+                                prev.intersectionRatio
+                                ? current
+                                : prev;
+                        },
+                    );
+
                     setActiveSection(mostVisible.target.id);
                 } else {
                     // If no sections are visible, find the closest one to the top
-                    const elementsWithDistance = sections.map(({ id }) => {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            const rect = element.getBoundingClientRect();
-                            return {
-                                id,
-                                distance: Math.abs(rect.top - 120) // 120px is our header offset
-                            };
-                        }
-                        return { id, distance: Infinity };
-                    }).filter(item => item.distance !== Infinity);
-                    
+                    const elementsWithDistance = sections
+                        .map(({ id }) => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                                const rect = element.getBoundingClientRect();
+                                return {
+                                    id,
+                                    distance: Math.abs(rect.top - 120), // 120px is our header offset
+                                };
+                            }
+                            return { id, distance: Infinity };
+                        })
+                        .filter((item) => item.distance !== Infinity);
+
                     if (elementsWithDistance.length > 0) {
-                        const closest = elementsWithDistance.reduce((prev, current) => {
-                            return current.distance < prev.distance ? current : prev;
-                        });
+                        const closest = elementsWithDistance.reduce(
+                            (prev, current) => {
+                                return current.distance < prev.distance
+                                    ? current
+                                    : prev;
+                            },
+                        );
                         setActiveSection(closest.id);
                     }
                 }
             },
-            { 
+            {
                 rootMargin: "-120px 0px -60% 0px", // Account for header and better detection
-                threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
-            }
+                threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+            },
         );
 
         // Wait for DOM to be fully ready and set initial active section
@@ -79,7 +97,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                     observer.observe(element);
                 }
             });
-            
+
             // Set initial active section based on scroll position
             if (sections.length > 0) {
                 const firstVisibleSection = sections.find(({ id }) => {
@@ -90,7 +108,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                     }
                     return false;
                 });
-                
+
                 if (firstVisibleSection) {
                     setActiveSection(firstVisibleSection.id);
                 } else {
@@ -110,17 +128,18 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
         if (element) {
             const headerOffset = 120; // Account for fixed header and padding
             const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
+            const offsetPosition =
+                elementPosition + window.pageYOffset - headerOffset;
+
             // Update active section immediately for better UX
             setActiveSection(id);
-            
+
             // Smooth scroll to the element
             window.scrollTo({
                 top: Math.max(0, offsetPosition), // Ensure we don't scroll above the page
-                behavior: "smooth"
+                behavior: "smooth",
             });
-            
+
             // Focus the element for accessibility
             setTimeout(() => {
                 element.focus({ preventScroll: true });
@@ -136,20 +155,32 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 shadow-lg"
                 >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
                     </svg>
                 </button>
             </div>
 
             <div className="flex">
                 {/* Left Sidebar - Documentation Navigation */}
-                <aside className={`
+                <aside
+                    className={`
                     fixed lg:sticky top-0 left-0 z-40 w-64 h-screen pt-20 
                     bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
                     transform lg:transform-none transition-transform duration-300 ease-in-out
                     ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-                `}>
+                `}
+                >
                     <div className="h-full px-3 pb-4 overflow-y-auto">
                         <div className="space-y-2 font-medium">
                             {/* Back to Docs Homepage */}
@@ -160,7 +191,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                                 <span className="mr-2">←</span>
                                 <span>Back to Docs Homepage</span>
                             </Link>
-                            
+
                             <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Documentation
                             </div>
@@ -170,13 +201,16 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                                     href={page.href}
                                     className={`
                                         flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors
-                                        ${pathname === page.href 
-                                            ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-r-2 border-primary-500" 
-                                            : "text-gray-700 dark:text-gray-300"
+                                        ${
+                                            pathname === page.href
+                                                ? "bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-r-2 border-primary-500"
+                                                : "text-gray-700 dark:text-gray-300"
                                         }
                                     `}
                                 >
-                                    <span className="mr-3 text-lg">{page.icon}</span>
+                                    <span className="mr-3 text-lg">
+                                        {page.icon}
+                                    </span>
                                     <span className="flex-1">{page.title}</span>
                                 </Link>
                             ))}
@@ -205,12 +239,16 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                                         {sections.map((section) => (
                                             <button
                                                 key={section.id}
-                                                onClick={() => scrollToSection(section.id)}
+                                                onClick={() =>
+                                                    scrollToSection(section.id)
+                                                }
                                                 className={`
                                                     block w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-200
-                                                    ${activeSection === section.id
-                                                        ? "text-primary-700 dark:text-primary-300 font-medium border-l-2 border-primary-500 bg-primary-50 dark:bg-primary-900/30"
-                                                        : "text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                    ${
+                                                        activeSection ===
+                                                        section.id
+                                                            ? "text-primary-700 dark:text-primary-300 font-medium border-l-2 border-primary-500 dark:bg-primary-900/30"
+                                                            : "text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                                                     }
                                                 `}
                                             >
@@ -233,5 +271,5 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                 />
             )}
         </div>
-    )
+    );
 }
