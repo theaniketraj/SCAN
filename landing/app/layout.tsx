@@ -5,17 +5,19 @@ import Script from "next/script";
 import ThemeProvider from "../components/ThemeProvider";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { baseMetadata } from "../lib/metadata";
+import {
+    generateOrganizationSchema,
+    generateSoftwareApplicationSchema,
+} from "../lib/structured-data";
 
-export const metadata = {
-    title: "SCAN - Secret detection for Gradle builds",
-    description:
-        "Catch API keys, tokens and credentials before they reach source control.",
-    viewport: {
-        width: "device-width",
-        initialScale: 1,
-        maximumScale: 5,
-        userScalable: true,
-    },
+export const metadata = baseMetadata;
+
+export const viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
 };
 
 export default function RootLayout({
@@ -23,8 +25,37 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const organizationSchema = generateOrganizationSchema();
+    const softwareSchema = generateSoftwareApplicationSchema();
+
     return (
         <html lang="en" className="dark" suppressHydrationWarning>
+            <head>
+                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link
+                    rel="icon"
+                    href="/icon.svg"
+                    type="image/svg+xml"
+                    sizes="any"
+                />
+                <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+                <link rel="manifest" href="/manifest.json" />
+                <meta name="theme-color" content="#1e293b" />
+                <Script
+                    id="schema-org-organization"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(organizationSchema),
+                    }}
+                />
+                <Script
+                    id="schema-org-software"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(softwareSchema),
+                    }}
+                />
+            </head>
             <body className="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300">
                 <Script
                     id="theme-no-flash"

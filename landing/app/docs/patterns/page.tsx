@@ -1,6 +1,21 @@
 import React from "react";
 import Link from "next/link";
 import DocsLayout from "../../../components/DocsLayout";
+import { generatePageMetadata } from "../../../lib/metadata";
+
+export const metadata = generatePageMetadata({
+    title: "Pattern Reference - SCAN Gradle Plugin",
+    description:
+        "Complete pattern reference for SCAN Gradle Plugin. Explore built-in patterns for API keys, tokens, database credentials, cloud services, and learn how to create custom patterns.",
+    path: "/docs/patterns",
+    keywords: [
+        "scan patterns",
+        "secret patterns",
+        "custom patterns",
+        "API key detection",
+        "pattern reference",
+    ],
+});
 
 export default function PatternsPage() {
     const sections = [

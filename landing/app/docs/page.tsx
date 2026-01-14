@@ -1,8 +1,38 @@
 import React from "react";
 import Link from "next/link";
+import Script from "next/script";
+import { generatePageMetadata } from "../../lib/metadata";
+import { generateBreadcrumbSchema } from "../../lib/structured-data";
+
+export const metadata = generatePageMetadata({
+    title: "Documentation - SCAN Gradle Plugin",
+    description:
+        "Complete documentation for SCAN Gradle Plugin including installation, configuration, pattern reference, CI/CD integration, and GitHub integration guides.",
+    path: "/docs",
+    keywords: [
+        "scan documentation",
+        "gradle plugin docs",
+        "installation guide",
+        "configuration reference",
+        "CI/CD integration",
+    ],
+});
 
 export default function DocsIndex() {
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: "Home", url: "https://theaniketraj.github.io/scan" },
+        { name: "Documentation", url: "https://theaniketraj.github.io/scan/docs" },
+    ]);
+
     return (
+        <>
+            <Script
+                id="schema-breadcrumb"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(breadcrumbSchema),
+                }}
+            />
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-4xl">
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>Documentation</h1>
@@ -252,5 +282,6 @@ export default function DocsIndex() {
                 </div>
             </div>
         </div>
+        </>
     );
 }

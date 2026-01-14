@@ -1,5 +1,14 @@
 import React from "react";
 import Link from "next/link";
+import { generatePageMetadata } from "../../lib/metadata";
+
+export const metadata = generatePageMetadata({
+    title: "Blog - SCAN Gradle Plugin",
+    description:
+        "Latest news, updates, and articles about SCAN Gradle Plugin. Learn about security best practices, new features, and tips for detecting secrets in your codebase.",
+    path: "/blog",
+    keywords: ["scan blog", "security news", "plugin updates", "security tips"],
+});
 
 export default function BlogIndex() {
     return (

@@ -1,6 +1,21 @@
 import React from "react";
 import Link from "next/link";
 import DocsLayout from "../../../components/DocsLayout";
+import { generatePageMetadata } from "../../../lib/metadata";
+
+export const metadata = generatePageMetadata({
+    title: "Configuration Reference - SCAN Gradle Plugin",
+    description:
+        "Complete configuration reference for SCAN Gradle Plugin. Learn about scan settings, output configuration, pattern customization, performance tuning, and file exclusions.",
+    path: "/docs/configuration",
+    keywords: [
+        "scan configuration",
+        "gradle plugin settings",
+        "custom patterns",
+        "performance tuning",
+        "file exclusions",
+    ],
+});
 
 export default function ConfigurationPage() {
     const sections = [

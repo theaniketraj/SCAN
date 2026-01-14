@@ -1,8 +1,30 @@
 import React from "react";
 import Link from "next/link";
+import Script from "next/script";
 import DocsLayout from "../../../components/DocsLayout";
+import { generatePageMetadata } from "../../../lib/metadata";
+import { generateBreadcrumbSchema } from "../../../lib/structured-data";
+
+export const metadata = generatePageMetadata({
+    title: "Getting Started - SCAN Gradle Plugin",
+    description:
+        "Quick setup guide for SCAN Gradle Plugin. Learn how to install, configure, and run your first security scan in minutes. Includes requirements, installation steps, and basic configuration.",
+    path: "/docs/getting-started",
+    keywords: [
+        "quick start",
+        "installation guide",
+        "setup scan",
+        "first scan",
+        "gradle plugin installation",
+    ],
+});
 
 export default function GettingStartedPage() {
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: "Home", url: "https://theaniketraj.github.io/scan" },
+        { name: "Documentation", url: "https://theaniketraj.github.io/scan/docs" },
+        { name: "Getting Started", url: "https://theaniketraj.github.io/scan/docs/getting-started" },
+    ]);
     const sections = [
         { id: "introduction", title: "Introduction" },
         { id: "requirements", title: "Requirements" },
@@ -14,8 +36,16 @@ export default function GettingStartedPage() {
     ];
 
     return (
-        <DocsLayout sections={sections} title="Getting Started">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
+        <>
+            <Script
+                id="schema-breadcrumb"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(breadcrumbSchema),
+                }}
+            />
+            <DocsLayout sections={sections} title="Getting Started">
+                <div className="prose prose-lg dark:prose-invert max-w-none">
                 <h1>Getting Started</h1>
                 <p className="text-xl text-gray-600 dark:text-gray-300">
                     Get up and running with SCAN in minutes. This guide will
@@ -445,5 +475,6 @@ BUILD FAILED`}</code>
                 </section>
             </div>
         </DocsLayout>
+        </>
     );
 }

@@ -1,6 +1,21 @@
 import React from "react";
 import Link from "next/link";
 import DocsLayout from "../../../components/DocsLayout";
+import { generatePageMetadata } from "../../../lib/metadata";
+
+export const metadata = generatePageMetadata({
+    title: "User Guide - SCAN Gradle Plugin",
+    description:
+        "Comprehensive user guide for SCAN Gradle Plugin covering installation, configuration, pattern understanding, CI integration, and best practices for secret detection.",
+    path: "/docs/user-guide",
+    keywords: [
+        "scan user guide",
+        "how to use scan",
+        "best practices",
+        "CI integration",
+        "troubleshooting",
+    ],
+});
 
 export default function UserGuidePage() {
     const sections = [
