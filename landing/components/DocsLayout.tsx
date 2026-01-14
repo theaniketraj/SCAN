@@ -150,10 +150,11 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900">
             {/* Mobile menu button */}
-            <div className="lg:hidden fixed top-20 left-4 z-50">
+            <div className="lg:hidden fixed top-16 sm:top-20 left-2 sm:left-4 z-50">
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 shadow-lg"
+                    aria-label="Toggle navigation menu"
                 >
                     <svg
                         className="w-5 h-5"
@@ -165,7 +166,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M4 6h16M4 12h16M4 18h16"
+                            d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
                         />
                     </svg>
                 </button>
@@ -175,7 +176,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                 {/* Left Sidebar - Documentation Navigation */}
                 <aside
                     className={`
-                    fixed lg:sticky top-0 left-0 z-40 w-64 h-screen pt-20 
+                    fixed lg:sticky top-0 left-0 z-40 w-64 h-screen pt-16 sm:pt-20 
                     bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
                     transform lg:transform-none transition-transform duration-300 ease-in-out
                     ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -187,6 +188,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                             <Link
                                 href="/docs"
                                 className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm border-b border-gray-200 dark:border-gray-700 mb-3"
+                                onClick={() => setSidebarOpen(false)}
                             >
                                 <span className="mr-2">←</span>
                                 <span>Back to Docs Homepage</span>
@@ -207,11 +209,12 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                                                 : "text-gray-700 dark:text-gray-300"
                                         }
                                     `}
+                                    onClick={() => setSidebarOpen(false)}
                                 >
                                     <span className="mr-3 text-lg">
                                         {page.icon}
                                     </span>
-                                    <span className="flex-1">{page.title}</span>
+                                    <span className="flex-1 text-sm sm:text-base">{page.title}</span>
                                 </Link>
                             ))}
                         </div>
@@ -219,12 +222,14 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-1 lg:ml-0">
-                    <div className="flex">
+                <main className="flex-1 lg:ml-0 w-full">
+                    <div className="flex flex-col xl:flex-row">
                         {/* Content Area */}
-                        <div className="flex-1 min-w-0">
-                            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl">
-                                {children}
+                        <div className="flex-1 min-w-0 w-full">
+                            <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 sm:pt-20 lg:pt-8">
+                                <div className="max-w-4xl mx-auto">
+                                    {children}
+                                </div>
                             </div>
                         </div>
 

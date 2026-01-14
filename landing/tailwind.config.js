@@ -19,6 +19,11 @@ module.exports = {
                 md: "768px",
                 lg: "1024px",
                 xl: "1280px",
+                "2xl": "1536px",
+            },
+            maxWidth: {
+                '8xl': '88rem',
+                '9xl': '96rem',
             },
         },
     },

@@ -129,6 +129,88 @@ div.prose :not(pre) > code::after,
     }
 }
 
+/* Mobile prose content improvements */
+@media (max-width: 768px) {
+    /* Reduce prose font size on mobile */
+    .prose {
+        font-size: 0.9375rem !important; /* 15px */
+    }
+
+    .prose h1 {
+        font-size: 1.75rem !important; /* 28px */
+        line-height: 2rem !important;
+    }
+
+    .prose h2 {
+        font-size: 1.5rem !important; /* 24px */
+        line-height: 1.75rem !important;
+    }
+
+    .prose h3 {
+        font-size: 1.25rem !important; /* 20px */
+        line-height: 1.5rem !important;
+    }
+
+    .prose h4 {
+        font-size: 1.125rem !important; /* 18px */
+        line-height: 1.5rem !important;
+    }
+
+    /* Ensure images scale properly */
+    .prose img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Tables should scroll horizontally on mobile */
+    .prose table {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Lists with better mobile spacing */
+    .prose ul,
+    .prose ol {
+        padding-left: 1.25rem !important;
+    }
+
+    /* Better spacing for list items */
+    .prose li {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Blockquotes */
+    .prose blockquote {
+        padding-left: 1rem !important;
+        font-size: 0.9375rem !important;
+    }
+}
+
+/* Ensure wide content doesn't break layout */
+.prose {
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+}
+
+/* Max width for prose images and videos */
+.prose img,
+.prose video,
+.prose iframe {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Ensure divs inside prose don't overflow */
+.prose > div,
+.prose div {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
