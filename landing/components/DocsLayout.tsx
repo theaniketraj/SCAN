@@ -30,6 +30,52 @@ const docPages = [
     { href: "/docs/contributing", title: "Contributing", icon: "🤝" },
 ];
 
+function PrevNextNav({ pathname }: { pathname: string }) {
+    const normalizedPath = pathname.replace(/\/$/, "");
+    const currentIndex = docPages.findIndex((p) => p.href === normalizedPath);
+    const prev = currentIndex > 0 ? docPages[currentIndex - 1] : null;
+    const next = currentIndex < docPages.length - 1 ? docPages[currentIndex + 1] : null;
+
+    if (!prev && !next) return null;
+
+    return (
+        <nav className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
+            <div className="flex-1 flex justify-start">
+                {prev && (
+                    <Link
+                        href={prev.href}
+                        className="group flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                    >
+                        <span className="text-gray-400 group-hover:text-primary-500 transition-colors mt-0.5">←</span>
+                        <div>
+                            <div className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Previous</div>
+                            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                {prev.icon} {prev.title}
+                            </div>
+                        </div>
+                    </Link>
+                )}
+            </div>
+            <div className="flex-1 flex justify-end">
+                {next && (
+                    <Link
+                        href={next.href}
+                        className="group flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-right"
+                    >
+                        <div>
+                            <div className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Next</div>
+                            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                {next.title} {next.icon}
+                            </div>
+                        </div>
+                        <span className="text-gray-400 group-hover:text-primary-500 transition-colors mt-0.5">→</span>
+                    </Link>
+                )}
+            </div>
+        </nav>
+    );
+}
+
 export default function DocsLayout({ children, sections }: DocsLayoutProps) {
     const pathname = usePathname();
     const [activeSection, setActiveSection] = useState("");
@@ -229,6 +275,7 @@ export default function DocsLayout({ children, sections }: DocsLayoutProps) {
                             <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 sm:pt-20 lg:pt-8">
                                 <div className="max-w-4xl mx-auto">
                                     {children}
+                                    <PrevNextNav pathname={pathname} />
                                 </div>
                             </div>
                         </div>
