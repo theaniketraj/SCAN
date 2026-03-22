@@ -1,3 +1,4 @@
+export const dynamic = "force-static";
 export default function manifest() {
     return {
         name: "SCAN - Secret Detection for Gradle Builds",

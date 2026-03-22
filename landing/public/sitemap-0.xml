@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://theaniketraj.github.io/SCAN/manifest.webmanifest/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/contributing/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/github-integration/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/user-guide/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/getting-started/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/robots.txt/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/patterns/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/configuration/</loc><lastmod>2026-03-22T20:18:18.823Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/sitemap.xml/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/blog/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/ci/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/docs/basic-usage/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/blog/posts/intro/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://theaniketraj.github.io/SCAN/</loc><lastmod>2026-03-22T20:18:18.824Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+</urlset>

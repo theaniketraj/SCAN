@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://theaniketraj.github.io/SCAN/
+
+# Sitemaps
+Sitemap: https://theaniketraj.github.io/SCAN/sitemap.xml
