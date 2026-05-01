@@ -14,14 +14,14 @@ snakeyaml = "2.2"
 kaml = "0.61.0"
 
 # JSON Processing
-jackson = "2.17.2"
+jackson = "2.21.3"
 kotlinxJson = "1.7.1"
 
 # Testing Framework
 junit = "5.10.3"
 kotest = "5.9.1"
 mockk = "1.13.12"
-assertj = "3.26.3"
+assertj = "3.27.7"
 
 # Logging
 slf4j = "2.0.13"
@@ -30,17 +30,17 @@ logback = "1.5.6"
 # Utilities
 commons-io = "2.16.1"
 commons-codec = "1.17.1"
-commons-lang3 = "3.15.0"
+commons-lang3 = "3.18.0"
 guava = "33.2.1-jre"
-commons-text = "1.9"
-bouncycastle = "1.77"
-poi = "5.2.5"
+commons-text = "1.10.0"
+bouncycastle = "1.84"
+poi = "5.4.0"
 
 # HTML Generation
 kotlinx-html = "0.11.0"
 
 # File Processing
-apache-tika = "2.9.2"
+apache-tika = "3.3.0"
 
 # Configuration Validation
 konf = "1.1.2"
