@@ -32,9 +32,9 @@ commons-io = "2.16.1"
 commons-codec = "1.17.1"
 commons-lang3 = "3.15.0"
 guava = "33.2.1-jre"
-commons-text = "1.9"
+commons-text = "1.10.0"
 bouncycastle = "1.77"
-poi = "5.2.5"
+poi = "5.4.0"
 
 # HTML Generation
 kotlinx-html = "0.11.0"
