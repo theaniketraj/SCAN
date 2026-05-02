@@ -1,253 +1,210 @@
 [versions]
+# File Processing
+apache-tika = "3.3.0"
+assertj = "3.27.7"
+bouncycastle = "1.84"
+commons-codec = "1.22.0"
+# Utilities
+commons-io = "2.22.0"
+commons-lang3 = "3.20.0"
+commons-text = "1.15.0"
+# Code Quality
+detekt = "1.23.6"
+ktlint = "1.0.1"
+# Documentation
+dokka = "1.9.20"
+guava = "33.6.0-jre"
+# JSON Processing
+jackson = "2.21.3"
+# Performance & Profiling
+jmh = "1.37"
+jmh-gradle-plugin = "0.7.2"
+# Testing Framework
+junit = "6.0.3"
+kaml = "0.104.0"
+# Configuration Validation
+konf = "1.1.2"
+kotest = "5.9.1"
 # Kotlin and Core
-kotlin = "2.0.20"
-kotlinCoroutines = "1.8.1"
-kotlinSerialization = "1.7.1"
-
+kotlin = "2.3.21"
+kotlinCoroutines = "1.10.2"
+kotlinSerialization = "1.11.0"
+# HTML Generation
+kotlinx-html = "0.12.0"
+kotlinxJson = "1.11.0"
+logback = "1.5.32"
+mockk = "1.14.9"
 # Gradle Plugin Development
 # gradleApi = "8.8"
 # gradleTestKit = "8.8"
 pluginPublish = "1.2.1"
-
-# YAML Processing
-snakeyaml = "2.2"
-kaml = "0.61.0"
-
-# JSON Processing
-jackson = "2.21.3"
-kotlinxJson = "1.7.1"
-
-# Testing Framework
-junit = "5.10.3"
-kotest = "5.9.1"
-mockk = "1.13.12"
-assertj = "3.27.7"
-
+poi = "5.5.1"
 # Logging
-slf4j = "2.0.13"
-logback = "1.5.6"
-
-# Utilities
-commons-io = "2.16.1"
-commons-codec = "1.17.1"
-commons-lang3 = "3.18.0"
-guava = "33.2.1-jre"
-commons-text = "1.10.0"
-bouncycastle = "1.84"
-poi = "5.4.0"
-
-# HTML Generation
-kotlinx-html = "0.11.0"
-
-# File Processing
-apache-tika = "3.3.0"
-
-# Configuration Validation
-konf = "1.1.2"
-
-# Performance & Profiling
-jmh = "1.37"
-jmh-gradle-plugin = "0.7.2"
-
-# Code Quality
-detekt = "1.23.6"
-ktlint = "1.0.1"
+slf4j = "2.0.17"
+# YAML Processing
+snakeyaml = "2.6"
 spotless = "6.25.0"
 
-# Documentation
-dokka = "1.9.20"
-
 [libraries]
-# Kotlin Standard Libraries
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-
-# Kotlin Coroutines
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
-kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinCoroutines" }
-
-# Kotlin Serialization
-kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinSerialization" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxJson" }
-
-# YAML Processing
-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
-kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-
+# File Processing
+apache-tika-core = { module = "org.apache.tika:tika-core", version.ref = "apache-tika" }
+apache-tika-parsers = { module = "org.apache.tika:tika-parsers-standard-package", version.ref = "apache-tika" }
+# Testing - AssertJ
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+# Utilities
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 # JSON Processing
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
-
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+# Performance & Benchmarking
+jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
+jmh-generator-annprocess = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
 # Testing - JUnit 5
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-
-# Testing - Kotest
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
-
-# Testing - Mockk
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-mockk-jvm = { module = "io.mockk:mockk-jvm", version.ref = "mockk" }
-
-# Testing - AssertJ
-assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-
-# Logging
-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
-
-# Utilities
-commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
-commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
-commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
-bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
-
-# HTML Generation
-kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinx-html" }
-
-# File Processing
-apache-tika-core = { module = "org.apache.tika:tika-core", version.ref = "apache-tika" }
-apache-tika-parsers = { module = "org.apache.tika:tika-parsers-standard-package", version.ref = "apache-tika" }
-tika-parser-pdf-module = { module = "org.apache.tika:tika-parser-pdf-module", version.ref = "apache-tika" }
-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
-
+kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 # Configuration Management
 konf-core = { module = "com.uchuhimo:konf-core", version.ref = "konf" }
 konf-yaml = { module = "com.uchuhimo:konf-yaml", version.ref = "konf" }
-
-# Performance & Benchmarking
-jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
-jmh-generator-annprocess = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-datatest = "io.kotest:kotest-framework-datatest:5.9.1"
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+# Testing - Kotest
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+# Kotlin Standard Libraries
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+# Kotlin Coroutines
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinCoroutines" }
+# HTML Generation
+kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version.ref = "kotlinx-html" }
+# Kotlin Serialization
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinSerialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxJson" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+logback-core = { module = "ch.qos.logback:logback-core", version.ref = "logback" }
+# Testing - Mockk
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-jvm = { module = "io.mockk:mockk-jvm", version.ref = "mockk" }
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
+# Logging
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+# YAML Processing
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+tika-parser-pdf-module = { module = "org.apache.tika:tika-parser-pdf-module", version.ref = "apache-tika" }
 
 [bundles]
-# Kotlin Core Bundle
-kotlin-core = [
-    "kotlin-stdlib",
-    "kotlin-stdlib-jdk8",
-    "kotlin-reflect"
+# Apache Commons Bundle
+commons = [
+    "commons-codec",
+    "commons-io",
+    "commons-lang3",
 ]
-
-# Kotlin Coroutines Bundle
-kotlin-coroutines = [
-    "kotlinx-coroutines-core",
-    "kotlinx-coroutines-jdk8"
+# Configuration Management Bundle
+config = [
+    "kaml",
+    "konf-core",
+    "konf-yaml",
 ]
-
-# Kotlin Serialization Bundle
-kotlin-serialization = [
-    "kotlinx-serialization-core",
-    "kotlinx-serialization-json"
+# File Processing Bundle
+file-processing = [
+    "apache-tika-core",
+    "apache-tika-parsers",
 ]
-
 # Jackson JSON Bundle
 jackson = [
     "jackson-core",
     "jackson-databind",
+    "jackson-dataformat-yaml",
     "jackson-module-kotlin",
-    "jackson-dataformat-yaml"
 ]
-
 # JUnit 5 Testing Bundle
 junit5 = [
     "junit-jupiter",
     "junit-jupiter-api",
     "junit-jupiter-engine",
-    "junit-jupiter-params"
+    "junit-jupiter-params",
 ]
-
 # Kotest Testing Bundle
 kotest = [
-    "kotest-runner-junit5",
     "kotest-assertions-core",
+    "kotest-framework-datatest",
     "kotest-property",
-    "kotest-framework-datatest"
+    "kotest-runner-junit5",
 ]
-
+# Kotlin Core Bundle
+kotlin-core = [
+    "kotlin-reflect",
+    "kotlin-stdlib",
+    "kotlin-stdlib-jdk8",
+]
+# Kotlin Coroutines Bundle
+kotlin-coroutines = [
+    "kotlinx-coroutines-core",
+    "kotlinx-coroutines-jdk8",
+]
+# Kotlin Serialization Bundle
+kotlin-serialization = [
+    "kotlinx-serialization-core",
+    "kotlinx-serialization-json",
+]
+# Logging Bundle
+logging = [
+    "logback-classic",
+    "logback-core",
+    "slf4j-api",
+]
 # Mockk Testing Bundle
 mockk = [
     "mockk",
-    "mockk-jvm"
+    "mockk-jvm",
 ]
-
-# Logging Bundle
-logging = [
-    "slf4j-api",
-    "logback-classic",
-    "logback-core"
-]
-
-# Apache Commons Bundle
-commons = [
-    "commons-io",
-    "commons-codec",
-    "commons-lang3"
-]
-
-# Configuration Management Bundle
-config = [
-    "konf-core",
-    "konf-yaml",
-    "kaml"
-]
-
-# File Processing Bundle
-file-processing = [
-    "apache-tika-core",
-    "apache-tika-parsers"
-]
-
 # Performance Testing Bundle
 performance = [
     "jmh-core",
-    "jmh-generator-annprocess"
+    "jmh-generator-annprocess",
 ]
-
 # Full Testing Bundle (combines all testing libraries)
 testing = [
+    "assertj-core",
     "junit-jupiter",
     "junit-jupiter-api",
     "junit-jupiter-engine",
     "junit-jupiter-params",
-    "kotest-runner-junit5",
     "kotest-assertions-core",
-    "kotest-property",
     "kotest-framework-datatest",
+    "kotest-property",
+    "kotest-runner-junit5",
     "mockk",
     "mockk-jvm",
-    "assertj-core"
 ]
 
 [plugins]
-# Kotlin Plugins
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
+dependency-analysis = "com.autonomousapps.dependency-analysis:2.1.4"
+# Code Quality
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+# Documentation
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 # Gradle Plugin Development
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 java-gradle-plugin = { id = "java-gradle-plugin" }
-
-# Documentation
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-
-# Code Quality
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-
 # Performance
 jmh = { id = "me.champeau.jmh", version.ref = "jmh-gradle-plugin" }
-
+# Kotlin Plugins
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 # Build Tools
-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
-dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version = "2.1.4" }
+versions = "com.github.ben-manes.versions:0.51.0"

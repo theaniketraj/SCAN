@@ -3,6 +3,7 @@ package com.scan.detectors
 import com.scan.core.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.nio.file.Paths
 
@@ -34,7 +35,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // API key patterns should be detected if configured
     }
 
@@ -56,7 +57,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Password patterns should be detected if configured
     }
 
@@ -82,7 +83,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Private key patterns should be detected if configured
     }
 
@@ -102,7 +103,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         assertTrue(findings.isEmpty())
     }
 
@@ -131,7 +132,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Should process multi-line content correctly
     }
 
@@ -153,17 +154,17 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Should handle unsupported file types gracefully
     }
 
     @Test
     @DisplayName("Should validate detector properties")
     fun shouldValidateDetectorProperties() {
-        assertNotNull(detector.detectorId)
-        assertNotNull(detector.detectorName)
-        assertNotNull(detector.version)
-        assertNotNull(detector.supportedFileTypes)
+        org.junit.jupiter.api.Assertions.assertNotNull(detector.detectorId)
+        org.junit.jupiter.api.Assertions.assertNotNull(detector.detectorName)
+        org.junit.jupiter.api.Assertions.assertNotNull(detector.version)
+        org.junit.jupiter.api.Assertions.assertNotNull(detector.supportedFileTypes)
     }
 
     @Test
@@ -184,7 +185,7 @@ class PatternDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Test files should be handled according to detector configuration
     }
 }

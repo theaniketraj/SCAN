@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
     alias(libs.plugins.dependency.analysis)
+    id("nl.littlerobots.version-catalog-update") version "1.1.0"
 }
 
 group = "io.github.theaniketraj"
@@ -90,12 +91,12 @@ gradlePlugin {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "21"
-        freeCompilerArgs += listOf(
-            "-Xopt-in=kotlin.RequiresOptIn",
-            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        freeCompilerArgs.addAll(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
         )
     }
 }
@@ -145,6 +146,11 @@ detekt {
     baseline = file("${rootProject.projectDir}/config/detekt/baseline.xml")
     buildUponDefaultConfig = true
     allRules = false
+}
+
+// Configure detekt tasks to use correct JVM target
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
 
     reports {
         html.required.set(true)
@@ -152,11 +158,6 @@ detekt {
         sarif.required.set(true)
         sarif.outputLocation.set(file("build/reports/detekt/detekt.sarif"))
     }
-}
-
-// Configure detekt tasks to use correct JVM target
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-    jvmTarget = "21"
 } // Documentation
 tasks.dokkaHtml.configure {
     outputDirectory.set(layout.buildDirectory.dir("dokka"))

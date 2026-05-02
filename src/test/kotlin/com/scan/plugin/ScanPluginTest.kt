@@ -48,7 +48,7 @@ class ScanPluginTest {
 
         // Then
         val extension = project.extensions.findByName("scan")
-        assertNotNull(extension)
+        org.junit.jupiter.api.Assertions.assertNotNull(extension)
         assertTrue(extension is ScanExtension)
     }
 
@@ -59,7 +59,7 @@ class ScanPluginTest {
 
         // Then
         val task = project.tasks.findByName("scanForSecrets")
-        assertNotNull(task)
+        org.junit.jupiter.api.Assertions.assertNotNull(task)
         assertTrue(task is ScanTask)
     }
 

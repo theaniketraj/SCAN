@@ -5,6 +5,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -268,7 +269,7 @@ class EntropyDetectorTest {
             val results = detector.detect(context)
 
             // Binary content detection depends on implementation
-            assertNotNull(results, "Should return results without throwing exception")
+            org.junit.jupiter.api.Assertions.assertNotNull(results, "Should return results without throwing exception")
         }
     }
 
@@ -426,7 +427,7 @@ class EntropyDetectorTest {
             val results = customDetector.detect(context)
 
             // Results should vary based on threshold
-            assertNotNull(results, "Should return results for threshold $threshold")
+            org.junit.jupiter.api.Assertions.assertNotNull(results, "Should return results for threshold $threshold")
         }
     }
 

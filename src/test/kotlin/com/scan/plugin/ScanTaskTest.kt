@@ -6,6 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
@@ -71,10 +72,10 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.skipped)
         assertTrue(result.didWork == false || result.skipped)
-        assertNotNull(result.summary)
+        org.junit.jupiter.api.Assertions.assertNotNull(result.summary)
         assertEquals(0, result.summary.totalFilesScanned)
     }
 
@@ -87,7 +88,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals("build/custom-reports", extension.reportPath.get())
     }
 
@@ -97,7 +98,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.summary.totalFilesScanned >= 0)
     }
 
@@ -110,7 +111,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(extension.includePatterns.get().contains("**/*.kt"))
     }
 
@@ -123,7 +124,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(extension.excludePatterns.get().contains("**/*.test"))
     }
 
@@ -137,7 +138,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals(2, extension.includePatterns.get().size)
         assertEquals(2, extension.excludePatterns.get().size)
     }
@@ -151,7 +152,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals(5.0, extension.entropyThreshold.get())
     }
 
@@ -164,7 +165,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.summary.totalFilesScanned > 0)
     }
 
@@ -177,7 +178,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals(false, extension.scanTests.get())
     }
 
@@ -191,7 +192,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals(false, extension.failOnFound.get())
     }
 
@@ -204,7 +205,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(extension.reportFormats.get().contains("json"))
         assertTrue(extension.reportFormats.get().contains("html"))
     }
@@ -218,7 +219,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(extension.enabled.get())
     }
 
@@ -232,7 +233,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(extension.includeFiles.get().contains("**/*.kt"))
         assertTrue(extension.excludeFiles.get().contains("**/test/**"))
     }
@@ -246,14 +247,14 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
-        assertNotNull(result.summary)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result.summary)
         assertTrue(result.summary.totalFilesScanned >= 1)
-        assertNotNull(result.findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(result.findings)
 
         if (result.findings.isNotEmpty()) {
             val finding = result.findings.first()
-            assertNotNull(finding)
+            org.junit.jupiter.api.Assertions.assertNotNull(finding)
             assertTrue(finding.isNotEmpty())
         }
     }
@@ -268,7 +269,7 @@ class ScanTaskTest {
         val result = runTask()
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertEquals("scan-results", extension.reportPath.get())
         assertTrue(extension.reportFormats.get().contains("xml"))
     }

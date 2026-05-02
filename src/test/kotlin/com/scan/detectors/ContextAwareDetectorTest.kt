@@ -4,6 +4,7 @@ import com.scan.core.*
 import com.scan.utils.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -46,7 +47,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
 
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Note: Actual detection depends on pattern matching implementation
     }
 
@@ -68,7 +69,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Test files typically have lower confidence findings
     }
 
@@ -88,7 +89,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         assertTrue(findings.isEmpty())
     }
 
@@ -110,7 +111,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // High entropy strings should be detected
     }
 
@@ -132,7 +133,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Binary files should typically be skipped or have fewer findings
     }
 
@@ -154,7 +155,7 @@ class ContextAwareDetectorTest {
 
         val findings = detector.detect(scanContext)
         
-        assertNotNull(findings)
+        org.junit.jupiter.api.Assertions.assertNotNull(findings)
         // Should handle gracefully without throwing exceptions
     }
 }

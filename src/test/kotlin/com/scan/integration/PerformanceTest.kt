@@ -3,6 +3,7 @@ package com.scan.integration
 import com.scan.core.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.io.TempDir
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -55,7 +56,7 @@ class PerformanceTest {
         val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.summary.totalFilesScanned >= 10)
         assertTrue(result.getScanDurationMs() > 0)
     }
@@ -77,7 +78,7 @@ class PerformanceTest {
         val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertNotNull(result.performance)
+        org.junit.jupiter.api.Assertions.assertNotNull(result.performance)
         assertTrue(result.performance.totalDurationMs > 0)
         assertTrue(result.performance.filesPerSecond >= 0)
     }
@@ -105,7 +106,7 @@ class PerformanceTest {
         val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.summary.totalFilesScanned >= 5)
     }
 
@@ -151,7 +152,7 @@ class PerformanceTest {
         val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertNotNull(result)
+        org.junit.jupiter.api.Assertions.assertNotNull(result)
         assertTrue(result.getScanDurationMs() > 0)
     }
 
@@ -174,7 +175,7 @@ class PerformanceTest {
         val result = runBlocking { scanEngine.executeScan(tempDir.toString()) }
 
         // Then
-        assertNotNull(result.performance)
+        org.junit.jupiter.api.Assertions.assertNotNull(result.performance)
         assertTrue(result.performance.filesPerSecond >= 0)
         // Should process at least 1 file per second for simple files
         if (result.summary.totalFilesScanned > 0) {
@@ -201,7 +202,7 @@ class PerformanceTest {
             val result = runBlocking { scanEngine.executeScan(emptyDir.absolutePath) }
             
             // Then
-            assertNotNull(result)
+            org.junit.jupiter.api.Assertions.assertNotNull(result)
             assertEquals(0, result.summary.totalFilesScanned)
         }
 
