@@ -15,7 +15,7 @@ ktlint = "1.0.1"
 dokka = "1.9.20"
 guava = "33.6.0-jre"
 # JSON Processing
-jackson = "2.21.3"
+jackson = "2.22.1"
 # Performance & Profiling
 jmh = "1.37"
 jmh-gradle-plugin = "0.7.2"
